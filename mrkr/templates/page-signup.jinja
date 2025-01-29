@@ -1,0 +1,46 @@
+{% extends "base.jinja" %}
+
+{% block header %}
+<header id="header">
+    <span class="logo">MRKR</span>
+    <span></span>
+    <span></span>
+</header>
+{% endblock %}
+
+{% block main %}
+<main class="main-login" id="main">
+    <!-- todo: replace urls -->
+    <form method="POST" action="/signup">
+        <h1>Nice to meet you! Sign up to use MRKR!</h1>
+        <span></span>
+        <div class="input-wrapper">
+            <label for="input-username">Username</label>
+            <span>At least three lower case letters</span>
+            <input id="input-username" type="text" name="username" autocomplete="nickname"
+                placeholder="Choose a username" autocapitalize="none" required autofocus></input>
+        </div>
+
+        <div class="input-wrapper">
+            <label for="input-email">Email</label>
+            <span>Invalid email address</span>
+            <input id="input-email" type="email" name="email" autocomplete="email" placeholder="Enter your email"
+                required autofocus></input>
+        </div>
+
+        <div class="input-wrapper">
+            <label for="input-password">Password</label>
+            <span>At least 4 characters required</span>
+            <input id="input-password" type="password" name="password" autocomplete="off"
+                placeholder="Enter your password" minlength="4" required></input>
+        </div>
+
+        <span></span>
+
+        <input class="primary" type="submit" value="Sign up"></input>
+
+        <!-- todo: replace urls -->
+        <span>Already have an account? <a class="inline bold" href="/login">Login!</a></span>
+    </form>
+</main>
+{% endblock %}

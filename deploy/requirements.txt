@@ -1,0 +1,8 @@
+bcrypt
+python-multipart
+fastapi
+jinja2
+typer
+psycopg2-binary
+sqlmodel
+uvicorn

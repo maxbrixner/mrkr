@@ -1,0 +1,90 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "build test-database",
+            "command": "docker compose -f deploy/compose.testdb.yaml --env-file .env build",
+            "problemMatcher": [],
+            "group": "test",
+        },
+        {
+            "type": "shell",
+            "label": "run test-database",
+            "dependsOn": [
+                "build database"
+            ],
+            "command": "docker compose -f deploy/compose.testdb.yaml --env-file .env up -d",
+            "problemMatcher": [],
+            "group": "test",
+        },
+        {
+            "type": "shell",
+            "label": "stop test-database",
+            "dependsOn": [
+                "start database"
+            ],
+            "command": "docker compose -f deploy/compose.testdb.yaml --env-file .env down",
+            "problemMatcher": [],
+            "group": "test",
+        },
+        {
+            "type": "shell",
+            "label": "build app",
+            "command": "docker compose -f deploy/compose.app.yaml --env-file .env build",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "type": "shell",
+            "label": "run app (background)",
+            "dependsOn": [
+                "docker-build"
+            ],
+            "command": "docker compose -f deploy/compose.app.yaml --env-file .env up -d",
+            "problemMatcher": [],
+            "group": "test",
+        },
+        {
+            "type": "shell",
+            "label": "run app",
+            "dependsOn": [
+                "docker-build"
+            ],
+            "command": "docker compose -f deploy/compose.app.yaml --env-file .env up",
+            "problemMatcher": [],
+            "group": "test"
+        },
+        {
+            "type": "shell",
+            "label": "enter app bash",
+            "command": "docker compose -f deploy/compose.app.yaml --env-file .env exec app bash",
+            "problemMatcher": [],
+            "group": "test"
+        },
+        {
+            "type": "shell",
+            "label": "stop app",
+            "command": "docker compose -f deploy/compose.app.yaml --env-file .env down",
+            "problemMatcher": [],
+            "group": "test"
+        },
+        {
+            "type": "shell",
+            "label": "prune docker",
+            "command": "docker system prune -a",
+            "problemMatcher": [],
+            "group": "test"
+        },
+        {
+            "type": "shell",
+            "label": "linting",
+            "command": ".venv/bin/mypy --disallow-untyped-defs --disallow-incomplete-defs --disable-error-code=import-untyped mrkr deploy",
+            "problemMatcher": [],
+            "group": "test",
+        }
+    ]
+}

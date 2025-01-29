@@ -1,0 +1,9 @@
+FROM python:3-slim-buster
+
+COPY deploy/requirements.txt /opt/requirements.txt
+RUN pip install -r "/opt/requirements.txt"
+
+RUN mkdir /var/logs
+
+WORKDIR /usr/src/app
+COPY . .

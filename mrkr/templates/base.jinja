@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% block title %}
+    <title>Mrkr</title>
+    {% endblock %}
+
+    <meta charset="utf-8">
+
+    <meta name="description" content="Label your text in images">
+    <meta name="keywords" content="Mrkr, Label, Labeling, AI">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Mrkr">
+    <meta name="apple-touch-startup-image" content="/ico/ico512.png">
+
+    <link rel="icon" type="image/x-icon" href="/img/ico192.png">
+    <link rel="shortcut icon" type="image/x-icon" href="/img/ico192.png">
+    <link rel="mask-icon" href="/img/ico192.png" color="#000000">
+    <link rel="apple-touch-icon" href="/img/ico192.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="preload" href="/static/img/cloud-offline-outline.svg" as="image">
+
+
+    {% block stylesheets %}
+    <link rel="stylesheet" href="/static/css/style.css">
+    {% endblock %}
+
+    {% block scripts %}
+    <script src="/static/js/htmx-2.0.4.js"></script>
+    <script src="/static/js/main.js"></script>
+    {% endblock %}
+</head>
+
+<body id="body">
+
+    {% block header %}
+    {% endblock %}
+
+    {% block main %}
+    {% endblock %}
+
+    <aside class="overlay vertical" id="dialog-overlay">
+        <div class="container dialog" id="dialog-container">
+            <div class="dialog-content" id="dialog-content">
+            </div>
+        </div>
+    </aside>
+
+    <aside class="overlay horizontal" id="sidebar-overlay">
+        <div class="container sidebar" id="sidebar-container">
+            {% block sidebar %}
+            {% endblock %}
+        </div>
+    </aside>
+
+</body>
+
+</html>

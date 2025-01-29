@@ -1,0 +1,63 @@
+{
+    "version": 1,
+    "disable_existing_loggers": false,
+    "formatters": {
+        "simple": {
+            "format": "%(levelname)-8s %(message)s"
+        },
+        "detailed": {
+            "format": "[MRKR | %(levelname)-8s | %(name)-30s] %(message)s",
+            "datefmt": "%Y-%m-%dT%H:%M:%S%z"
+        }
+    },
+    "handlers": {
+        "stdout": {
+            "class": "logging.StreamHandler",
+            "formatter": "detailed",
+            "stream": "ext://sys.stdout"
+        }
+    },
+    "loggers": {
+        "root": {
+            "level": "WARNING",
+            "handlers": [
+                "stdout"
+            ]
+        },
+        "mrkr": {
+            "level": "DEBUG",
+            "handlers": [
+                "stdout"
+            ],
+            "propagate": false
+        },
+        "mrkr.security": {
+            "level": "DEBUG",
+            "handlers": [
+                "stdout"
+            ],
+            "propagate": false
+        },
+        "mrkr.database": {
+            "level": "DEBUG",
+            "handlers": [
+                "stdout"
+            ],
+            "propagate": false
+        },
+        "mrkr.cli": {
+            "level": "DEBUG",
+            "handlers": [
+                "stdout"
+            ],
+            "propagate": false
+        },
+        "mrkr.session": {
+            "level": "DEBUG",
+            "handlers": [
+                "stdout"
+            ],
+            "propagate": false
+        }
+    }
+}

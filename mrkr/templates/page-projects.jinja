@@ -1,0 +1,24 @@
+{% extends "base.jinja" %}
+
+{% block header %}
+<header id="header">
+    <span class="logo">MRKR&nbsp;|&nbsp;</span>
+    <span>Projects</span>
+    <button class="image" id="header-menu-button" aria-label="Open Menu"><img src="/static/img/menu-outline.svg"
+            alt="Hamburger Menu Icon"></button>
+</header>
+{% endblock %}
+
+{% block main %}
+<main class="main-calendar" id="main">
+    Empty
+</main>
+{% endblock %}
+
+{% block sidebar %}
+<div class="sidebar-content" id="sidebar-content">
+    <button class="image" id="sidebar-close-button" aria-label="Close Sidebar"><img src="/static/img/close-outline.svg"
+            alt="Close Icon"></button>
+    <a class="menu" href="{{logout_url}}">Logout</a>
+</div>
+{% endblock %}

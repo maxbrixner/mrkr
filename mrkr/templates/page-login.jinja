@@ -1,0 +1,41 @@
+{% extends "base.jinja" %}
+
+{% block header %}
+<header id="header">
+    <span class="logo">MRKR</span>
+    <span></span>
+    <span></span>
+</header>
+{% endblock %}
+
+{% block main %}
+<main class="main-login" id="main">
+    <form method="POST" action="{{login_url}}">
+        <h1>Welcome back! Glad to see you again!</h1>
+        {% if flash %}
+        <span></span>
+        <div class="flash">{{ flash.user_message }}</div>
+        {% endif %}
+        <span></span>
+        <div class=" input-wrapper">
+            <label for="input-email">Email</label>
+            <span>Invalid email address</span>
+            <input id="input-email" type="email" name="email" autocomplete="email" placeholder="Enter your email"
+                required autofocus></input>
+        </div>
+
+        <div class="input-wrapper">
+            <label for="input-password">Password</label>
+            <span>At least 4 characters required</span>
+            <input id="input-password" type="password" name="password" autocomplete="current-password"
+                placeholder="Enter your password" minlength="4" required></input>
+        </div>
+
+        <span></span>
+
+        <input class="primary" type="submit" value="Login"></input>
+
+        <span>Don't have an account yet? <a class="inline bold" href="{{signup_url}}">Sign up!</a></span>
+    </form>
+</main>
+{% endblock %}
