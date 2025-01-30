@@ -3,9 +3,10 @@
 import sqlmodel
 import sqlalchemy
 import os
+import enum
 import logging
 import datetime
-from typing import Any, Generator, Optional
+from typing import Any, Generator, Optional, List
 from contextlib import contextmanager
 
 # ---------------------------------------------------------------------------- #
@@ -42,6 +43,51 @@ class Session(sqlmodel.SQLModel, table=True):
     flash: Optional[FlashMessage] = sqlmodel.Field(nullable=True)
 
     user: User = sqlmodel.Relationship()
+
+
+class Project(sqlmodel.SQLModel, table=True):
+    __tablename__ = "tproject"
+    id: int = sqlmodel.Field(primary_key=True)
+    name: str = sqlmodel.Field()
+    description: str = sqlmodel.Field()
+    creator_id: int = sqlmodel.Field(foreign_key="tuser.id")
+
+    creator: User = sqlmodel.Relationship()
+
+
+class TaskStatus(str, enum.Enum):
+    open = "OPEN"
+    progress = "PROGRESS"
+    complete = "COMPLETE"
+
+
+class DocumentSource(str, enum.Enum):
+    local = "LOCAL"
+    s3 = "S3"
+
+
+class Task(sqlmodel.SQLModel, table=True):
+    __tablename__ = "ttask"
+    id: int = sqlmodel.Field(primary_key=True)
+    project_id: int = sqlmodel.Field(foreign_key="tproject.id")
+    name: str = sqlmodel.Field()
+    creator_id: int = sqlmodel.Field(foreign_key="tuser.id")
+    created: datetime.datetime = sqlmodel.Field()
+    status: TaskStatus = sqlmodel.Field()
+    source: DocumentSource = sqlmodel.Field()
+
+    project: Project = sqlmodel.Relationship()
+    creator: User = sqlmodel.Relationship()
+
+
+class Document(sqlmodel.SQLModel, table=True):
+    __tablename__ = "tdocument"
+    id: int = sqlmodel.Field(primary_key=True)
+    task_id: int = sqlmodel.Field(foreign_key="ttask.id")
+    filename: str = sqlmodel.Field()
+
+    task: Task = sqlmodel.Relationship()
+
 
 # ---------------------------------------------------------------------------- #
 

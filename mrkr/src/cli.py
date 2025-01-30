@@ -18,7 +18,7 @@ from .config import config
 cli = typer.Typer()
 logger = Logger("mrkr.cli")
 
-dotenv.load_dotenv(".env")
+dotenv.load_dotenv(".env")  # todo
 
 # ---------------------------------------------------------------------------- #
 
@@ -69,6 +69,35 @@ def insert_demo() -> None:
 
         session.add(user)
         session.add(authentication)
+        session.commit()
+
+        project = Project(
+            name="Demo Project",
+            description="A simple demo project.",
+            creator=user
+        )
+
+        session.add(project)
+        session.commit()
+
+        task = Task(
+            project=project,
+            name="Demo Document",
+            creator=user,
+            created=datetime.datetime.now(),
+            status=TaskStatus.open,
+            source=DocumentSource.local
+        )
+
+        session.add(task)
+        session.commit()
+
+        document = Document(
+            task=task,
+            filename="test/document1EN.pdf"
+        )
+
+        session.add(document)
         session.commit()
 
     logger.info("Demo data inserted.")

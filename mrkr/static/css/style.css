@@ -92,10 +92,6 @@ main {
     padding: 2rem;
 }
 
-main {
-    display: grid;
-}
-
 header {
     align-items: center;
     display: grid;
@@ -106,7 +102,7 @@ header {
 
 /* -------------------------------------------------------------------------- */
 
-header>span {
+header>a {
     font-size: 2rem;
     font-weight: 700;
 }
@@ -223,37 +219,6 @@ div.sidebar-content>button {
     grid-column: 2;
 }
 
-
-/* -------------------------------------------------------------------------- */
-
-main.main-login,
-main.main-error {
-    display: flex;
-    justify-content: center;
-}
-
-main.main-login>form,
-main.main-error>div.error-wrapper {
-    padding: 2rem;
-    max-width: 400px;
-    min-width: 320px;
-    display: grid;
-    gap: 1.5rem;
-    grid-auto-rows: min-content;
-}
-
-main.main-error>div.error-wrapper {
-    max-width: 800px;
-}
-
-main.main-login>form>div.flash {
-    color: var(--primary);
-}
-
-main.main-calendar {
-    position: relative;
-}
-
 /* -------------------------------------------------------------------------- */
 
 h1,
@@ -265,6 +230,11 @@ h6 {
     margin: 0;
     padding: 0;
     font-weight: 700;
+}
+
+p {
+    margin: 0;
+    padding: 0;
 }
 
 a {
@@ -508,7 +478,7 @@ button.htmx-swapping:before {
 }
 
 @media (max-width: 800px) {
-    span.logo {
+    a.logo {
         display: none
     }
 
@@ -563,3 +533,49 @@ select:-webkit-autofill:focus {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--scrollbar-hover);
 }
+
+/* -------------------------------------------------------------------------- */
+
+main.main-login,
+main.main-error {
+    display: flex;
+    justify-content: center;
+}
+
+main.main-login>form,
+main.main-error>div.error-wrapper {
+    padding: 2rem;
+    max-width: 400px;
+    min-width: 320px;
+    display: grid;
+    gap: 1.5rem;
+    grid-auto-rows: min-content;
+}
+
+main.main-error>div.error-wrapper {
+    max-width: 800px;
+}
+
+main.main-login>form>div.flash {
+    color: var(--primary);
+}
+
+div.main.projects {
+    display: grid;
+    gap: 1rem;
+}
+
+div.project-card {
+    display: grid;
+    gap: 1rem;
+    background-color: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 1rem;
+    display: grid;
+    overflow: hidden;
+    padding: 2rem;
+    position: relative;
+    max-width: 40rem;
+}
+
+/* -------------------------------------------------------------------------- */

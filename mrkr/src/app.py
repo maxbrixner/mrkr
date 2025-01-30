@@ -16,6 +16,7 @@ from .logging import Logger
 from .config import config
 from .database import Database
 from .session import SessionManager
+from .project import ProjectManager
 
 # ---------------------------------------------------------------------------- #
 
@@ -293,11 +294,48 @@ async def projects_page(
     """
     Display the projects page.
     """
+    manager = ProjectManager(session=session)
+
+    projects = await manager.get_projects()
+
     return templates.TemplateResponse(
         request=session.request,
         name="page-projects.jinja",
         context={
+            "projects_url": app.url_path_for("projects_page"),
             "logout_url": app.url_path_for("logout"),
+            "tasks_url": app.url_path_for("tasks_page"),
+            "timeout": 20000,
+            "swap_delay": 500,
+            "projects": projects,
+
+        }
+    )
+
+# ---------------------------------------------------------------------------- #
+
+
+@app.get("/tasks")
+async def tasks_page(
+    session: AuthHttpSessionDep,
+    project_id: int
+) -> Response:
+    """
+    Display the projects page.
+    """
+    manager = ProjectManager(session=session)
+
+    project = await manager.get_project(project_id=project_id)
+
+    tasks = await manager.get_tasks(project=project)
+
+    return templates.TemplateResponse(
+        request=session.request,
+        name="page-tasks.jinja",
+        context={
+            "logout_url": app.url_path_for("logout"),
+
+            "tasks": tasks
         }
     )
 

@@ -1,17 +1,15 @@
 {% extends "base.jinja" %}
 
-{% block header %}
-<header id="header">
-    <span class="logo">MRKR&nbsp;|&nbsp;</span>
-    <span>Projects</span>
-    <button class="image" id="header-menu-button" aria-label="Open Menu"><img src="/static/img/menu-outline.svg"
-            alt="Hamburger Menu Icon"></button>
-</header>
-{% endblock %}
-
 {% block main %}
-<main class="main-calendar" id="main">
-    Empty
+<main class="main-projects" id="main">
+    {% for project in projects %}
+    <div class="project-card" hx-get="{{tasks_url}}?project_id={{project.id}}" hx-trigger="click"
+        hx-swap="outerHTML swap:{{swap_delay}}ms" hx-target="#main" hx-select="#main" hx-push-url="true"
+        hx-indicator="#dialog-content" hx-request='{"timeout": {{timeout}}}'>
+        <h2>{{project.name}}</h2>
+        <p>{{project.description}}</p>
+    </div>
+    {% endfor %}
 </main>
 {% endblock %}
 
