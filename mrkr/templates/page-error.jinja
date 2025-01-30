@@ -1,5 +1,15 @@
 {% extends "base.jinja" %}
 
+{% block header %}
+<header id="header">
+    <a href="{{projects_url}}" hx-get="{{projects_url}}" hx-trigger="click" hx-swap="outerHTML swap:{{swap_delay}}ms"
+        hx-target="#main" hx-select="#main" hx-push-url="true" hx-indicator="#dialog-content"
+        hx-request='{"timeout": {{timeout}}}' class="logo">MRKR</a>
+    <span></span>
+    <span></span>
+</header>
+{% endblock %}
+
 {% block main %}
 <main class="main-error" id="main">
     <div class="error-wrapper">
