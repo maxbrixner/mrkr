@@ -9,10 +9,10 @@ from PIL import Image
 
 
 class OcrCoordinates(pydantic.BaseModel):
-    left: int
-    top: int
-    width: int
-    height: int
+    left: float
+    top: float
+    width: float
+    height: float
 
 
 class OcrBlock(pydantic.BaseModel):

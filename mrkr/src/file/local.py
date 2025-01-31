@@ -41,18 +41,6 @@ class LocalFileProvider(BaseFileProvider):
 
         return result
 
-    def _get_checksum(self, filename: pathlib.Path) -> str:
-        """
-        Get the checksum of a file.
-        """
-        sha256 = hashlib.sha256()
-
-        with open(filename, "rb") as f:
-            while chunk := f.read(4096):
-                sha256.update(chunk)
-
-        return sha256.hexdigest()
-
     @contextlib.contextmanager
     def read_file(
         self,

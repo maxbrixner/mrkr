@@ -5,6 +5,7 @@ import pydantic
 import contextlib
 import pathlib
 import pdf2image
+import hashlib
 import io
 from typing import List
 from PIL import Image
@@ -72,6 +73,18 @@ class BaseFileProvider():
         except Exception as exception:
             self.logger.exception(exception)
             raise Exception("File '{uri}' could not be read.")
+
+    def get_checksum(self, uri: str) -> str:
+        """
+        Get the checksum of a file.
+        """
+        sha256 = hashlib.sha256()
+
+        with self.get_file(uri=uri) as file:
+            while chunk := file.read(4096):
+                sha256.update(chunk)
+
+        return sha256.hexdigest()
 
     def _read_image_file(
         self,

@@ -228,8 +228,14 @@ class ProjectManager():
 
         ocr_result = ocr_provider.run_ocr(images=images)
 
-        print(ocr_result)
+        result = OcrResult(
+            etag=task.etag,
+            status=OcrStatus.scanned,
+            ocr=ocr_result.dict(),
+            last_scan=datetime.datetime.now()
+        )
 
-        pass  # ..... hier geht es weiter
+        self.session.add(result)
+        self.session.commit()
 
-        # ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
