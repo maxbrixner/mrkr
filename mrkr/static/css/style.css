@@ -599,5 +599,28 @@ div.task-card>div.task-options {
     align-items: center;
 }
 
+div.main-label {
+    display: grid;
+    grid-template-columns: min-content 1fr;
+}
+
+div.label-surface {
+    border: 1px solid var(--border);
+    position: relative;
+    display: block;
+}
+
+div.label-surface>img {
+    display: block;
+    z-index: 1;
+}
+
+div.label-surface>div.highlight {
+    position: absolute;
+    z-index: 2;
+    background-color: yellow;
+    opacity: 0.3;
+}
+
 
 /* -------------------------------------------------------------------------- */

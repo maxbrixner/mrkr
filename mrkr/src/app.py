@@ -18,6 +18,7 @@ from .database import *
 from .session import SessionManager
 from .project import ProjectManager
 from .worker import WorkerManager
+from .file import FileProviderFactory
 
 # ---------------------------------------------------------------------------- #
 
@@ -361,14 +362,14 @@ async def scan_project_worker(
 @app.get("/tasks")
 async def tasks_page(
     session: AuthHttpSessionDep,
-    project_id: int
+    id: int
 ) -> Response:
     """
     Display the projects page.
     """
     manager = ProjectManager(session=session.database)
 
-    project = await manager.get_project(project_id=project_id)
+    project = await manager.get_project(project_id=id)
 
     tasks = await manager.get_tasks(project=project)
 
@@ -379,6 +380,7 @@ async def tasks_page(
             "projects_url": app.url_path_for("projects_page"),
             "ocr_url": app.url_path_for("run_ocr"),
             "logout_url": app.url_path_for("logout"),
+            "label_url": app.url_path_for("label_page"),
             "timeout": 20000,
             "swap_delay": 500,
             "tasks": tasks
@@ -391,7 +393,7 @@ async def tasks_page(
 @app.post("/run_ocr")
 async def run_ocr(
     session: AuthHttpSessionDep,
-    task_id: int,
+    id: int,
     force: bool = False,
     provider: str = "tesseract"
 ) -> Response:
@@ -400,7 +402,7 @@ async def run_ocr(
     """
     manager = ProjectManager(session=session.database)
 
-    task = await manager.get_task(task_id=task_id)
+    task = await manager.get_task(task_id=id)
 
     worker.put("run-ocr", task=task, provider=provider, force=force)
 
@@ -424,3 +426,63 @@ async def run_ocr_worker(
         await manager.run_ocr(task=task, provider=provider, force=force)
 
 # ---------------------------------------------------------------------------- #
+
+
+@app.get("/label")
+async def label_page(
+    session: AuthHttpSessionDep,
+    id: int
+) -> Response:
+    """
+    Display the labeling page.
+    """
+    manager = ProjectManager(session=session.database)
+
+    task = await manager.get_task(task_id=id)
+
+    return templates.TemplateResponse(
+        request=session.request,
+        name="page-label.jinja",
+        context={
+            "projects_url": app.url_path_for("projects_page"),
+            "logout_url": app.url_path_for("logout"),
+            "label_surface_url": app.url_path_for("content_label_surface"),
+            "timeout": 20000,
+            "swap_delay": 500,
+            "task": task
+
+        }
+    )
+
+
+# ---------------------------------------------------------------------------- #
+
+@app.get("/content/label-surface")
+async def content_label_surface(
+    session: AuthHttpSessionDep,
+    id: int
+) -> Response:
+    return templates.TemplateResponse(
+        request=session.request,
+        name="content-label-surface.jinja",
+        context={
+            "id": id
+        }
+    )
+
+# ---------------------------------------------------------------------------- #
+
+
+@app.get("/label-image")
+async def label_image(
+    session: AuthHttpSessionDep,
+    id: int
+) -> Response:
+    manager = ProjectManager(session=session.database)
+
+    task = await manager.get_task(task_id=id)
+
+    with FileProviderFactory.get_provider("local").read_file(task.uri) as file:
+        content = file.read()
+
+    return Response(content=content, media_type="image/jpeg")

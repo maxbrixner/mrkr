@@ -21,9 +21,9 @@
                 <img src="/static/img/scan-outline.svg">
             </button>
             <button class="image small" aria-label="View project {{project.name}}"
-                hx-get="{{tasks_url}}?project_id={{project.id}}" hx-trigger="click"
-                hx-swap="outerHTML swap:{{swap_delay}}ms" hx-target="#main" hx-select="#main" hx-push-url="true"
-                hx-indicator="#dialog-content" hx-request='{"timeout": {{timeout}}}'>
+                hx-get="{{tasks_url}}?id={{project.id}}" hx-trigger="click" hx-swap="outerHTML swap:{{swap_delay}}ms"
+                hx-target="#main" hx-select="#main" hx-push-url="true" hx-indicator="#dialog-content"
+                hx-request='{"timeout": {{timeout}}}'>
                 <img src="/static/img/arrow-forward-outline.svg">
             </button>
         </div>

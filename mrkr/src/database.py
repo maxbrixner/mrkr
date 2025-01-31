@@ -47,8 +47,8 @@ class Session(sqlmodel.SQLModel, table=True):
 
 
 class SourceType(str, enum.Enum):
-    local = "LOCAL"
-    s3 = "S3"
+    local = "local"
+    s3 = "s3"
 
 
 class ProjectStatus(str, enum.Enum):

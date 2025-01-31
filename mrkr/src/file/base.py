@@ -72,7 +72,7 @@ class BaseFileProvider():
                 return self._read_image_file(uri=uri)
         except Exception as exception:
             self.logger.exception(exception)
-            raise Exception("File '{uri}' could not be read.")
+            raise Exception(f"File '{uri}' could not be read.")
 
     def get_checksum(self, uri: str) -> str:
         """

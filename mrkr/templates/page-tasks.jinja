@@ -11,10 +11,15 @@
             <div id="status-{{task.id}}" class="project-status ellipsis">
                 {{task.status.value}}
             </div>
-            <button class="image small" aria-label="Run OCR for {{task.name}}" hx-post="{{ocr_url}}?task_id={{task.id}}"
+            <button class="image small" aria-label="Run OCR for {{task.name}}" hx-post="{{ocr_url}}?id={{task.id}}"
                 hx-trigger="click" hx-swap="innerHTML swap:{{swap_delay}}ms" hx-target="#status-{{task.id}}"
                 hx-indicator="#status-{{task.id}}" hx-request='{"timeout": {{timeout}}}'>
                 <img src="/static/img/text-outline.svg">
+            </button>
+            <button class="image small" aria-label="View task {{task.name}}" hx-get="{{label_url}}?id={{task.id}}"
+                hx-trigger="click" hx-swap="outerHTML swap:{{swap_delay}}ms" hx-target="#main" hx-select="#main"
+                hx-push-url="true" hx-indicator="#dialog-content" hx-request='{"timeout": {{timeout}}}'>
+                <img src="/static/img/arrow-forward-outline.svg">
             </button>
         </div>
     </div>
