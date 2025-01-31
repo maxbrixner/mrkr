@@ -47,7 +47,7 @@ class BaseFileProvider():
         raise NotImplementedError
 
     @contextlib.contextmanager
-    def get_file(
+    def read_file(
         self,
         uri: str
     ):
@@ -80,7 +80,7 @@ class BaseFileProvider():
         """
         sha256 = hashlib.sha256()
 
-        with self.get_file(uri=uri) as file:
+        with self.read_file(uri=uri) as file:
             while chunk := file.read(4096):
                 sha256.update(chunk)
 

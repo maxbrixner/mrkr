@@ -165,12 +165,13 @@ class ProjectManager():
 
                 task = Task(
                     project=project,
+                    ocr=None,
                     name=file.name,
                     created=datetime.datetime.now(),
                     modified=None,
                     status=TaskStatus.open,
-                    uri=file.uri,
-                    etag=file.etag
+                    etag=file.etag,
+                    uri=file.uri
                 )
 
                 self.session.add(task)
@@ -208,34 +209,51 @@ class ProjectManager():
     async def run_ocr(
         self,
         task: Task,
-        provider: str,
-        force: bool
+        provider: str = "tesseract",
+        force: bool = False
     ) -> None:
         """
         Run OCR for a task.
         """
         self.logger.debug(f"OCR for task with id={task.id} started.")
 
-        if await self.ocr_exists(etag=task.etag) and not force:
-            self.logger.debug("OCR already exists.")
+        file_provider = FileProviderFactory.get_provider(
+            provider="local")
+
+        if task.ocr_id and not force:
+            self.logger.debug("OCR for this content already exists.")
             return
 
-        ocr_provider = OcrProviderFactory.get_provider(provider=provider)
-        file_provider = FileProviderFactory.get_provider(
-            provider="local")  # todo
+        etag = file_provider.get_checksum(uri=task.uri)
+
+        if etag != task.etag:
+            self.logger.warning("File has changed since last scan.")
+            task.etag = etag
+
+        # todo: if another task has the same etag, just use that OCR result
+
+        ocr_provider = OcrProviderFactory.get_provider(
+            provider=provider
+        )
 
         images = file_provider.file_to_image(uri=task.uri)
 
         ocr_result = ocr_provider.run_ocr(images=images)
 
-        result = OcrResult(
-            etag=task.etag,
-            status=OcrStatus.scanned,
-            ocr=ocr_result.dict(),
-            last_scan=datetime.datetime.now()
+        ocr_result = OcrResult(
+            ocr=ocr_result.model_dump(),
+            provider=provider,
+            created=datetime.datetime.now()
         )
 
-        self.session.add(result)
+        self.session.add(ocr_result)
+        self.session.commit()
+        self.session.refresh(ocr_result)
+
+        task.ocr_id = ocr_result.id
+
+        self.session.add(task)
+
         self.session.commit()
 
 # ---------------------------------------------------------------------------- #

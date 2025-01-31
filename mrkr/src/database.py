@@ -73,27 +73,6 @@ class Project(sqlmodel.SQLModel, table=True):
     creator: User = sqlmodel.Relationship()
 
 
-class TaskStatus(str, enum.Enum):
-    open = "open"
-    progress = "progress"
-    complete = "complete"
-
-
-class Task(sqlmodel.SQLModel, table=True):
-    __tablename__ = "ttask"
-    id: int = sqlmodel.Field(primary_key=True)
-    project_id: int = sqlmodel.Field(foreign_key="tproject.id")
-    name: str = sqlmodel.Field()
-    created: datetime.datetime = sqlmodel.Field()
-    modified: datetime.datetime = sqlmodel.Field(nullable=True)
-    status: TaskStatus = sqlmodel.Field()
-
-    uri: str = sqlmodel.Field(unique=True)
-    etag: Optional[str] = sqlmodel.Field()
-
-    project: Project = sqlmodel.Relationship()
-
-
 class OcrStatus(str, enum.Enum):
     error = "error"
     unscanned = "unscanned"
@@ -104,11 +83,35 @@ class OcrStatus(str, enum.Enum):
 class OcrResult(sqlmodel.SQLModel, table=True):
     __tablename__ = "tocrresult"
     id: int = sqlmodel.Field(primary_key=True)
-    etag: str = sqlmodel.Field()
-    status: OcrStatus = sqlmodel.Field()
     ocr: Optional[dict] = sqlmodel.Field(
         default_factory=OcrObject, sa_type=sqlmodel.JSON)
-    last_scan: datetime.datetime = sqlmodel.Field()
+    provider: str = sqlmodel.Field()
+    created: datetime.datetime = sqlmodel.Field()
+
+
+class TaskStatus(str, enum.Enum):
+    open = "open"
+    progress = "progress"
+    complete = "complete"
+
+
+class Task(sqlmodel.SQLModel, table=True):
+    __tablename__ = "ttask"
+    id: int = sqlmodel.Field(primary_key=True)
+    project_id: int = sqlmodel.Field(
+        foreign_key="tproject.id")
+    ocr_id: Optional[int] = sqlmodel.Field(
+        foreign_key="tocrresult.id", nullable=True)
+    name: str = sqlmodel.Field()
+    created: datetime.datetime = sqlmodel.Field()
+    modified: datetime.datetime = sqlmodel.Field(nullable=True)
+    status: TaskStatus = sqlmodel.Field()
+
+    etag: str = sqlmodel.Field()
+    uri: str = sqlmodel.Field(unique=True)
+
+    project: Project = sqlmodel.Relationship()
+    ocr: OcrResult = sqlmodel.Relationship()
 
 
 # ---------------------------------------------------------------------------- #

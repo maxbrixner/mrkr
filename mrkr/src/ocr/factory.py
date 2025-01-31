@@ -9,13 +9,11 @@ class OcrProviderFactory():
     Factory for OCR providers.
     """
     @staticmethod
-    def get_provider(provider: Optional[str] = None) -> BaseOcrProvider:
+    def get_provider(provider: str) -> BaseOcrProvider:
         """
         Get OCR provider by name.
         """
         match provider:
-            case None:
-                return TesseractOcrProvider()
             case "tesseract":
                 return TesseractOcrProvider()
             case _:

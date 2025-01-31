@@ -35,7 +35,7 @@ class LocalFileProvider(BaseFileProvider):
                 FileObject(
                     name=file.name,
                     uri=str(file),
-                    etag=self._get_checksum(file)
+                    etag=self.get_checksum(file)
                 )
             )
 

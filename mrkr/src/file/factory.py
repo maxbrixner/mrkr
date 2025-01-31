@@ -15,13 +15,11 @@ class FileProviderFactory():
     Factory for file providers.
     """
     @staticmethod
-    def get_provider(provider: Optional[str] = None) -> BaseFileProvider:
+    def get_provider(provider: str) -> BaseFileProvider:
         """
         Get OCR provider by name.
         """
         match provider:
-            case None:
-                return LocalFileProvider()
             case "local":
                 return LocalFileProvider()
             case _:

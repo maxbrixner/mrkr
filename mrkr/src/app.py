@@ -392,8 +392,8 @@ async def tasks_page(
 async def run_ocr(
     session: AuthHttpSessionDep,
     task_id: int,
-    force: Optional[bool] = False,
-    provider: Optional[str] = None
+    force: bool = False,
+    provider: str = "tesseract"
 ) -> Response:
     """
     Run OCR for a task.
@@ -402,7 +402,7 @@ async def run_ocr(
 
     task = await manager.get_task(task_id=task_id)
 
-    await manager.run_ocr(task=task, force=force, provider=provider)
+    worker.put("run-ocr", task=task, provider=provider, force=force)
 
     return HTMLResponse("OK")
 
@@ -412,8 +412,8 @@ async def run_ocr(
 @worker.workermethod("run-ocr")
 async def run_ocr_worker(
     task: Task,
-    provider: Optional[str] = None,
-    force: Optional[bool] = False
+    force: bool = False,
+    provider: str = "tesseract"
 ) -> None:
     """
     Run OCR for a document.
