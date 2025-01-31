@@ -83,7 +83,7 @@ class OcrStatus(str, enum.Enum):
 class OcrResult(sqlmodel.SQLModel, table=True):
     __tablename__ = "tocrresult"
     id: int = sqlmodel.Field(primary_key=True)
-    ocr: Optional[dict] = sqlmodel.Field(
+    ocr: Optional[OcrObject] = sqlmodel.Field(
         default_factory=OcrObject, sa_type=sqlmodel.JSON)
     provider: str = sqlmodel.Field()
     created: datetime.datetime = sqlmodel.Field()

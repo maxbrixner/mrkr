@@ -2,7 +2,7 @@
 
 import logging
 import pydantic
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from PIL import Image
 
 # ---------------------------------------------------------------------------- #
@@ -24,6 +24,7 @@ class OcrBlock(pydantic.BaseModel):
 class OcrPage(pydantic.BaseModel):
     page: int
     blocks: List[OcrBlock]
+    dimensions: Tuple[int, int]
 
 
 class OcrObject(pydantic.BaseModel):

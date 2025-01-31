@@ -2,8 +2,9 @@
 
 {% block main %}
 <main class="main-label" id="main">
-    <div class="label-surface" id="label-surface" hx-get="{{label_surface_url}}?id={{task.id}}" hx-trigger="load"
+    <div class="label-surface" id="label-surface" hx-get="{{label_surface_url}}?id={{task.id}}&page=1" hx-trigger="load"
         hx-swap="innerHTML swap:{{swap_delay}}ms" hx-request='{"timeout": {{timeout}}}'>
     </div>
+    <span>Sidebar</span>
 </main>
 {% endblock %}

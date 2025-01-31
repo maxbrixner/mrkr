@@ -460,13 +460,19 @@ async def label_page(
 @app.get("/content/label-surface")
 async def content_label_surface(
     session: AuthHttpSessionDep,
-    id: int
+    id: int,
+    page: int
 ) -> Response:
+
+    manager = ProjectManager(session=session.database)
+
+    task = await manager.get_task(task_id=id)
+
     return templates.TemplateResponse(
         request=session.request,
         name="content-label-surface.jinja",
         context={
-            "id": id
+            "task": task
         }
     )
 
@@ -486,3 +492,5 @@ async def label_image(
         content = file.read()
 
     return Response(content=content, media_type="image/jpeg")
+
+# ---------------------------------------------------------------------------- #

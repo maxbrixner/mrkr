@@ -220,6 +220,8 @@ class ProjectManager():
         file_provider = FileProviderFactory.get_provider(
             provider="local")
 
+        force = True  # todo
+
         if task.ocr_id and not force:
             self.logger.debug("OCR for this content already exists.")
             return

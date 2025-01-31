@@ -1,5 +1,9 @@
-<img src="/label-image/?id={{id}}">
-</img>
-
-<div class="highlight" style="left:10%; top:10%; width:30%; height: 30%;">
+<div class="image-container">
+    <img id="immm" src="/label-image/?id={{task.id}}" draggable="false">
+    </img>
+    {% for block in task.ocr.ocr.pages[0].blocks %}
+    <div class="highlight" data-content="{{block.content}}"
+        style="left:{{block.coordinates.left}}%; top:{{block.coordinates.top}}%; width:{{block.coordinates.width}}%; height:{{block.coordinates.height}}%;">
+    </div>
+    {% endfor %}
 </div>

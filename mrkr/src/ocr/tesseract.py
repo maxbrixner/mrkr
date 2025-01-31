@@ -3,7 +3,7 @@
 import pydantic
 import pytesseract
 from PIL import Image
-from typing import List
+from typing import List, Tuple
 
 # ---------------------------------------------------------------------------- #
 
@@ -54,11 +54,15 @@ class TesseractOcrProvider(BaseOcrProvider):
             )
             tesseract = TesseractResult(**boxes)
 
-            blocks = self._convert_to_blocks(tesseract=tesseract)
+            blocks = self._convert_to_blocks(
+                tesseract=tesseract,
+                dimensions=(image.width, image.height)
+            )
 
             ocr_page = OcrPage(
                 page=page+1,
-                blocks=blocks
+                blocks=blocks,
+                dimensions=(image.width, image.height)
             )
 
             pages.append(ocr_page)
@@ -67,7 +71,8 @@ class TesseractOcrProvider(BaseOcrProvider):
 
     def _convert_to_blocks(
         self,
-        tesseract: TesseractResult
+        tesseract: TesseractResult,
+        dimensions: Tuple[int, int]
     ) -> List[OcrBlock]:
         blocks = []
         for index, text in enumerate(tesseract.text):
@@ -80,10 +85,11 @@ class TesseractOcrProvider(BaseOcrProvider):
                 confidence = None
 
             coordinates = OcrCoordinates(
-                left=tesseract.left[index],
-                top=tesseract.top[index],
-                width=tesseract.width[index],
-                height=tesseract.height[index]
+                left=round(tesseract.left[index] / dimensions[0] * 100.0, 5),
+                top=round(tesseract.top[index] / dimensions[1] * 100.0, 5),
+                width=round(tesseract.width[index] / dimensions[0] * 100.0, 5),
+                height=round(
+                    tesseract.height[index] / dimensions[1] * 100.0, 5)
             )
 
             block = OcrBlock(

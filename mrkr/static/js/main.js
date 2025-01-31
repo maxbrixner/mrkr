@@ -25,6 +25,11 @@ document.addEventListener('htmx:afterSwap', function (evt) {
         }
     }
 
+    document.getElementById("immm")?.addEventListener('click', function (e) {
+        console.log(e.target);
+        e.target.style.width = "1000px";
+    });
+
 });
 
 document.addEventListener('htmx:timeout', function (evt) {

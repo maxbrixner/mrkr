@@ -599,28 +599,43 @@ div.task-card>div.task-options {
     align-items: center;
 }
 
-div.main-label {
+main.main-label {
     display: grid;
-    grid-template-columns: min-content 1fr;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: 1fr;
+    height: 100%;
 }
 
 div.label-surface {
     border: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: min-content;
+    grid-template-rows: min-content;
+    overflow: auto;
+    height: 100%;
+}
+
+div.label-surface>div.image-container {
+    border: 3px solid red;
     position: relative;
-    display: block;
+    flex-basis: 0;
 }
 
-div.label-surface>img {
-    display: block;
+div.label-surface>div.image-container>img {
     z-index: 1;
+    display: block;
 }
 
-div.label-surface>div.highlight {
+div.label-surface>div.image-container>div.highlight {
     position: absolute;
     z-index: 2;
     background-color: yellow;
+    border: 1px solid yellow;
     opacity: 0.3;
 }
 
+div.label-surface>div.image-container>div.highlight:hover {
+    opacity: 0.8;
+}
 
 /* -------------------------------------------------------------------------- */
