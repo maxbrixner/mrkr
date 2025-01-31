@@ -31,13 +31,6 @@
             ],
             "propagate": false
         },
-        "mrkr.security": {
-            "level": "DEBUG",
-            "handlers": [
-                "stdout"
-            ],
-            "propagate": false
-        },
         "mrkr.database": {
             "level": "DEBUG",
             "handlers": [
@@ -53,6 +46,13 @@
             "propagate": false
         },
         "mrkr.session": {
+            "level": "DEBUG",
+            "handlers": [
+                "stdout"
+            ],
+            "propagate": false
+        },
+        "mrkr.worker": {
             "level": "DEBUG",
             "handlers": [
                 "stdout"

@@ -69,35 +69,17 @@ def insert_demo() -> None:
 
         session.add(user)
         session.add(authentication)
-        session.commit()
 
         project = Project(
             name="Demo Project",
             description="A simple demo project.",
-            creator=user
+            creator=user,
+            source_type=SourceType.local,
+            source_uri="*.*",
+            scan_status=ScanStatus.unscanned
         )
 
         session.add(project)
-        session.commit()
-
-        task = Task(
-            project=project,
-            name="Demo Document",
-            creator=user,
-            created=datetime.datetime.now(),
-            status=TaskStatus.open,
-            source=DocumentSource.local
-        )
-
-        session.add(task)
-        session.commit()
-
-        document = Document(
-            task=task,
-            filename="test/document1EN.pdf"
-        )
-
-        session.add(document)
         session.commit()
 
     logger.info("Demo data inserted.")

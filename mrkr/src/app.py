@@ -7,16 +7,17 @@ from fastapi.templating import Jinja2Templates
 from fastapi.exceptions import RequestValidationError
 from starlette.middleware.gzip import GZipMiddleware
 from starlette.exceptions import HTTPException as StarlettHTTPException
-from typing import Any, Tuple, List, Annotated, Callable, Optional
-import datetime
+from typing import Annotated, Callable
+import pathlib
 
 # ---------------------------------------------------------------------------- #
 
 from .logging import Logger
 from .config import config
-from .database import Database
+from .database import *
 from .session import SessionManager
 from .project import ProjectManager
+from .worker import WorkerManager
 
 # ---------------------------------------------------------------------------- #
 
@@ -28,6 +29,8 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 logger = Logger(name="mrkr.app")
 templates = Jinja2Templates(directory="mrkr/templates", autoescape=True)
 database = Database(alias="POSTGRES")
+
+worker = WorkerManager()
 
 HttpSessionDep = Annotated[
     SessionManager, Depends(SessionManager.get_session(database))
@@ -294,7 +297,7 @@ async def projects_page(
     """
     Display the projects page.
     """
-    manager = ProjectManager(session=session)
+    manager = ProjectManager(session=session.database)
 
     projects = await manager.get_projects()
 
@@ -305,12 +308,77 @@ async def projects_page(
             "projects_url": app.url_path_for("projects_page"),
             "logout_url": app.url_path_for("logout"),
             "tasks_url": app.url_path_for("tasks_page"),
+            "scan_url": app.url_path_for("scan_project"),
+            "scan_status_url": app.url_path_for("scan_status"),
             "timeout": 20000,
             "swap_delay": 500,
             "projects": projects,
 
         }
     )
+
+# ---------------------------------------------------------------------------- #
+
+
+@app.get("/scan_status")
+async def scan_status(
+    session: AuthHttpSessionDep,
+    project_id: int
+) -> Response:
+    """
+    Display the projects page.
+    """
+    manager = ProjectManager(session=session.database)
+
+    project = await manager.get_project(project_id=project_id)
+
+    if project is None:
+        return HTMLResponse(ScanStatus.error)
+
+    return HTMLResponse(project.scan_status)
+
+# ---------------------------------------------------------------------------- #
+
+
+@app.post("/scan_project")
+async def scan_project(
+    session: AuthHttpSessionDep,
+    project_id: int
+) -> Response:
+    """
+    Display the projects page.
+    """
+    manager = ProjectManager(session=session.database)
+
+    project = await manager.get_project(project_id=project_id)
+
+    if await manager.is_scannable(project=project):
+        logger.debug(f"Scanning project {project.name}.")
+        project.scan_status = ScanStatus.scanning
+        project.last_scan = datetime.datetime.now()
+        session.database.add(project)
+        session.database.commit()
+        session.database.refresh(project)
+        worker.put("scan-project", project_id=project_id)
+    else:
+        logger.debug(f"Project {project.name} not ready to be scanned.")
+
+    return HTMLResponse(project.scan_status)
+
+# ---------------------------------------------------------------------------- #
+
+
+@worker.workermethod("scan-project")
+async def scan_project_worker(
+    project_id: int
+) -> None:
+    """
+    Scan a project's source and refresh its tasks.
+    """
+    with database.session() as session:
+        manager = ProjectManager(session=session)
+
+        await manager.scan_project(project_id=project_id)
 
 # ---------------------------------------------------------------------------- #
 
@@ -323,7 +391,7 @@ async def tasks_page(
     """
     Display the projects page.
     """
-    manager = ProjectManager(session=session)
+    manager = ProjectManager(session=session.database)
 
     project = await manager.get_project(project_id=project_id)
 
@@ -333,8 +401,10 @@ async def tasks_page(
         request=session.request,
         name="page-tasks.jinja",
         context={
+            "projects_url": app.url_path_for("projects_page"),
             "logout_url": app.url_path_for("logout"),
-
+            "timeout": 20000,
+            "swap_delay": 500,
             "tasks": tasks
         }
     )

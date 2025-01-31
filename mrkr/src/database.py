@@ -45,6 +45,19 @@ class Session(sqlmodel.SQLModel, table=True):
     user: User = sqlmodel.Relationship()
 
 
+class SourceType(str, enum.Enum):
+    local = "LOCAL"
+    s3 = "S3"
+
+
+class ScanStatus(str, enum.Enum):
+    unscanned = "unscanned"
+    scanning = "scanning"
+    pending = "pending"
+    error = "error"
+    scanned = "scanned"
+
+
 class Project(sqlmodel.SQLModel, table=True):
     __tablename__ = "tproject"
     id: int = sqlmodel.Field(primary_key=True)
@@ -52,18 +65,18 @@ class Project(sqlmodel.SQLModel, table=True):
     description: str = sqlmodel.Field()
     creator_id: int = sqlmodel.Field(foreign_key="tuser.id")
 
+    source_type: SourceType = sqlmodel.Field()
+    source_uri: str = sqlmodel.Field()
+    scan_status: ScanStatus = sqlmodel.Field()
+    last_scan: datetime.datetime = sqlmodel.Field(nullable=True)
+
     creator: User = sqlmodel.Relationship()
 
 
 class TaskStatus(str, enum.Enum):
-    open = "OPEN"
-    progress = "PROGRESS"
-    complete = "COMPLETE"
-
-
-class DocumentSource(str, enum.Enum):
-    local = "LOCAL"
-    s3 = "S3"
+    open = "open"
+    progress = "progress"
+    complete = "complete"
 
 
 class Task(sqlmodel.SQLModel, table=True):
@@ -71,22 +84,14 @@ class Task(sqlmodel.SQLModel, table=True):
     id: int = sqlmodel.Field(primary_key=True)
     project_id: int = sqlmodel.Field(foreign_key="tproject.id")
     name: str = sqlmodel.Field()
-    creator_id: int = sqlmodel.Field(foreign_key="tuser.id")
     created: datetime.datetime = sqlmodel.Field()
-    status: TaskStatus = sqlmodel.Field()
-    source: DocumentSource = sqlmodel.Field()
+    modified: datetime.datetime = sqlmodel.Field(nullable=True)
+    task_status: TaskStatus = sqlmodel.Field()
+
+    uri: str = sqlmodel.Field(unique=True)
+    etag: Optional[str] = sqlmodel.Field()
 
     project: Project = sqlmodel.Relationship()
-    creator: User = sqlmodel.Relationship()
-
-
-class Document(sqlmodel.SQLModel, table=True):
-    __tablename__ = "tdocument"
-    id: int = sqlmodel.Field(primary_key=True)
-    task_id: int = sqlmodel.Field(foreign_key="ttask.id")
-    filename: str = sqlmodel.Field()
-
-    task: Task = sqlmodel.Relationship()
 
 
 # ---------------------------------------------------------------------------- #
@@ -96,23 +101,23 @@ class DatabaseSession(sqlmodel.Session):
     """
     A child of the SQLModel session that provides additional functionality.
     """
-    _logger: logging.Logger
+    logger: logging.Logger
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self._logger = logging.getLogger('mrkr.database')
-        self._logger.debug("New database session initialized.")
+        self.logger = logging.getLogger('mrkr.database')
+        self.logger.debug("New database session initialized.")
 
     def commit(self) -> None:
         """
         Commit the session.
         """
-        self._logger.debug("Committing to database session.")
+        self.logger.debug("Committing to database session.")
 
         try:
             super().commit()
         except Exception as exception:
-            self._logger.exception(exception)
+            self.logger.exception(exception)
             raise Exception("Unable to commit to database session.")
 
 # ---------------------------------------------------------------------------- #

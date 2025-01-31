@@ -567,15 +567,33 @@ div.main.projects {
 
 div.project-card {
     display: grid;
-    gap: 1rem;
     background-color: var(--surface);
     border: 2px solid var(--border);
     border-radius: 1rem;
     display: grid;
     overflow: hidden;
-    padding: 2rem;
     position: relative;
     max-width: 40rem;
+}
+
+div.project-card>div.project-description {
+    display: grid;
+    padding: 2rem;
+    grid-auto-rows: min-content;
+    gap: 1rem;
+    border-bottom: 2px solid var(--border);
+}
+
+div.project-card>div.project-options {
+    padding: 1rem 1rem 1rem 2rem;
+    display: grid;
+    grid-template-columns: 1fr min-content min-content;
+    gap: 1rem;
+    align-items: center;
+}
+
+div.project-card>div.project-options>div.project-status {
+    position: relative;
 }
 
 /* -------------------------------------------------------------------------- */
