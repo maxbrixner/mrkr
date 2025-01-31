@@ -26,8 +26,12 @@ document.addEventListener('htmx:afterSwap', function (evt) {
     }
 
     document.getElementById("immm")?.addEventListener('click', function (e) {
-        console.log(e.target);
-        e.target.style.width = "1000px";
+        console.log(e);
+        width = e.target.clientWidth
+        if (e.altKey === true)
+            e.target.style.width = Math.round(width * 1.1, 0) + "px";
+        else if (e.shiftKey === true)
+            e.target.style.width = Math.round(width * 0.9, 0) + "px";
     });
 
 });
