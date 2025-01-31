@@ -10,16 +10,16 @@
         </div>
         <div class="project-options">
             <div id="status-{{project.id}}" class="project-status ellipsis">
-                {{project.scan_status.name}}
+                {{project.status.value}}
             </div>
             <button class="image small" aria-label="Edit project's {{project.name}} settings"><img
                     src="/static/img/settings-outline.svg"></button>
-            <!--<button class="image small" aria-label="Scan project {{project.name}}"
-                hx-post="{{scan_url}}?project_id={{project.id}}" hx-trigger="click"
-                hx-swap="innerHTML swap:{{swap_delay}}ms" hx-target="#status-{{project.id}}"
-                hx-indicator="#status-{{project.id}}" hx-request='{"timeout": {{timeout}}}'>
+            <button class="image small" aria-label="Scan project {{project.name}}"
+                hx-post="{{scan_url}}?id={{project.id}}" hx-trigger="click" hx-swap="innerHTML swap:{{swap_delay}}ms"
+                hx-target="#status-{{project.id}}" hx-indicator="#status-{{project.id}}"
+                hx-request='{"timeout": {{timeout}}}'>
                 <img src="/static/img/scan-outline.svg">
-            </button>-->
+            </button>
             <button class="image small" aria-label="View project {{project.name}}"
                 hx-get="{{tasks_url}}?project_id={{project.id}}" hx-trigger="click"
                 hx-swap="outerHTML swap:{{swap_delay}}ms" hx-target="#main" hx-select="#main" hx-push-url="true"

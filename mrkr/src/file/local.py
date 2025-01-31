@@ -2,16 +2,17 @@
 
 import pathlib
 import hashlib
+import contextlib
 from typing import List
 
 # ---------------------------------------------------------------------------- #
 
-from .base import BaseConnector, FileObject
+from .base import BaseFileProvider, FileObject
 
 # ---------------------------------------------------------------------------- #
 
 
-class LocalConnector(BaseConnector):
+class LocalFileProvider(BaseFileProvider):
     """
     The LocalConnector class is used to retrieve local data.
     """
@@ -34,13 +35,13 @@ class LocalConnector(BaseConnector):
                 FileObject(
                     name=file.name,
                     uri=str(file),
-                    etag=self.get_checksum(file)
+                    etag=self._get_checksum(file)
                 )
             )
 
         return result
 
-    def get_checksum(self, filename: pathlib.Path) -> str:
+    def _get_checksum(self, filename: pathlib.Path) -> str:
         """
         Get the checksum of a file.
         """
@@ -52,5 +53,20 @@ class LocalConnector(BaseConnector):
 
         return sha256.hexdigest()
 
+    @contextlib.contextmanager
+    def read_file(
+        self,
+        uri: str
+    ):
+        """
+        Yields a binary file stream.
+        """
+        filename = pathlib.Path(uri)
+
+        if not filename.is_file():
+            raise FileNotFoundError(f"File {filename} not found.")
+
+        with pathlib.Path(uri).open("rb") as file:
+            yield file
 
 # ---------------------------------------------------------------------------- #

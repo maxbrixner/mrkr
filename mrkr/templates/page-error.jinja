@@ -2,9 +2,7 @@
 
 {% block header %}
 <header id="header">
-    <a href="{{projects_url}}" hx-get="{{projects_url}}" hx-trigger="click" hx-swap="outerHTML swap:{{swap_delay}}ms"
-        hx-target="#main" hx-select="#main" hx-push-url="true" hx-indicator="#dialog-content"
-        hx-request='{"timeout": {{timeout}}}' class="logo">MRKR</a>
+    <a href="{{projects_url}}" class="logo">MRKR</a>
     <span></span>
     <span></span>
 </header>
@@ -16,7 +14,7 @@
         <h1>We are terrible sorry, but something went wrong!</h1>
         <h2>{{status_code}} &mdash; {{error_message}}</h2>
         <br><br>
-        <a class="inline bold underlined" href=".">Return home</a>
+        <a class="inline bold underlined" href="{{projects_url}}">Return home</a>
     </div>
 </main>
 {% endblock %}

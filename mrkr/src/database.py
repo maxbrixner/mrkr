@@ -12,6 +12,7 @@ from contextlib import contextmanager
 # ---------------------------------------------------------------------------- #
 
 from .config import *
+from .ocr import OcrObject
 
 # ---------------------------------------------------------------------------- #
 
@@ -50,11 +51,10 @@ class SourceType(str, enum.Enum):
     s3 = "S3"
 
 
-class ScanStatus(str, enum.Enum):
+class ProjectStatus(str, enum.Enum):
+    error = "error"
     unscanned = "unscanned"
     scanning = "scanning"
-    pending = "pending"
-    error = "error"
     scanned = "scanned"
 
 
@@ -67,7 +67,7 @@ class Project(sqlmodel.SQLModel, table=True):
 
     source_type: SourceType = sqlmodel.Field()
     source_uri: str = sqlmodel.Field()
-    scan_status: ScanStatus = sqlmodel.Field()
+    status: ProjectStatus = sqlmodel.Field()
     last_scan: datetime.datetime = sqlmodel.Field(nullable=True)
 
     creator: User = sqlmodel.Relationship()
@@ -86,12 +86,29 @@ class Task(sqlmodel.SQLModel, table=True):
     name: str = sqlmodel.Field()
     created: datetime.datetime = sqlmodel.Field()
     modified: datetime.datetime = sqlmodel.Field(nullable=True)
-    task_status: TaskStatus = sqlmodel.Field()
+    status: TaskStatus = sqlmodel.Field()
 
     uri: str = sqlmodel.Field(unique=True)
     etag: Optional[str] = sqlmodel.Field()
 
     project: Project = sqlmodel.Relationship()
+
+
+class OcrStatus(str, enum.Enum):
+    error = "error"
+    unscanned = "unscanned"
+    scanning = "scanning"
+    scanned = "scanned"
+
+
+class OcrResult(sqlmodel.SQLModel, table=True):
+    __tablename__ = "tocrresult"
+    id: int = sqlmodel.Field(primary_key=True)
+    etag: str = sqlmodel.Field()
+    status: OcrStatus = sqlmodel.Field()
+    ocr: Optional[dict] = sqlmodel.Field(
+        default_factory=OcrObject, sa_type=sqlmodel.JSON)
+    last_scan: datetime.datetime = sqlmodel.Field()
 
 
 # ---------------------------------------------------------------------------- #

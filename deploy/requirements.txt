@@ -1,8 +1,10 @@
 bcrypt
-python-multipart
 fastapi
 jinja2
-typer
+pdf2image
 psycopg2-binary
+pytesseract
+python-multipart
 sqlmodel
+typer
 uvicorn

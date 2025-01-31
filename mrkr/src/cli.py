@@ -76,7 +76,7 @@ def insert_demo() -> None:
             creator=user,
             source_type=SourceType.local,
             source_uri="*.*",
-            scan_status=ScanStatus.unscanned
+            status=ProjectStatus.unscanned
         )
 
         session.add(project)

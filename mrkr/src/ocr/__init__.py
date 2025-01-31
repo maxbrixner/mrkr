@@ -1,6 +1,6 @@
 # ---------------------------------------------------------------------------- #
 
-from .base import FileObject
-from .local import LocalConnector
+from .base import OcrObject
+from .factory import OcrProviderFactory
 
 # ---------------------------------------------------------------------------- #

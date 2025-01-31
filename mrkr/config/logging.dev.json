@@ -58,6 +58,13 @@
                 "stdout"
             ],
             "propagate": false
+        },
+        "mrkr.ocr": {
+            "level": "DEBUG",
+            "handlers": [
+                "stdout"
+            ],
+            "propagate": false
         }
     }
 }

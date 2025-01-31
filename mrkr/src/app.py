@@ -8,7 +8,7 @@ from fastapi.exceptions import RequestValidationError
 from starlette.middleware.gzip import GZipMiddleware
 from starlette.exceptions import HTTPException as StarlettHTTPException
 from typing import Annotated, Callable
-import pathlib
+import datetime
 
 # ---------------------------------------------------------------------------- #
 
@@ -142,7 +142,11 @@ async def http_exception_handler(
     return templates.TemplateResponse(
         request=request,
         name="page-error.jinja",
-        context={"status_code": status_code, "error_message": error_message},
+        context={
+            "projects_url": app.url_path_for("projects_page"),
+            "status_code": status_code,
+            "error_message": error_message
+        },
         status_code=status_code
     )
 
@@ -309,7 +313,6 @@ async def projects_page(
             "logout_url": app.url_path_for("logout"),
             "tasks_url": app.url_path_for("tasks_page"),
             "scan_url": app.url_path_for("scan_project"),
-            "scan_status_url": app.url_path_for("scan_status"),
             "timeout": 20000,
             "swap_delay": 500,
             "projects": projects,
@@ -317,68 +320,40 @@ async def projects_page(
         }
     )
 
-# ---------------------------------------------------------------------------- #
-
-
-@app.get("/scan_status")
-async def scan_status(
-    session: AuthHttpSessionDep,
-    project_id: int
-) -> Response:
-    """
-    Display the projects page.
-    """
-    manager = ProjectManager(session=session.database)
-
-    project = await manager.get_project(project_id=project_id)
-
-    if project is None:
-        return HTMLResponse(ScanStatus.error)
-
-    return HTMLResponse(project.scan_status)
 
 # ---------------------------------------------------------------------------- #
 
 
-@app.post("/scan_project")
+@app.post("/scan-project")
 async def scan_project(
     session: AuthHttpSessionDep,
-    project_id: int
+    id: int
 ) -> Response:
     """
-    Display the projects page.
+    Scan a project's source and update the task list accordingly.
     """
     manager = ProjectManager(session=session.database)
 
-    project = await manager.get_project(project_id=project_id)
+    project = await manager.get_project(project_id=id)
 
-    if await manager.is_scannable(project=project):
-        logger.debug(f"Scanning project {project.name}.")
-        project.scan_status = ScanStatus.scanning
-        project.last_scan = datetime.datetime.now()
-        session.database.add(project)
-        session.database.commit()
-        session.database.refresh(project)
-        worker.put("scan-project", project_id=project_id)
-    else:
-        logger.debug(f"Project {project.name} not ready to be scanned.")
+    worker.put("scan-project", project=project)
 
-    return HTMLResponse(project.scan_status)
+    return HTMLResponse("pending")
 
 # ---------------------------------------------------------------------------- #
 
 
 @worker.workermethod("scan-project")
 async def scan_project_worker(
-    project_id: int
+    project: Project
 ) -> None:
     """
-    Scan a project's source and refresh its tasks.
+    Scan a project's source and update the task list accordingly.
     """
     with database.session() as session:
         manager = ProjectManager(session=session)
 
-        await manager.scan_project(project_id=project_id)
+        await manager.scan_project(project=project)
 
 # ---------------------------------------------------------------------------- #
 
@@ -402,11 +377,50 @@ async def tasks_page(
         name="page-tasks.jinja",
         context={
             "projects_url": app.url_path_for("projects_page"),
+            "ocr_url": app.url_path_for("run_ocr"),
             "logout_url": app.url_path_for("logout"),
             "timeout": 20000,
             "swap_delay": 500,
             "tasks": tasks
         }
     )
+
+# ---------------------------------------------------------------------------- #
+
+
+@app.post("/run_ocr")
+async def run_ocr(
+    session: AuthHttpSessionDep,
+    task_id: int,
+    force: Optional[bool] = False,
+    provider: Optional[str] = None
+) -> Response:
+    """
+    Run OCR for a task.
+    """
+    manager = ProjectManager(session=session.database)
+
+    task = await manager.get_task(task_id=task_id)
+
+    await manager.run_ocr(task=task, force=force, provider=provider)
+
+    return HTMLResponse("OK")
+
+# ---------------------------------------------------------------------------- #
+
+
+@worker.workermethod("run-ocr")
+async def run_ocr_worker(
+    task: Task,
+    provider: Optional[str] = None,
+    force: Optional[bool] = False
+) -> None:
+    """
+    Run OCR for a document.
+    """
+    with database.session() as session:
+        manager = ProjectManager(session=session)
+
+        await manager.run_ocr(task=task, provider=provider, force=force)
 
 # ---------------------------------------------------------------------------- #

@@ -3,9 +3,20 @@
 {% block main %}
 <main class="main-tasks" id="main">
     {% for task in tasks %}
-    <div class="project-card">
-        <h2>{{task.name}}</h2>
-        <p>{{task.status}}</p>
+    <div class="task-card">
+        <div class="task-description">
+            <h2>{{task.name}}</h2>
+        </div>
+        <div class="task-options">
+            <div id="status-{{task.id}}" class="project-status ellipsis">
+                {{task.status.value}}
+            </div>
+            <button class="image small" aria-label="Run OCR for {{task.name}}" hx-post="{{ocr_url}}?task_id={{task.id}}"
+                hx-trigger="click" hx-swap="innerHTML swap:{{swap_delay}}ms" hx-target="#status-{{task.id}}"
+                hx-indicator="#status-{{task.id}}" hx-request='{"timeout": {{timeout}}}'>
+                <img src="/static/img/text-outline.svg">
+            </button>
+        </div>
     </div>
     {% endfor %}
 </main>

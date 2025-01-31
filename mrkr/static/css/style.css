@@ -560,12 +560,16 @@ main.main-login>form>div.flash {
     color: var(--primary);
 }
 
-div.main.projects {
+main.main-projects,
+main.main-tasks {
     display: grid;
     gap: 1rem;
+    grid-auto-rows: min-content;
+    justify-items: center;
 }
 
-div.project-card {
+div.project-card,
+div.task-card {
     display: grid;
     background-color: var(--surface);
     border: 2px solid var(--border);
@@ -574,9 +578,11 @@ div.project-card {
     overflow: hidden;
     position: relative;
     max-width: 40rem;
+    width: 100%;
 }
 
-div.project-card>div.project-description {
+div.project-card>div.project-description,
+div.task-card>div.task-description {
     display: grid;
     padding: 2rem;
     grid-auto-rows: min-content;
@@ -584,16 +590,14 @@ div.project-card>div.project-description {
     border-bottom: 2px solid var(--border);
 }
 
-div.project-card>div.project-options {
+div.project-card>div.project-options,
+div.task-card>div.task-options {
     padding: 1rem 1rem 1rem 2rem;
     display: grid;
-    grid-template-columns: 1fr min-content min-content;
+    grid-template-columns: 1fr min-content min-content min-content;
     gap: 1rem;
     align-items: center;
 }
 
-div.project-card>div.project-options>div.project-status {
-    position: relative;
-}
 
 /* -------------------------------------------------------------------------- */
