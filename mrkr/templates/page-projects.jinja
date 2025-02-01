@@ -6,29 +6,40 @@
 
 
 {% block nav %}
-<div class="nav-header">
+<div class="header">
     <span>mrkr</span>
     <button id="toggle-nav-button">
         <img src="/static/img/chevron-forward-outline.svg" alt="Back">
     </button>
 </div>
-<button aria-label="Home" hx-get="{{url_for('projects_page')}}" hx-trigger="click"
-    hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-target="body" hx-push-url="true" hx-indicator="body"
-    hx-request='{"timeout": {{config.timeout}}}'>
-    <img src="/static/img/home-outline.svg" alt="Home Icon">
-    <span>Home</span>
-</button>
-<!--<button class="expandable">
-    <img src="/static/img/pricetag-outline.svg" alt="Back">
-    <span>Labels</span>
-    <img class="chevron" src="/static/img/chevron-down-outline.svg" alt="Back">
-</button>-->
-<button aria-label="Logout" hx-post="{{url_for('logout')}}" hx-trigger="click"
-    hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-target="body" hx-push-url="true" hx-indicator="body"
-    hx-request='{"timeout": {{config.timeout}}}'>
-    <img src="/static/img/log-out-outline.svg" alt="Logout Icon">
-    <span>Logout</span>
-</button>
+<div class="button-container">
+    <button aria-label="Home" hx-get="{{url_for('projects_page')}}" hx-trigger="click"
+        hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-target="body" hx-push-url="true" hx-indicator="body"
+        hx-request='{"timeout": {{config.timeout}}}'>
+        <img src="/static/img/home-outline.svg" alt="Home Icon">
+        <span>Home</span>
+    </button>
+</div>
+<div class="button-container expandable">
+    <button aria-label="Create Project">
+        <img src="/static/img/create-outline.svg" alt="Create Icon">
+        <span>Create</span>
+        <img class="chevron" src="/static/img/chevron-down-outline.svg" alt="Back">
+    </button>
+    <div class="expandable-content-container">
+        <div class="expandable-content">
+            Hallo<br>Hallo
+        </div>
+    </div>
+</div>
+<div class="button-container">
+    <button aria-label="Logout" hx-post="{{url_for('logout')}}" hx-trigger="click"
+        hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-target="body" hx-push-url="true" hx-indicator="body"
+        hx-request='{"timeout": {{config.timeout}}}'>
+        <img src="/static/img/log-out-outline.svg" alt="Logout Icon">
+        <span>Logout</span>
+    </button>
+</div>
 {% endblock %}
 
 {% block main %}

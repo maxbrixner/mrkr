@@ -27,14 +27,14 @@
     --scrollbar-thumb: #c0c0c0;
     --scrollbar-hover: #a0a0a0;
 
-    --nav-width: 15.5rem;
+    --nav-width: 21rem;
     --nav-animation: .3s;
     --border-radius: 10px;
 }
 
 @media (max-width: 800px) {
     :root {
-        --nav-width: 10rem;
+        --nav-width: 17rem;
     }
 }
 
@@ -294,7 +294,7 @@ nav:empty {
     display: none;
 }
 
-nav>div.nav-header {
+nav>div.header {
     align-items: center;
     display: grid;
     gap: 0rem;
@@ -303,7 +303,7 @@ nav>div.nav-header {
     transition: grid-template-columns var(--nav-animation) ease, grid-gap var(--nav-animation) ease;
 }
 
-nav>div.nav-header>span {
+nav>div.header>span {
     font-size: 1.5rem;
     font-weight: 700;
     opacity: 0;
@@ -312,11 +312,11 @@ nav>div.nav-header>span {
     visibility: hidden;
 }
 
-nav>div.nav-header>button {
+nav>div.header>button {
     padding: 1rem;
 }
 
-nav>div.nav-header>button>img {
+nav>div.header>button>img {
     height: 1.5rem;
     filter: invert(var(--icon-invert-background));
     transform: rotate(0deg);
@@ -324,61 +324,114 @@ nav>div.nav-header>button>img {
     width: 1.5rem;
 }
 
-nav.expanded>div.nav-header {
+nav.expanded>div.header {
     gap: 1rem;
-    grid-template-columns: var(--nav-width) min-content;
+    grid-template-columns: calc(var(--nav-width) - 5.5rem) min-content;
 }
 
-nav.expanded>div.nav-header>span {
+nav.expanded>div.header>span {
     opacity: 1;
     visibility: visible;
 }
 
-nav.expanded>div.nav-header>button>img {
+nav.expanded>div.header>button>img {
     transform: rotate(180deg);
 }
 
-nav>button {
+nav>div.button-container {
+    display: grid;
+    grid-template-rows: min-content auto;
+    overflow: hidden;
+}
+
+nav>div.button-container>button {
     align-items: center;
     display: grid;
     font-size: 1.2rem;
     gap: 0rem;
     grid-template-columns: min-content 0rem;
     padding: 1rem;
-    transition: grid-template-columns var(--nav-animation) ease, grid-gap var(--nav-animation) ease;
+    transition: grid-template-columns var(--nav-animation) ease, grid-gap var(--nav-animation) ease, border-radius var(--nav-animation) ease;
 }
 
-nav>button>img {
+nav>div.button-container.expandable>button {
+    grid-template-columns: min-content 0rem 0rem;
+}
+
+nav>div.button-container>button>img {
     filter: invert(var(--icon-invert-background));
     height: 1.5rem;
     width: 1.5rem;
 }
 
-nav>button>span {
+nav>div.button-container>button>span,
+nav>div.button-container>button>img.chevron {
     opacity: 0;
     overflow: hidden;
     text-align: left;
     text-overflow: ellipsis;
-    transition: opacity var(--nav-animation) ease, visibility var(--nav-animation) ease;
+    transition: opacity var(--nav-animation) ease, visibility var(--nav-animation) ease, transform var(--nav-animation) ease;
     visibility: hidden;
     white-space: nowrap;
 }
 
-nav>button>img.chevron {
+nav>div.button-container>button>img.chevron {
     width: 1rem;
     height: 1rem;
 }
 
-nav.expanded>button {
+nav.expanded>div.button-container>button {
     align-items: center;
     display: grid;
     gap: 1rem;
-    grid-template-columns: min-content var(--nav-width);
+    grid-template-columns: min-content calc(var(--nav-width) - 5.5rem);
     padding: 1rem;
 }
 
-nav.expanded>button>span {
+nav.expanded>div.button-container.expandable>button {
+    grid-template-columns: min-content calc(var(--nav-width) - 7.5rem) 1rem;
+}
+
+nav.expanded>div.button-container>button>span,
+nav.expanded>div.button-container>button>img.chevron {
     opacity: 1;
+    visibility: visible;
+}
+
+nav>div.button-container.expanded>button {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+nav>div.button-container.expanded>button>img.chevron {
+    transform: rotate(180deg);
+}
+
+nav>div.button-container>div.expandable-content-container {
+    background-color: var(--surface);
+    border-bottom-right-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--nav-animation) ease;
+}
+
+nav>div.button-container.expanded>div.expandable-content-container {
+    display: grid;
+    grid-template-rows: 1fr;
+}
+
+nav>div.button-container>div.expandable-content-container>div.expandable-content {
+    opacity: 0;
+    overflow: hidden;
+    padding: 0rem 1rem 0rem 1rem;
+    transition: opacity var(--nav-animation) ease, visibility var(--nav-animation) ease, padding var(--nav-animation) ease;
+    visibility: hidden;
+}
+
+nav>div.button-container.expanded>div.expandable-content-container>div.expandable-content {
+    opacity: 1;
+    padding: 1rem;
     visibility: visible;
 }
 

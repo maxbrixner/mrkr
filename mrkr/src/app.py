@@ -323,14 +323,7 @@ async def projects_page(
         name="page-projects.jinja",
         context={
             "config": config.htmx_config,
-            "projects_url": app.url_path_for("projects_page"),
-            "logout_url": app.url_path_for("logout"),
-            "tasks_url": app.url_path_for("tasks_page"),
-            "scan_url": app.url_path_for("scan_project"),
-            "timeout": 20000,
-            "swap_delay": 500,
             "projects": projects,
-
         }
     )
 

@@ -36,12 +36,56 @@ function register_event_listeners() {
         toggle_navigation();
     });
 
+    const nav = document.getElementById("nav");
+    const expandable_nav_items = nav.getElementsByClassName('button-container expandable');
+    for (const item of expandable_nav_items) {
+        const button = item.firstElementChild;
+        button.addEventListener('click', function (evt) {
+            toggle_nav_item(item);
+        });
+    }
 
 }
 
 /* ---- */
 
+function expand_navigation() {
+    const nav = document.getElementById("nav");
+    nav.classList.add("expanded");
+}
+
+function collapse_navigation() {
+    const nav = document.getElementById("nav");
+    const expandable_nav_items = nav.getElementsByClassName('button-container expandable');
+    for (const item of expandable_nav_items) {
+        collapse_nav_item(item);
+    }
+    nav.classList.remove("expanded");
+}
+
 function toggle_navigation() {
     const nav = document.getElementById("nav");
-    nav.classList.toggle("expanded");
+    if (nav.classList.contains("expanded")) {
+        collapse_navigation();
+    } else {
+        expand_navigation();
+    }
+}
+
+function expand_nav_item(element) {
+    expand_navigation();
+    element.classList.add("expanded");
+}
+
+function collapse_nav_item(element) {
+    expand_navigation();
+    element.classList.remove("expanded");
+}
+
+function toggle_nav_item(element) {
+    if (element.classList.contains("expanded")) {
+        collapse_nav_item(element);
+    } else {
+        expand_nav_item(element);
+    }
 }
