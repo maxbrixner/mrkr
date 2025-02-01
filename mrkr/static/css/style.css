@@ -27,8 +27,15 @@
     --scrollbar-thumb: #c0c0c0;
     --scrollbar-hover: #a0a0a0;
 
+    --nav-width: 15.5rem;
     --nav-animation: .3s;
     --border-radius: 10px;
+}
+
+@media (max-width: 800px) {
+    :root {
+        --nav-width: 10rem;
+    }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -253,7 +260,6 @@ body {
 
 header {
     align-items: center;
-    border-bottom: 1px solid var(--border);
     display: grid;
     grid-column: 2;
     grid-row: 1;
@@ -271,10 +277,11 @@ main {
     grid-template-rows: 1fr;
     grid-column: 2;
     grid-row: 2;
+    overflow: auto;
 }
 
 nav {
-    border-right: 1px solid var(--border);
+    border-right: 1px solid var(--border-background-surface);
     display: grid;
     gap: 1rem;
     grid-column: 1;
@@ -319,7 +326,7 @@ nav>div.nav-header>button>img {
 
 nav.expanded>div.nav-header {
     gap: 1rem;
-    grid-template-columns: 15.5rem min-content;
+    grid-template-columns: var(--nav-width) min-content;
 }
 
 nav.expanded>div.nav-header>span {
@@ -366,7 +373,7 @@ nav.expanded>button {
     align-items: center;
     display: grid;
     gap: 1rem;
-    grid-template-columns: min-content 15.5rem;
+    grid-template-columns: min-content var(--nav-width);
     padding: 1rem;
 }
 
@@ -374,8 +381,6 @@ nav.expanded>button>span {
     opacity: 1;
     visibility: visible;
 }
-
-@media (max-width: 800px) {}
 
 /* -------------------------------------------------------------------------- */
 /* Specific Layouts                                                           */

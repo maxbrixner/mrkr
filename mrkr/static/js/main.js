@@ -1,11 +1,8 @@
 
 
 document.addEventListener('DOMContentLoaded', function (evt) {
-
-    document.getElementById('toggle-nav-button')?.addEventListener('click', function (evt) {
-        toggle_navigation();
-    });
-
+    console.log('DOMContentLoaded');
+    register_event_listeners()
 });
 
 document.addEventListener('htmx:beforeRequest', function (evt) {
@@ -16,6 +13,7 @@ document.addEventListener('htmx:beforeRequest', function (evt) {
 
 document.addEventListener('htmx:afterSwap', function (evt) {
     console.log('htmx:afterSwap');
+    register_event_listeners()
 });
 
 document.addEventListener('htmx:timeout', function (evt) {
@@ -29,6 +27,17 @@ document.addEventListener('htmx:sendError', function (evt) {
 document.addEventListener('htmx:responseError', function (evt) {
     return;
 });
+
+/* ---- */
+
+function register_event_listeners() {
+
+    document.getElementById('toggle-nav-button')?.addEventListener('click', function (evt) {
+        toggle_navigation();
+    });
+
+
+}
 
 /* ---- */
 
