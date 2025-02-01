@@ -7,7 +7,11 @@ document.addEventListener('DOMContentLoaded', function (evt) {
 
 document.addEventListener('htmx:beforeRequest', function (evt) {
     console.log('htmx:beforeRequest');
-    evt.detail.target.innerHTML = "";
+    if (evt.detail.target.tagName === "SPAN") {
+        evt.detail.target.innerHTML = "&nbsp;";
+    } else {
+        evt.detail.target.innerHTML = "";
+    }
 });
 
 
@@ -32,7 +36,7 @@ document.addEventListener('htmx:responseError', function (evt) {
 
 function register_event_listeners() {
 
-    document.getElementById('toggle-nav-button')?.addEventListener('click', function (evt) {
+    add_event_listener(document.getElementById('toggle-nav-button'), 'click', function (evt) {
         toggle_navigation();
     });
 
@@ -40,7 +44,7 @@ function register_event_listeners() {
     const expandable_nav_items = nav.getElementsByClassName('button-container expandable');
     for (const item of expandable_nav_items) {
         const button = item.firstElementChild;
-        button.addEventListener('click', function (evt) {
+        add_event_listener(button, 'click', function (evt) {
             toggle_nav_item(item);
         });
     }
@@ -49,12 +53,28 @@ function register_event_listeners() {
 
 /* ---- */
 
+function add_event_listener(element, event_name, callback) {
+    if (!element) {
+        return
+    }
+
+    if (element.dataset.listeners === 'true') {
+        return
+    }
+    element.addEventListener(event_name, callback);
+    element.dataset.listeners = 'true'
+}
+
+/* ---- */
+
 function expand_navigation() {
+    console.log('expand_navigation');
     const nav = document.getElementById("nav");
     nav.classList.add("expanded");
 }
 
 function collapse_navigation() {
+    console.log('collapse_navigation');
     const nav = document.getElementById("nav");
     const expandable_nav_items = nav.getElementsByClassName('button-container expandable');
     for (const item of expandable_nav_items) {
@@ -64,6 +84,7 @@ function collapse_navigation() {
 }
 
 function toggle_navigation() {
+    console.log('toggle_navigation');
     const nav = document.getElementById("nav");
     if (nav.classList.contains("expanded")) {
         collapse_navigation();
@@ -78,7 +99,6 @@ function expand_nav_item(element) {
 }
 
 function collapse_nav_item(element) {
-    expand_navigation();
     element.classList.remove("expanded");
 }
 

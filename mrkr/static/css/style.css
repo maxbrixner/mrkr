@@ -34,7 +34,7 @@
 
 @media (max-width: 800px) {
     :root {
-        --nav-width: 17rem;
+        --nav-width: 21rem;
     }
 }
 
@@ -95,7 +95,8 @@ img {
 
 h1,
 h2,
-h3 {
+h3,
+p {
     margin: 0;
     margin-block: 0;
     padding: 0;
@@ -131,8 +132,7 @@ button {
 button.primary {
     background-color: var(--primary);
     color: var(--on-primary);
-    font-size: 1.2rem;
-    padding: 1.3rem;
+    padding: 1rem;
 }
 
 button:hover,
@@ -283,10 +283,11 @@ main {
 nav {
     border-right: 1px solid var(--border-background-surface);
     display: grid;
-    gap: 1rem;
+    gap: .5rem;
     grid-column: 1;
     grid-row: 1 / span 2;
     grid-auto-rows: min-content;
+    overflow-y: auto;
     padding: 1rem .5rem;
 }
 
@@ -429,6 +430,7 @@ nav>div.button-container>div.expandable-content-container>div.expandable-content
     padding: 0rem 1rem 0rem 1rem;
     transition: opacity var(--nav-animation) ease, visibility var(--nav-animation) ease, padding var(--nav-animation) ease;
     visibility: hidden;
+    max-width: var(--nav-width);
 }
 
 nav>div.button-container.expanded>div.expandable-content-container>div.expandable-content {
@@ -438,7 +440,7 @@ nav>div.button-container.expanded>div.expandable-content-container>div.expandabl
 }
 
 /* -------------------------------------------------------------------------- */
-/* Specific Layouts                                                           */
+/* Specific Layouts: Login                                                    */
 /* -------------------------------------------------------------------------- */
 
 div.login-container {
@@ -465,15 +467,81 @@ div.login-container>form>h1 {
 }
 
 /* -------------------------------------------------------------------------- */
+/* Specific Layouts: Projects                                                    */
+/* -------------------------------------------------------------------------- */
+
+div.projects {
+    align-items: flex-start;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-start;
+    padding: 2rem;
+}
+
+div.project-card,
+div.task-card {
+    display: grid;
+    background-color: var(--surface);
+    border: 2px solid var(--border-background-surface);
+    border-radius: 1rem;
+    display: grid;
+    overflow: hidden;
+    position: relative;
+    max-width: 20rem;
+    width: 100%;
+}
+
+div.project-card>div.project-description,
+div.task-card>div.task-description {
+    display: grid;
+    padding: 2rem;
+    grid-auto-rows: min-content;
+    gap: 1rem;
+    border-bottom: 2px solid var(--border-background-surface);
+}
+
+div.project-card>div.project-options,
+div.task-card>div.task-options {
+    padding: 1rem 1rem 1rem 2rem;
+    display: grid;
+    grid-template-columns: 1fr min-content min-content;
+    gap: 1rem;
+    align-items: center;
+}
+
+div.project-card>div.project-options>button>img,
+div.task-card>div.task-options>button>img {
+    filter: invert(var(--icon-invert-surface));
+    height: 1.5rem;
+    width: 1.5rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Specific Layouts: Tasks                                                  */
+/* -------------------------------------------------------------------------- */
+
+div.expandable-content.scan {
+    display: grid;
+    grid-auto-columns: auto;
+    gap: 1rem;
+}
+
+div.expandable-content.scan>span.scan-status-span {
+    position: relative;
+}
+
+/* -------------------------------------------------------------------------- */
 /* HTMX styles                                                                */
 /* -------------------------------------------------------------------------- */
 
 body.htmx-request:before,
-body.htmx-swapping:before {
+body.htmx-swapping:before,
+div.htmx-request:before,
+div.htmx-swapping:before {
     animation: spinner .6s linear infinite;
     border: 2px solid var(--primary);
     border-radius: 50%;
-    border-top-color: var(--background);
+    border-top-color: transparent;
     box-sizing: border-box;
     content: '';
     height: 2rem;
@@ -483,6 +551,21 @@ body.htmx-swapping:before {
     position: absolute;
     top: 50%;
     width: 2rem;
+}
+
+span.htmx-request:before,
+span.htmx-swapping:before {
+    animation: spinner .6s linear infinite;
+    border: 2px solid var(--primary);
+    border-radius: 50%;
+    border-top-color: transparent;
+    box-sizing: border-box;
+    content: '';
+    height: 1rem;
+    left: 0%;
+    position: absolute;
+    top: 0%;
+    width: 1rem;
 }
 
 @keyframes spinner {

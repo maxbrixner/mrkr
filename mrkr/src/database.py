@@ -53,6 +53,7 @@ class SourceType(str, enum.Enum):
 
 class ProjectStatus(str, enum.Enum):
     error = "error"
+    pending = "pending"
     unscanned = "unscanned"
     scanning = "scanning"
     scanned = "scanned"

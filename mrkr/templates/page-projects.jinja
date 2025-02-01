@@ -8,8 +8,8 @@
 {% block nav %}
 <div class="header">
     <span>mrkr</span>
-    <button id="toggle-nav-button">
-        <img src="/static/img/chevron-forward-outline.svg" alt="Back">
+    <button aria-label="Expand Navigation" id="toggle-nav-button">
+        <img src="/static/img/chevron-forward-outline.svg" alt="Expand Navigation Icon">
     </button>
 </div>
 <div class="button-container">
@@ -24,7 +24,7 @@
     <button aria-label="Create Project">
         <img src="/static/img/create-outline.svg" alt="Create Icon">
         <span>Create</span>
-        <img class="chevron" src="/static/img/chevron-down-outline.svg" alt="Back">
+        <img class="chevron" src="/static/img/chevron-down-outline.svg" alt="Create Project Icon">
     </button>
     <div class="expandable-content-container">
         <div class="expandable-content">
@@ -43,28 +43,25 @@
 {% endblock %}
 
 {% block main %}
-{% for project in projects %}
-<div class="project-card">
-    <div class="project-description">
-        <h2>{{project.name}}</h2>
-        <p>{{project.description}}</p>
-    </div>
-    <div class="project-options">
-        <div id="status-{{project.id}}" class="project-status ellipsis">
-            {{project.status.value}}
+<div class="projects">
+    {% for project in projects %}
+    <div class="project-card">
+        <div class="project-description">
+            <h2>{{project.name}}</h2>
+            <p>{{project.description}}</p>
         </div>
-        <button class="image small" aria-label="Edit project's {{project.name}} settings"><img
-                src="/static/img/settings-outline.svg"></button>
-        <button class="image small" aria-label="Scan project {{project.name}}" hx-post="{{scan_url}}?id={{project.id}}"
-            hx-trigger="click" hx-swap="innerHTML swap:{{swap_delay}}ms" hx-target="#status-{{project.id}}"
-            hx-indicator="#status-{{project.id}}" hx-request='{"timeout": {{timeout}}}'>
-            <img src="/static/img/scan-outline.svg">
-        </button>
-        <button class="image small" aria-label="View project {{project.name}}" hx-get="{{tasks_url}}?id={{project.id}}"
-            hx-trigger="click" hx-swap="outerHTML swap:{{swap_delay}}ms" hx-target="#main" hx-select="#main"
-            hx-push-url="true" hx-indicator="#dialog-content" hx-request='{"timeout": {{timeout}}}'>
-            <img src="/static/img/arrow-forward-outline.svg">
-        </button>
+        <div class="project-options">
+            <div id="status-{{project.id}}" class="project-status ellipsis">
+            </div>
+            <button class="image small" aria-label="Edit settings for {{project.name}}"><img
+                    src="/static/img/settings-outline.svg" alt="Settings Icon"></button>
+            <button class="image small" aria-label="View {{project.name}}"
+                hx-get="{{url_for('tasks_page')}}?id={{project.id}}" hx-trigger="click"
+                hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-target="body" hx-push-url="true" hx-indicator="body"
+                hx-request='{"timeout": {{config.timeout}}}'>
+                <img src="/static/img/arrow-forward-outline.svg" alt="View Project Icon">
+            </button>
+        </div>
     </div>
 </div>
 {% endfor %}

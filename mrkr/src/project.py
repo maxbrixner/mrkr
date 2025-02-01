@@ -111,11 +111,13 @@ class ProjectManager():
 
     async def scan_project(
         self,
-        project: Project
+        project_id: int
     ) -> None:
         """
         Scan a project's source and update the task list accordingly.
         """
+        project = await self.get_project(project_id=project_id)
+
         if not await self._is_scannable(project=project):
             raise Exception(
                 f"Project {project.name} is already being scanned.")

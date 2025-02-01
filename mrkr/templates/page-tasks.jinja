@@ -1,7 +1,67 @@
 {% extends "base.jinja" %}
 
+{% block header %}
+&nbsp;
+{% endblock %}
+
+
+{% block nav %}
+<div class="header">
+    <span>mrkr</span>
+    <button aria-label="Expand Navigation" id="toggle-nav-button">
+        <img src="/static/img/chevron-forward-outline.svg" alt="Expand Navigation Icon">
+    </button>
+</div>
+<div class="button-container">
+    <button aria-label="Home" hx-get="{{url_for('projects_page')}}" hx-trigger="click"
+        hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-target="body" hx-push-url="true" hx-indicator="body"
+        hx-request='{"timeout": {{config.timeout}}}'>
+        <img src="/static/img/home-outline.svg" alt="Home Icon">
+        <span>Home</span>
+    </button>
+</div>
+<div class="button-container">
+    <button aria-label="Refresh" hx-get="{{url_for('tasks_page')}}?id={{project.id}}" hx-trigger="click"
+        hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#tasks-list" hx-select="#tasks-list"
+        hx-push-url="true" hx-indicator="#main" hx-request='{"timeout": {{config.timeout}}}'
+        hx-select-oob="#scan-content">
+        <img src="/static/img/reload-outline.svg" alt="Home Icon">
+        <span>Refresh</span>
+    </button>
+</div>
+<div class="button-container expandable">
+    <button aria-label="Scan Project">
+        <img src="/static/img/scan-outline.svg" alt="Scan Icon">
+        <span>Scan</span>
+        <img class="chevron" src="/static/img/chevron-down-outline.svg" alt="Scan Project Icon">
+    </button>
+    <div class="expandable-content-container">
+        <div class="expandable-content scan" id="scan-content">
+            <b>Status</b>
+            <span id="scan-status" class="scan-status-span">{{project.status.value}}</span>
+            <b>Last Scan</b>
+            <span>{%if not project.last_scan %}Never{% else %}{{project.last_scan}}{%endif%}</span>
+            <b>Source</b>
+            <span>{{project.source_type.value}}</span>
+            <button class="primary" aria-label="Queue Scan" hx-post="{{url_for('scan_project')}}?id={{project.id}}"
+                hx-trigger="click" hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-target="#scan-status"
+                hx-indicator="#scan-status" hx-request='{"timeout": {{config.timeout}}}'>Queue Scan
+            </button>
+        </div>
+    </div>
+</div>
+<div class="button-container">
+    <button aria-label="Logout" hx-post="{{url_for('logout')}}" hx-trigger="click"
+        hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-target="body" hx-push-url="true" hx-indicator="body"
+        hx-request='{"timeout": {{config.timeout}}}'>
+        <img src="/static/img/log-out-outline.svg" alt="Logout Icon">
+        <span>Logout</span>
+    </button>
+</div>
+{% endblock %}
+
 {% block main %}
-<main class="main-tasks" id="main">
+<div class="tasks" id="tasks-list">
     {% for task in tasks %}
     <div class="task-card">
         <div class="task-description">
@@ -24,5 +84,5 @@
         </div>
     </div>
     {% endfor %}
-</main>
+</div>
 {% endblock %}

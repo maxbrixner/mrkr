@@ -343,16 +343,20 @@ async def scan_project(
 
     project = await manager.get_project(project_id=id)
 
-    worker.put("scan-project", project=project)
+    project.status = ProjectStatus.pending
+    session.database.add(project)
+    session.database.commit()
 
-    return HTMLResponse("pending")
+    worker.put("scan-project", project_id=project.id)
+
+    return HTMLResponse("pending... please refresh")
 
 # ---------------------------------------------------------------------------- #
 
 
 @worker.workermethod("scan-project")
 async def scan_project_worker(
-    project: Project
+    project_id: int
 ) -> None:
     """
     Scan a project's source and update the task list accordingly.
@@ -360,7 +364,7 @@ async def scan_project_worker(
     with database.session() as session:
         manager = ProjectManager(session=session)
 
-        await manager.scan_project(project=project)
+        await manager.scan_project(project_id=project_id)
 
 # ---------------------------------------------------------------------------- #
 
@@ -383,12 +387,8 @@ async def tasks_page(
         request=session.request,
         name="page-tasks.jinja",
         context={
-            "projects_url": app.url_path_for("projects_page"),
-            "ocr_url": app.url_path_for("run_ocr"),
-            "logout_url": app.url_path_for("logout"),
-            "label_url": app.url_path_for("label_page"),
-            "timeout": 20000,
-            "swap_delay": 500,
+            "config": config.htmx_config,
+            "project": project,
             "tasks": tasks
         }
     )
