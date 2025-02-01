@@ -1,11 +1,11 @@
 {% extends "base.jinja" %}
 
 {% block main %}
-<main class="main-login" id="main">
+<div class="login-container">
     <!-- todo: replace urls -->
-    <form method="POST" action="/signup">
-        <h1>Nice to meet you! Sign up to use MRKR!</h1>
-        <span></span>
+    <form method="POST" action="{{url_for('signup')}}">
+        <h1>Sign up to use MRKR</h1>
+
         <div class="input-wrapper">
             <label for="input-username">Username</label>
             <span>At least three lower case letters</span>
@@ -27,12 +27,16 @@
                 placeholder="Enter your password" minlength="4" required></input>
         </div>
 
-        <span></span>
+        <button class="primary" type="submit" aria-label="Sign up">Sign up</button>
 
-        <input class="primary" type="submit" value="Sign up"></input>
+        <span>
+            Already have an account?
+            <a class="primary" href="{{url_for('login_page')}}" hx-get="{{url_for('login_page')}}" hx-trigger="click"
+                hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-target="body" hx-push-url="true"
+                hx-indicator="#body" hx-request='{"timeout": {{config.timeout}}}'>Log in!</a>
+            </a>
+        </span>
 
-        <!-- todo: replace urls -->
-        <span>Already have an account? <a class="inline bold" href="/login">Login!</a></span>
     </form>
-</main>
+</div>
 {% endblock %}

@@ -54,7 +54,7 @@ async def add_process_time_header(
     """
     response = await call_next(request)
 
-    if request.url.path.startswith("/static"):
+    if "/static" in request.url.path:
         return response
 
     response.headers["Access-Control-Allow-Origin"] = "https://yoursite.com"
@@ -75,6 +75,10 @@ async def add_process_time_header(
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-XSS-Protection"] = "1; mode=block"
+
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
 
     return response
 
@@ -116,7 +120,7 @@ async def http_exception_handler(
     """
     if isinstance(exception, HTTPException) and exception.status_code == 401:
         return RedirectResponse(
-            url=app.url_path_for("login_page"),
+            url=app.url_path_for("login_page") + "?unauthorized_redirect=true",
             # this is important to change from post to get
             # on invalid login attempt
             status_code=302
@@ -181,20 +185,27 @@ async def home_page(
          response_class=HTMLResponse,
          tags=["pages"])
 async def login_page(
-    session: HttpSessionDep
+    session: HttpSessionDep,
+    unauthorized_redirect: bool = False
 ) -> Response:
     """
     Display the login page.
     """
+    if unauthorized_redirect:
+        headers = {"HX-Redirect": app.url_path_for("login_page")}
+    else:
+        headers = {}
+
     return templates.TemplateResponse(
         request=session.request,
         name="page-login.jinja",
         context={
-            "login_url": app.url_path_for("login"),
-            "signup_url": app.url_path_for("signup_page"),
+            "config": config.htmx_config,
             "flash": await session.pop_flash_message()
         },
-        headers={"HX-Redirect": app.url_path_for("login_page")}
+        # this makes sure that the login page is always displayed as a
+        # full page
+        headers=headers
     )
 
 # ---------------------------------------------------------------------------- #
@@ -226,9 +237,9 @@ async def login(
 # ---------------------------------------------------------------------------- #
 
 
-@app.get("/logout",
-         response_class=RedirectResponse,
-         tags=["actions"])
+@app.post("/logout",
+          response_class=RedirectResponse,
+          tags=["actions"])
 async def logout(
     session: HttpSessionDep
 ) -> RedirectResponse:
@@ -260,8 +271,9 @@ async def signup_page(
     return templates.TemplateResponse(
         request=session.request,
         name="page-signup.jinja",
-        context={},
-        headers={"HX-Redirect": app.url_path_for("signup_page")}
+        context={
+            "config": config.htmx_config,
+        }
     )
 
 # ---------------------------------------------------------------------------- #
@@ -310,6 +322,7 @@ async def projects_page(
         request=session.request,
         name="page-projects.jinja",
         context={
+            "config": config.htmx_config,
             "projects_url": app.url_path_for("projects_page"),
             "logout_url": app.url_path_for("logout"),
             "tasks_url": app.url_path_for("tasks_page"),

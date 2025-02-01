@@ -1,24 +1,12 @@
 {% extends "base.jinja" %}
 
-{% block header %}
-<header id="header">
-    <a href="{{projects_url}}" hx-get="{{projects_url}}" hx-trigger="click" hx-swap="outerHTML swap:{{swap_delay}}ms"
-        hx-target="#main" hx-select="#main" hx-push-url="true" hx-indicator="#dialog-content"
-        hx-request='{"timeout": {{timeout}}}' class="logo">MRKR</a>
-    <span></span>
-    <span></span>
-</header>
-{% endblock %}
-
 {% block main %}
-<main class="main-login" id="main">
-    <form method="POST" action="{{login_url}}">
-        <h1>Welcome back! Glad to see you again!</h1>
+<div class="login-container">
+    <form method="POST" action="{{url_for('login')}}">
+        <h1>MRKR</h1>
         {% if flash %}
-        <span></span>
         <div class="flash">{{ flash.user_message }}</div>
         {% endif %}
-        <span></span>
         <div class=" input-wrapper">
             <label for="input-email">Email</label>
             <span>Invalid email address</span>
@@ -33,11 +21,15 @@
                 placeholder="Enter your password" minlength="4" required></input>
         </div>
 
-        <span></span>
+        <button class="primary" type="submit" aria-label="Login">Login</button>
 
-        <input class="primary" type="submit" value="Login"></input>
-
-        <span>Don't have an account yet? <a class="inline bold" href="{{signup_url}}">Sign up!</a></span>
+        <span>
+            Don't have an account yet?
+            <a class="primary" href="{{url_for('signup_page')}}" hx-get="{{url_for('signup_page')}}" hx-trigger="click"
+                hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-target="body" hx-push-url="true"
+                hx-indicator="#body" hx-request='{"timeout": {{config.timeout}}}'>Sign up!</a>
+            </a>
+        </span>
     </form>
-</main>
+</div>
 {% endblock %}

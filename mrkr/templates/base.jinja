@@ -31,8 +31,6 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
         rel="stylesheet">
-    <!--<link rel="preload" href="/static/img/cloud-offline-outline.svg" as="image">-->
-
 
     {% block stylesheets %}
     <link rel="stylesheet" href="/static/css/style.css">
@@ -46,36 +44,11 @@
 
 <body id="body">
 
-    {% block header %}
-    <header id="header">
-        <a href="{{projects_url}}" hx-get="{{projects_url}}" hx-trigger="click"
-            hx-swap="outerHTML swap:{{swap_delay}}ms" hx-target="#main" hx-select="#main" hx-push-url="true"
-            hx-indicator="#dialog-content" hx-request='{"timeout": {{timeout}}}' class="logo">MRKR</a>
-        <span></span>
-        <button class="image" id="header-menu-button" aria-label="Open Menu"><img
-                src="/static/img/person-circle-outline.svg" alt="Hamburger Menu Icon"></button>
-    </header>
-    {% endblock %}
+    <header id="header">{% block header %}{% endblock %}</header>
 
-    {% block main %}
-    {% endblock %}
+    <main id="main">{% block main %}{% endblock %}</main>
 
-    <aside class="overlay vertical" id="dialog-overlay">
-        <div class="container dialog" id="dialog-container">
-            <div class="dialog-content" id="dialog-content">
-            </div>
-        </div>
-    </aside>
-
-    <aside class="overlay horizontal" id="sidebar-overlay">
-        <div class="container sidebar" id="sidebar-container">
-            <div class="sidebar-content" id="sidebar-content">
-                <button class="image" id="sidebar-close-button" aria-label="Close Sidebar"><img
-                        src="/static/img/close-outline.svg" alt="Close Icon"></button>
-                <a class="menu" href="{{logout_url}}">Logout</a>
-            </div>
-        </div>
-    </aside>
+    <nav id="nav">{% block nav %}{% endblock %}</nav>
 
 </body>
 

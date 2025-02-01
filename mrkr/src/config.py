@@ -43,7 +43,17 @@ class Localization(pydantic.BaseModel):
 # ---------------------------------------------------------------------------- #
 
 
+class HtmxConfig(pydantic.BaseModel):
+    # artificial delay (in milliseconds) that is added to htmx requests
+    # in order to avoid flickering
+    swap_delay: int = 1000
+    # timeout
+    timeout: int = 20000
+
+
 class Config(pydantic.BaseModel):
+    htmx_config: HtmxConfig = HtmxConfig()
+
     # length of the random csrf token
     csrf_token_length: int = 32
     # dictionary containing localization configurations for each supported
