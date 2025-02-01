@@ -412,12 +412,14 @@ nav>div.button-container>div.expandable-content-container {
     border-bottom-right-radius: var(--border-radius);
     border-bottom-left-radius: var(--border-radius);
     display: grid;
+    grid-template-columns: 0fr;
     grid-template-rows: 0fr;
     transition: grid-template-rows var(--nav-animation) ease;
 }
 
 nav>div.button-container.expanded>div.expandable-content-container {
     display: grid;
+    grid-template-columns: 1fr;
     grid-template-rows: 1fr;
 }
 
