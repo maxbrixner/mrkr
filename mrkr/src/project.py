@@ -109,6 +109,16 @@ class ProjectManager():
             OcrResult.etag == etag)
         return self.session.exec(query).first() > 0
 
+    async def get_tags(
+        self,
+        project: Project
+    ) -> Sequence[Tag]:
+        """
+        Get all tags for a project.
+        """
+        query = sqlmodel.select(Tag).where(Tag.project_id == project.id)
+        return self.session.exec(query).all()
+
     async def scan_project(
         self,
         project_id: int

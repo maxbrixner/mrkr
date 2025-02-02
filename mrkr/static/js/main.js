@@ -49,6 +49,7 @@ function register_event_listeners() {
         });
     }
 
+    /* todo */
     document.getElementById("label-image")?.addEventListener('click', function (e) {
         console.log(e);
         width = e.target.clientWidth
@@ -56,6 +57,27 @@ function register_event_listeners() {
             e.target.style.width = Math.round(width * 1.1, 0) + "px";
         else if (e.shiftKey === true)
             e.target.style.width = Math.round(width * 0.9, 0) + "px";
+    });
+
+    document.addEventListener('keypress', function (evt) {
+        console.log(evt.key);
+        const labelimage = document.getElementById("label-image");
+        if (labelimage === null) {
+            console.log("nöööö")
+            return;
+        }
+        if (evt.key === '+') {
+            console.log("Plus key pressed!");
+            width = labelimage.clientWidth
+            console.log(width);
+            labelimage.style.width = Math.round(width * 1.01, 0) + "px";
+        }
+        if (evt.key === '-') {
+            console.log("Minus key pressed!");
+            width = labelimage.clientWidth
+            console.log(width);
+            labelimage.style.width = Math.round(width * 0.99, 0) + "px";
+        }
     });
 
 }

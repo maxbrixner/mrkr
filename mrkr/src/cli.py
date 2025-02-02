@@ -82,6 +82,30 @@ def insert_demo() -> None:
         session.add(project)
         session.commit()
 
+        tag1 = Tag(
+            project=project,
+            name="Name",
+            color="#648fff"
+        )
+
+        tag2 = Tag(
+            project=project,
+            name="Street",
+            color="#dc267f"
+        )
+
+        tag3 = Tag(
+            project=project,
+            name="IBAN",
+            color="#ffb000"
+        )
+
+        session.add(tag1)
+        session.add(tag2)
+        session.add(tag3)
+
+        session.commit()
+
     logger.info("Demo data inserted.")
 
 # ---------------------------------------------------------------------------- #

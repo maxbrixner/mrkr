@@ -401,49 +401,6 @@ async def tasks_page(
 
 # ---------------------------------------------------------------------------- #
 
-    project.scan_status = ScanStatus.pending
-    project.last_scan = datetime.datetime.now()
-    session.database.add(project)
-    session.database.commit()
-
-
-@app.post("/run_ocr")
-async def run_ocr(
-    session: AuthHttpSessionDep,
-    id: int,
-    force: bool = False,
-    provider: str = "tesseract"
-) -> Response:
-    """
-    Run OCR for a task.
-    """
-    manager = ProjectManager(session=session.database)
-
-    task = await manager.get_task(task_id=id)
-
-    worker.put("run-ocr", task=task, provider=provider, force=force)
-
-    return HTMLResponse("OK")
-
-# ---------------------------------------------------------------------------- #
-
-
-@worker.workermethod("run-ocr")
-async def run_ocr_worker(
-    task: Task,
-    force: bool = False,
-    provider: str = "tesseract"
-) -> None:
-    """
-    Run OCR for a document.
-    """
-    with database.session() as session:
-        manager = ProjectManager(session=session)
-
-        await manager.run_ocr(task=task, provider=provider, force=force)
-
-# ---------------------------------------------------------------------------- #
-
 
 @app.get("/label")
 async def label_page(
@@ -457,12 +414,17 @@ async def label_page(
 
     task = await manager.get_task(task_id=id)
 
+    project = await manager.get_project(project_id=task.project_id)
+
+    tags = await manager.get_tags(project=project)
+
     return templates.TemplateResponse(
         request=session.request,
         name="page-label.jinja",
         context={
             "config": config.htmx_config,
-            "task": task
+            "task": task,
+            "tags": tags
         }
     )
 

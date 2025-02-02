@@ -460,10 +460,12 @@ div.tasks,
 div.labeling {
     display: grid;
     grid-template-rows: 5.5rem 1fr;
+    overflow: hidden;
 }
 
 div.page-toolbar {
     align-items: center;
+    border-bottom: 1px solid var(--border-background-surface);
     display: grid;
     gap: 1rem;
     grid-template-rows: 1fr;
@@ -482,6 +484,7 @@ div.page-toolbar>h1 {
 div.page-surface {
     align-items: flex-start;
     display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
     justify-content: flex-start;
     padding: 1.5rem;
@@ -497,7 +500,6 @@ div.status-card {
     color: var(--on-background);
     opacity: 0.5;
 }
-
 
 div.project-card,
 div.task-card {
@@ -541,41 +543,27 @@ div.task-card>div.task-options>button>img {
 
 
 /* -------------------------------------------------------------------------- */
-/* Specific Layouts: Tasks                                                  */
+/* Specific Layouts: Labeling                                                 */
 /* -------------------------------------------------------------------------- */
 
-div.expandable-content.scan {
-    display: grid;
-    grid-auto-columns: auto;
-    gap: 1rem;
-}
-
-div.expandable-content.scan>span.scan-status-span {
-    position: relative;
-}
-
-/* -------------------------------------------------------------------------- */
-/* Specific Layouts: Labelung                                                 */
-/* -------------------------------------------------------------------------- */
-
-div.label-surface {
+div.page-surface.labeling {
     display: grid;
     grid-template-columns: min-content;
     grid-template-rows: min-content;
 }
 
-div.label-surface>div.image-container {
+div.page-surface.labeling>div.image-container {
     border: 3px solid red;
     position: relative;
     flex-basis: 0;
 }
 
-div.label-surface>div.image-container>img {
+div.page-surface.labeling>div.image-container>img {
     z-index: 1;
     display: block;
 }
 
-div.label-surface>div.image-container>div.highlight {
+div.page-surface.labeling>div.image-container>div.highlight {
     position: absolute;
     z-index: 2;
     background-color: silver;
@@ -583,7 +571,7 @@ div.label-surface>div.image-container>div.highlight {
     opacity: 0.3;
 }
 
-div.label-surface>div.image-container>div.highlight:hover {
+div.page-surface.labeling>div.image-container>div.highlight:hover {
     opacity: 0.8;
 }
 

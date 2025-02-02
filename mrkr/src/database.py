@@ -75,6 +75,16 @@ class Project(sqlmodel.SQLModel, table=True):
     creator: User = sqlmodel.Relationship()
 
 
+class Tag(sqlmodel.SQLModel, table=True):
+    __tablename__ = "ttag"
+    id: int = sqlmodel.Field(primary_key=True)
+    project_id: int = sqlmodel.Field(foreign_key="tproject.id")
+    name: str = sqlmodel.Field(unique=True)
+    color: str = sqlmodel.Field()
+
+    project: Project = sqlmodel.Relationship()
+
+
 class OcrResult(sqlmodel.SQLModel, table=True):
     __tablename__ = "tocrresult"
     id: int = sqlmodel.Field(primary_key=True)

@@ -8,9 +8,14 @@
 <div class="labeling">
     <div class="page-toolbar labeling">
         <h1>{{task.name}}</h1>
+        <span class="tag" style="background-color: silver">notag</span>
+        {% for tag in tags %}
+        <span class="tag" style="background-color: {{tag.color}};">{{tag.name}}</span>
+        {% endfor %}
     </div>
-    <div class="label-surface" id="label-surface" hx-get="{{url_for('content_label_surface')}}?id={{task.id}}&page=1"
-        hx-trigger="load" hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-request='{"timeout": {{config.timeout}}}'>
+    <div class="page-surface labeling" id="label-surface"
+        hx-get="{{url_for('content_label_surface')}}?id={{task.id}}&page=1" hx-trigger="load"
+        hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-request='{"timeout": {{config.timeout}}}'>
     </div>
 </div>
 {% endblock %}
