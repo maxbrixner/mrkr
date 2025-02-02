@@ -118,31 +118,45 @@ class ProjectManager():
         """
         project = await self.get_project(project_id=project_id)
 
-        if not await self._is_scannable(project=project):
-            raise Exception(
-                f"Project {project.name} is already being scanned.")
+        if project.scan_status != ScanStatus.pending:
+            raise Exception("Project is not ready for scanning.")
 
         self.logger.debug(f"Scan of project {project.name} started.")
 
-        project.status = ProjectStatus.scanning
-        project.last_scan = datetime.datetime.now()
-        self.session.add(project)
-        self.session.commit()
-
         try:
-            await self._update_tasks(project=project)
-        except Exception as exception:
-            project.status = ProjectStatus.error
+            project.scan_status = ScanStatus.scanning
             self.session.add(project)
             self.session.commit()
-            raise Exception(exception)
 
-    async def _is_scannable(self, project: Project) -> None:
-        if project.status != ProjectStatus.scanning:
-            return True
+            await self._update_tasks(project=project)
+        except Exception as exception:
+            logging.exception(exception)
+            logging.error(f"Scan for {project.name} failed.")
+            project.scan_status = ScanStatus.error
+            self.session.add(project)
+            self.session.commit()
 
-        # todo
-        if (datetime.datetime.now() - project.last_scan).total_seconds() < 60:
+    async def is_scannable(
+        self,
+        project: Project,
+    ) -> None:
+        """
+        Determines whether a project is ready to be scanned.
+        """
+        if project.last_scan:
+            since_last_scan = (datetime.datetime.now() -
+                               project.last_scan).total_seconds()
+        else:
+            since_last_scan = 0
+
+        self.logger.debug(f"Time since last scan: {since_last_scan}s.")
+
+        if project.scan_status == ScanStatus.pending and \
+                not since_last_scan > 15:
+            return False
+
+        if project.scan_status == ScanStatus.scanning and \
+                not since_last_scan > 15:
             return False
 
         return True
@@ -151,47 +165,44 @@ class ProjectManager():
         """
         Update tasks in the database with current file information.
         """
+        self.logger.debug(f"Updating tasks for project {project.name}.")
         tasks = await self.get_tasks(project=project)
         files = await self._get_project_files(project=project)
 
+        for task in tasks:
+            if task.uri not in [file.uri for file in files]:
+                self.logger.debug(f"Task file not found: {task.name}.")
+                task.file_status = FileStatus.missing
+            else:
+                self.logger.debug(f"Task file found: {task.name}.")
+                task.file_status = FileStatus.found
+
+            self.session.add(task)
+
         for file in files:
-            corresponding_tasks = list(
-                filter(lambda x: x.uri == file.uri, tasks)
-            )
-
-            if len(corresponding_tasks) > 1:
-                raise Exception("Inconsistent project database state.")
-
-            if len(corresponding_tasks) == 0:
-                self.logger.debug(f"New task found: {file.name}")
-
+            if file.uri not in [task.uri for task in tasks]:
+                self.logger.debug(f"New task found: {file.name}.")
                 task = Task(
                     project=project,
                     ocr=None,
                     name=file.name,
                     created=datetime.datetime.now(),
                     modified=None,
-                    status=TaskStatus.open,
-                    etag=file.etag,
-                    uri=file.uri
+                    uri=file.uri,
+                    task_status=TaskStatus.open,
+                    file_status=FileStatus.found,
+                    ocr_status=OcrStatus.initialized
                 )
 
                 self.session.add(task)
 
-            else:
-                task = corresponding_tasks[0]
-                if task.etag == file.etag:
-                    self.logger.debug(f"Existing task with unchanged content "
-                                      f"found: {file.name}")
-                else:
-                    self.logger.debug(f"Existing task with updated content "
-                                      f"found: {file.name}")
-                    task.etag = file.etag
-                    self.session.add(task)
+        self.session.commit()
 
-        # todo: delete tasks if file not found?
+        self.logger.debug(f"Tasks updated for {project.name}.")
 
-        project.status = ProjectStatus.scanned
+        await self.run_ocr(project=project)
+
+        project.scan_status = ScanStatus.ready
         self.session.add(project)
 
         self.session.commit()
@@ -210,6 +221,38 @@ class ProjectManager():
 
     async def run_ocr(
         self,
+        project: Project,
+        provider: str = "tesseract",
+        force: bool = False
+    ) -> None:
+        """
+        Run OCR for a project.
+        """
+        self.logger.debug(f"Running OCR for project {project.name}.")
+        tasks = await self.get_tasks(project=project)
+
+        for task in tasks:
+            try:
+                if task.file_status == FileStatus.missing:
+                    continue
+
+                task.ocr_status = OcrStatus.scanning
+                self.session.add(task)
+                self.session.commit()
+
+                await self._run_task_ocr(task=task)
+
+            except Exception as exception:
+                logging.exception(exception)
+                logging.error(f"OCR for {task.name} failed.")
+                task.ocr_status = OcrStatus.error
+                self.session.add(task)
+                self.session.commit()
+
+        self.logger.debug(f"OCR finished for {project.name}.")
+
+    async def _run_task_ocr(
+        self,
         task: Task,
         provider: str = "tesseract",
         force: bool = False
@@ -222,6 +265,10 @@ class ProjectManager():
         file_provider = FileProviderFactory.get_provider(
             provider="local")
 
+        ocr_provider = OcrProviderFactory.get_provider(
+            provider=provider
+        )
+
         force = True  # todo
 
         if task.ocr_id and not force:
@@ -230,24 +277,17 @@ class ProjectManager():
 
         etag = file_provider.get_checksum(uri=task.uri)
 
-        if etag != task.etag:
-            self.logger.warning("File has changed since last scan.")
-            task.etag = etag
-
         # todo: if another task has the same etag, just use that OCR result
-
-        ocr_provider = OcrProviderFactory.get_provider(
-            provider=provider
-        )
 
         images = file_provider.file_to_image(uri=task.uri)
 
         ocr_result = ocr_provider.run_ocr(images=images)
 
         ocr_result = OcrResult(
-            ocr=ocr_result.model_dump(),
+            etag=etag,
             provider=provider,
-            created=datetime.datetime.now()
+            created=datetime.datetime.now(),
+            ocr=ocr_result.model_dump()
         )
 
         self.session.add(ocr_result)
@@ -255,9 +295,13 @@ class ProjectManager():
         self.session.refresh(ocr_result)
 
         task.ocr_id = ocr_result.id
+        task.ocr_status = OcrStatus.ready
 
         self.session.add(task)
 
         self.session.commit()
+
+        self.logger.debug(f"OCR for task with id={task.id} successful.")
+
 
 # ---------------------------------------------------------------------------- #

@@ -1,5 +1,5 @@
 <div class="image-container">
-    <img id="immm" src="/label-image/?id={{task.id}}" draggable="false">
+    <img id="label-image" src="/label-image/?id={{task.id}}" draggable="false">
     </img>
     {% if task.ocr %}
     {% for block in task.ocr.ocr.pages[0].blocks %}

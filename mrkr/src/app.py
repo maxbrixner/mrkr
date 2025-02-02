@@ -343,13 +343,18 @@ async def scan_project(
 
     project = await manager.get_project(project_id=id)
 
-    project.status = ProjectStatus.pending
-    session.database.add(project)
-    session.database.commit()
+    if await manager.is_scannable(project=project):
+        project.scan_status = ScanStatus.pending
+        project.last_scan = datetime.datetime.now()
+        session.database.add(project)
+        session.database.commit()
 
-    worker.put("scan-project", project_id=project.id)
+        worker.put("scan-project", project_id=project.id)
+        logger.debug("Project scan initialized.")
+    else:
+        logger.debug("Project is not ready to be scanned.")
 
-    return HTMLResponse("pending... please refresh")
+    return await tasks_page(session=session, id=project.id)
 
 # ---------------------------------------------------------------------------- #
 
@@ -389,11 +394,17 @@ async def tasks_page(
         context={
             "config": config.htmx_config,
             "project": project,
-            "tasks": tasks
+            "tasks": tasks,
+            "scannable": await manager.is_scannable(project=project)
         }
     )
 
 # ---------------------------------------------------------------------------- #
+
+    project.scan_status = ScanStatus.pending
+    project.last_scan = datetime.datetime.now()
+    session.database.add(project)
+    session.database.commit()
 
 
 @app.post("/run_ocr")

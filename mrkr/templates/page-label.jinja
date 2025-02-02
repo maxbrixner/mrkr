@@ -6,8 +6,8 @@
 
 {% block main %}
 <div class="labeling">
-    <div class="labeling-header">
-        <h1>Labeling</h1>
+    <div class="page-toolbar labeling">
+        <h1>{{task.name}}</h1>
     </div>
     <div class="label-surface" id="label-surface" hx-get="{{url_for('content_label_surface')}}?id={{task.id}}&page=1"
         hx-trigger="load" hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-request='{"timeout": {{config.timeout}}}'>

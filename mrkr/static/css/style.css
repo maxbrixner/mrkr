@@ -459,22 +459,11 @@ div.projects,
 div.tasks,
 div.labeling {
     display: grid;
-    grid-template-rows: 5.5rem 5.5rem 1fr;
-}
-
-div.page-header {
-    align-items: center;
-    border-bottom: 1px solid var(--border-background-surface);
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr;
-    padding: 1rem 1.5rem;
+    grid-template-rows: 5.5rem 1fr;
 }
 
 div.page-toolbar {
     align-items: center;
-    border-bottom: 1px solid var(--border-background-surface);
     display: grid;
     gap: 1rem;
     grid-template-rows: 1fr;
@@ -485,6 +474,11 @@ div.page-toolbar {
     overflow-y: hidden;
 }
 
+div.page-toolbar>h1 {
+    margin-right: 1rem;
+    white-space: nowrap;
+}
+
 div.page-surface {
     align-items: flex-start;
     display: flex;
@@ -493,6 +487,17 @@ div.page-surface {
     padding: 1.5rem;
     overflow: auto;
 }
+
+div.page-surface:has(div.status-card) {
+    justify-content: center;
+}
+
+div.status-card {
+    font-size: 1.2rem;
+    color: var(--on-background);
+    opacity: 0.5;
+}
+
 
 div.project-card,
 div.task-card {
@@ -521,8 +526,9 @@ div.project-card>div.project-options,
 div.task-card>div.task-options {
     padding: 1rem 1rem 1rem 2rem;
     display: grid;
-    grid-template-columns: 1fr min-content min-content;
+    grid-template-columns: min-content min-content;
     gap: 1rem;
+    justify-content: end;
     align-items: center;
 }
 
@@ -532,6 +538,7 @@ div.task-card>div.task-options>button>img {
     height: 1.5rem;
     width: 1.5rem;
 }
+
 
 /* -------------------------------------------------------------------------- */
 /* Specific Layouts: Tasks                                                  */
@@ -545,6 +552,39 @@ div.expandable-content.scan {
 
 div.expandable-content.scan>span.scan-status-span {
     position: relative;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Specific Layouts: Labelung                                                 */
+/* -------------------------------------------------------------------------- */
+
+div.label-surface {
+    display: grid;
+    grid-template-columns: min-content;
+    grid-template-rows: min-content;
+}
+
+div.label-surface>div.image-container {
+    border: 3px solid red;
+    position: relative;
+    flex-basis: 0;
+}
+
+div.label-surface>div.image-container>img {
+    z-index: 1;
+    display: block;
+}
+
+div.label-surface>div.image-container>div.highlight {
+    position: absolute;
+    z-index: 2;
+    background-color: silver;
+    border: 1px solid silver;
+    opacity: 0.3;
+}
+
+div.label-surface>div.image-container>div.highlight:hover {
+    opacity: 0.8;
 }
 
 /* -------------------------------------------------------------------------- */

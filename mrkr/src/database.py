@@ -51,12 +51,12 @@ class SourceType(str, enum.Enum):
     s3 = "s3"
 
 
-class ProjectStatus(str, enum.Enum):
-    error = "error"
+class ScanStatus(str, enum.Enum):
+    initialized = "initialized"
     pending = "pending"
-    unscanned = "unscanned"
     scanning = "scanning"
-    scanned = "scanned"
+    ready = "ready"
+    error = "error"
 
 
 class Project(sqlmodel.SQLModel, table=True):
@@ -68,32 +68,40 @@ class Project(sqlmodel.SQLModel, table=True):
 
     source_type: SourceType = sqlmodel.Field()
     source_uri: str = sqlmodel.Field()
-    status: ProjectStatus = sqlmodel.Field()
+
+    scan_status: ScanStatus = sqlmodel.Field()
     last_scan: datetime.datetime = sqlmodel.Field(nullable=True)
 
     creator: User = sqlmodel.Relationship()
 
 
-class OcrStatus(str, enum.Enum):
-    error = "error"
-    unscanned = "unscanned"
-    scanning = "scanning"
-    scanned = "scanned"
-
-
 class OcrResult(sqlmodel.SQLModel, table=True):
     __tablename__ = "tocrresult"
     id: int = sqlmodel.Field(primary_key=True)
-    ocr: Optional[OcrObject] = sqlmodel.Field(
-        default_factory=OcrObject, sa_type=sqlmodel.JSON)
+    etag: str = sqlmodel.Field()
     provider: str = sqlmodel.Field()
     created: datetime.datetime = sqlmodel.Field()
+    ocr: Optional[OcrObject] = sqlmodel.Field(
+        default_factory=OcrObject, sa_type=sqlmodel.JSON)
 
 
 class TaskStatus(str, enum.Enum):
     open = "open"
     progress = "progress"
     complete = "complete"
+
+
+class FileStatus(str, enum.Enum):
+    found = "found"
+    missing = "missing"
+
+
+class OcrStatus(str, enum.Enum):
+    initialized = "initialized"
+    pending = "pending"
+    scanning = "scanning"
+    ready = "ready"
+    error = "error"
 
 
 class Task(sqlmodel.SQLModel, table=True):
@@ -103,13 +111,15 @@ class Task(sqlmodel.SQLModel, table=True):
         foreign_key="tproject.id")
     ocr_id: Optional[int] = sqlmodel.Field(
         foreign_key="tocrresult.id", nullable=True)
+
     name: str = sqlmodel.Field()
     created: datetime.datetime = sqlmodel.Field()
     modified: datetime.datetime = sqlmodel.Field(nullable=True)
-    status: TaskStatus = sqlmodel.Field()
-
-    etag: str = sqlmodel.Field()
     uri: str = sqlmodel.Field(unique=True)
+
+    task_status: TaskStatus = sqlmodel.Field()
+    file_status: FileStatus = sqlmodel.Field()
+    ocr_status: OcrStatus = sqlmodel.Field()
 
     project: Project = sqlmodel.Relationship()
     ocr: OcrResult = sqlmodel.Relationship()

@@ -46,7 +46,7 @@ class Localization(pydantic.BaseModel):
 class HtmxConfig(pydantic.BaseModel):
     # artificial delay (in milliseconds) that is added to htmx requests
     # in order to avoid flickering
-    swap_delay: int = 1000
+    swap_delay: int = 200
     # timeout
     timeout: int = 20000
 
