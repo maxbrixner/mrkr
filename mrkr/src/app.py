@@ -450,13 +450,8 @@ async def label_page(
         request=session.request,
         name="page-label.jinja",
         context={
-            "projects_url": app.url_path_for("projects_page"),
-            "logout_url": app.url_path_for("logout"),
-            "label_surface_url": app.url_path_for("content_label_surface"),
-            "timeout": 20000,
-            "swap_delay": 500,
+            "config": config.htmx_config,
             "task": task
-
         }
     )
 
@@ -478,6 +473,7 @@ async def content_label_surface(
         request=session.request,
         name="content-label-surface.jinja",
         context={
+            "config": config.htmx_config,
             "task": task
         }
     )

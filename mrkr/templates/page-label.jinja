@@ -1,10 +1,16 @@
 {% extends "base.jinja" %}
 
+{% block nav %}
+{% include 'content-nav.jinja' %}
+{% endblock %}
+
 {% block main %}
-<main class="main-label" id="main">
-    <div class="label-surface" id="label-surface" hx-get="{{label_surface_url}}?id={{task.id}}&page=1" hx-trigger="load"
-        hx-swap="innerHTML swap:{{swap_delay}}ms" hx-request='{"timeout": {{timeout}}}'>
+<div class="labeling">
+    <div class="labeling-header">
+        <h1>Labeling</h1>
     </div>
-    <span>Sidebar</span>
-</main>
+    <div class="label-surface" id="label-surface" hx-get="{{url_for('content_label_surface')}}?id={{task.id}}&page=1"
+        hx-trigger="load" hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-request='{"timeout": {{config.timeout}}}'>
+    </div>
+</div>
 {% endblock %}

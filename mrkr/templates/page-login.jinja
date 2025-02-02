@@ -1,8 +1,8 @@
 {% extends "base.jinja" %}
 
 {% block main %}
-<div class="login-container">
-    <form method="POST" action="{{url_for('login')}}">
+<div id="login-container" class="login-container">
+    <form id="login-form" method="POST" action="{{url_for('login')}}">
         <h1>MRKR</h1>
         {% if flash %}
         <div class="flash">{{ flash.user_message }}</div>
@@ -26,8 +26,9 @@
         <span>
             Don't have an account yet?
             <a class="primary" href="{{url_for('signup_page')}}" hx-get="{{url_for('signup_page')}}" hx-trigger="click"
-                hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-target="body" hx-push-url="true"
-                hx-indicator="#body" hx-request='{"timeout": {{config.timeout}}}'>Sign up!</a>
+                hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#login-form" hx-select="#signup-form"
+                hx-push-url="true" hx-indicator="#login-form" hx-request='{"timeout": {{config.timeout}}}'>Sign
+                up!</a>
             </a>
         </span>
     </form>

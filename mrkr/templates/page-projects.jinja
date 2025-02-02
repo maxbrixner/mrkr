@@ -1,68 +1,39 @@
 {% extends "base.jinja" %}
 
-{% block header %}
-&nbsp;
-{% endblock %}
-
-
 {% block nav %}
-<div class="header">
-    <span>mrkr</span>
-    <button aria-label="Expand Navigation" id="toggle-nav-button">
-        <img src="/static/img/chevron-forward-outline.svg" alt="Expand Navigation Icon">
-    </button>
-</div>
-<div class="button-container">
-    <button aria-label="Home" hx-get="{{url_for('projects_page')}}" hx-trigger="click"
-        hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-target="body" hx-push-url="true" hx-indicator="body"
-        hx-request='{"timeout": {{config.timeout}}}'>
-        <img src="/static/img/home-outline.svg" alt="Home Icon">
-        <span>Home</span>
-    </button>
-</div>
-<div class="button-container expandable">
-    <button aria-label="Create Project">
-        <img src="/static/img/create-outline.svg" alt="Create Icon">
-        <span>Create</span>
-        <img class="chevron" src="/static/img/chevron-down-outline.svg" alt="Create Project Icon">
-    </button>
-    <div class="expandable-content-container">
-        <div class="expandable-content">
-            Hallo<br>Hallo
-        </div>
-    </div>
-</div>
-<div class="button-container">
-    <button aria-label="Logout" hx-post="{{url_for('logout')}}" hx-trigger="click"
-        hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-target="body" hx-push-url="true" hx-indicator="body"
-        hx-request='{"timeout": {{config.timeout}}}'>
-        <img src="/static/img/log-out-outline.svg" alt="Logout Icon">
-        <span>Logout</span>
-    </button>
-</div>
+{% include 'content-nav.jinja' %}
 {% endblock %}
 
 {% block main %}
 <div class="projects">
-    {% for project in projects %}
-    <div class="project-card">
-        <div class="project-description">
-            <h2>{{project.name}}</h2>
-            <p>{{project.description}}</p>
-        </div>
-        <div class="project-options">
-            <div id="status-{{project.id}}" class="project-status ellipsis">
+    <div class="page-header projects">
+        <h1>Projects</h1>
+    </div>
+    <div class="page-toolbar projects">
+        <button class="primary"><img src="/static/img/reload-outline.svg"></button>
+        <button class="secondary">New Project</button>
+    </div>
+    <div class="page-surface projects">
+        {% for project in projects %}
+        <div class="project-card">
+            <div class="project-description">
+                <h2>{{project.name}}</h2>
+                <p>{{project.description}}</p>
             </div>
-            <button class="image small" aria-label="Edit settings for {{project.name}}"><img
-                    src="/static/img/settings-outline.svg" alt="Settings Icon"></button>
-            <button class="image small" aria-label="View {{project.name}}"
-                hx-get="{{url_for('tasks_page')}}?id={{project.id}}" hx-trigger="click"
-                hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-target="body" hx-push-url="true" hx-indicator="body"
-                hx-request='{"timeout": {{config.timeout}}}'>
-                <img src="/static/img/arrow-forward-outline.svg" alt="View Project Icon">
-            </button>
+            <div class="project-options">
+                <div id="status-{{project.id}}" class="project-status ellipsis">
+                </div>
+                <button class="image small" aria-label="Edit project {{project.name}}"><img
+                        src="/static/img/create-outline.svg" alt="Edit Icon" draggable="false"></button>
+                <button class="image small" aria-label="View {{project.name}}"
+                    hx-get="{{url_for('tasks_page')}}?id={{project.id}}" hx-trigger="click"
+                    hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main"
+                    hx-push-url="true" hx-request='{"timeout": {{config.timeout}}}' hx-indicator="#main">
+                    <img src="/static/img/arrow-forward-outline.svg" alt="View Project Icon" draggable="false">
+                </button>
+            </div>
         </div>
+        {% endfor %}
     </div>
 </div>
-{% endfor %}
 {% endblock %}

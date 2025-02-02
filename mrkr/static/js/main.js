@@ -7,11 +7,11 @@ document.addEventListener('DOMContentLoaded', function (evt) {
 
 document.addEventListener('htmx:beforeRequest', function (evt) {
     console.log('htmx:beforeRequest');
-    if (evt.detail.target.tagName === "SPAN") {
+    /*if (evt.detail.target.tagName in ["SPAN", "H1"]) {
         evt.detail.target.innerHTML = "&nbsp;";
     } else {
         evt.detail.target.innerHTML = "";
-    }
+    }*/
 });
 
 
@@ -41,11 +41,11 @@ function register_event_listeners() {
     });
 
     const nav = document.getElementById("nav");
-    const expandable_nav_items = nav.getElementsByClassName('button-container expandable');
-    for (const item of expandable_nav_items) {
-        const button = item.firstElementChild;
-        add_event_listener(button, 'click', function (evt) {
-            toggle_nav_item(item);
+    const nav_items = nav.getElementsByTagName('button');
+    console.log(nav_items);
+    for (const item of nav_items) {
+        add_event_listener(item, 'click', function (evt) {
+            collapse_navigation();
         });
     }
 
