@@ -416,15 +416,16 @@ async def label_page(
 
     project = await manager.get_project(project_id=task.project_id)
 
-    tags = await manager.get_tags(project=project)
+    labels = await manager.get_labels(project=project)
 
     return templates.TemplateResponse(
         request=session.request,
         name="page-label.jinja",
         context={
             "config": config.htmx_config,
+            "project": project,
             "task": task,
-            "tags": tags
+            "labels": labels
         }
     )
 

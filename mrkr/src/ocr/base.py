@@ -16,6 +16,7 @@ class OcrCoordinates(pydantic.BaseModel):
 
 
 class OcrBlock(pydantic.BaseModel):
+    id: int
     content: str
     confidence: Optional[float] = None
     coordinates: OcrCoordinates

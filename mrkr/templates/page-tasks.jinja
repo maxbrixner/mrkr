@@ -7,33 +7,47 @@
 {% block main %}
 <div class="tasks">
     <div class="page-toolbar tasks">
-        <h1>{{project.name}}</h1>
-        <button class="primary" hx-get="{{url_for('tasks_page')}}?id={{project.id}}" hx-trigger="click"
-            hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#tasks-surface" hx-select="#tasks-surface"
-            hx-request='{"timeout": {{config.timeout}}}' hx-indicator="#tasks-surface"><img
-                src="/static/img/reload-outline.svg"></button>
-        <button class="secondary" hx-post="{{url_for('scan_project')}}?id={{project.id}}" hx-trigger="click"
-            hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#tasks-surface" hx-select="#tasks-surface"
-            hx-indicator="#tasks-surface" hx-request='{"timeout": {{config.timeout}}}'>Queue Scan</button>
+        <div>
+            <button class="secondary" aria-label="Back to Projects" hx-get="{{url_for('projects_page')}}"
+                hx-trigger="click" hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main"
+                hx-push-url="true" hx-indicator="#main" hx-request='{"timeout": {{config.timeout}}}'><img
+                    src="/static/img/arrow-back-outline.svg"></button>
+            <button class="secondary" hx-get="{{url_for('tasks_page')}}?id={{project.id}}" hx-trigger="click"
+                hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#tasks-surface" hx-select="#tasks-surface"
+                hx-request='{"timeout": {{config.timeout}}}' hx-indicator="#tasks-surface"><img
+                    src="/static/img/reload-outline.svg"></button>
+        </div>
+        <div>
+            <h1>{{project.name}}</h1>
+        </div>
+        <div class="toolbar-buttons">
+            <button class="primary" hx-post="{{url_for('scan_project')}}?id={{project.id}}" hx-trigger="click"
+                hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#tasks-surface" hx-select="#tasks-surface"
+                hx-indicator="#tasks-surface" hx-request='{"timeout": {{config.timeout}}}'>Queue Scan</button>
+        </div>
     </div>
     <div id="tasks-surface" class="page-surface tasks">
         {% if not project.scan_status == 'ready' %}
         <div class="status-card">
             {% if project.scan_status == 'initialized' %}
-            No scan has been queued for this project.
+            <span><b>No scan has been queued for this project.</b></span>
             {% elif project.scan_status == 'pending' %}
-            A scan of this project is pending.
+            <span><b>A scan of this project is pending.</b></span>
             {% elif project.scan_status == 'scanning' %}
-            A scan of this project is running.
+            <span><b>A scan of this project is currently running.</b></span>
             {% elif project.scan_status == 'error' %}
-            The last scan of this project resulted in an error.
+            <span>The last scan of this project resulted in an error.</span>
             {% endif %}
             {% if scannable %}
-            You can try to queue a new scan.
+            <span>You can queue a new scan now.</span>
             {% else %}
-            Please wait.
+            <span>Please wait and then refresh the page.</span>
             {% endif %}
-            {{project.last_scan}}
+            <!--
+            {% if project.last_scan %}
+            <span>List scan: {{project.last_scan}}</span>
+            {% endif %}
+            -->
         </div>
 
         {% else %}

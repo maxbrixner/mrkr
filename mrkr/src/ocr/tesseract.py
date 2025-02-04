@@ -93,6 +93,7 @@ class TesseractOcrProvider(BaseOcrProvider):
             )
 
             block = OcrBlock(
+                id=index,
                 content=text,
                 confidence=confidence,
                 coordinates=coordinates

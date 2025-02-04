@@ -75,8 +75,8 @@ class Project(sqlmodel.SQLModel, table=True):
     creator: User = sqlmodel.Relationship()
 
 
-class Tag(sqlmodel.SQLModel, table=True):
-    __tablename__ = "ttag"
+class Label(sqlmodel.SQLModel, table=True):
+    __tablename__ = "tlabeö"
     id: int = sqlmodel.Field(primary_key=True)
     project_id: int = sqlmodel.Field(foreign_key="tproject.id")
     name: str = sqlmodel.Field(unique=True)

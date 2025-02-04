@@ -7,15 +7,33 @@
 {% block main %}
 <div class="labeling">
     <div class="page-toolbar labeling">
-        <h1>{{task.name}}</h1>
-        <span class="tag" style="background-color: silver">notag</span>
-        {% for tag in tags %}
-        <span class="tag" style="background-color: {{tag.color}};">{{tag.name}}</span>
-        {% endfor %}
+        <div>
+            <button class="secondary" aria-label="Back to Tasks" hx-get="{{url_for('tasks_page')}}?id={{project.id}}"
+                hx-trigger="click" hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main"
+                hx-push-url="true" hx-indicator="#main" hx-request='{"timeout": {{config.timeout}}}'><img
+                    src="/static/img/arrow-back-outline.svg"></button>
+
+        </div>
+        <div>
+            <h1>{{task.name}}</h1>
+        </div>
+        <div>
+            <button class="primary" aria-label="Save Changes">Save Changes</button>
+        </div>
     </div>
     <div class="page-surface labeling" id="label-surface"
         hx-get="{{url_for('content_label_surface')}}?id={{task.id}}&page=1" hx-trigger="load"
-        hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-request='{"timeout": {{config.timeout}}}'>
+        hx-swap="innerHTML swap:1000ms" hx-indiator="#label-surface" hx-request='{"timeout": {{config.timeout}}}'>
+    </div>
+    <div id="labeling-details" class="page-details labeling">
+        <div class="available-labels">
+            {% for label in labels %}
+            <button class="label-button" style="background-color: {{label.color}}20; border-color: {{label.color}};"
+                data-label="{{label.name}}" data-color="{{label.color}}">{{label.name}}</button>
+            {% endfor %}
+        </div>
+        <div id="added-labels" class="added-labels">
+        </div>
     </div>
 </div>
 {% endblock %}

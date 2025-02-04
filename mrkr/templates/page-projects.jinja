@@ -7,11 +7,16 @@
 {% block main %}
 <div class="projects">
     <div class="page-toolbar projects">
-        <h1>Projects</h1>
-        <button class="primary"><img src="/static/img/reload-outline.svg"></button>
-        <button class="secondary">New Project</button>
+        <div><button class="secondary" hx-get="{{url_for('projects_page')}}" hx-trigger="click"
+                hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#projects-surface"
+                hx-select="#projects-surface" hx-request='{"timeout": {{config.timeout}}}'
+                hx-indicator="#projects-surface"><img src="/static/img/reload-outline.svg"></button></div>
+        <div></div>
+        <div class="toolbar-buttons">
+            <button class="primary">New Project</button>
+        </div>
     </div>
-    <div class="page-surface projects">
+    <div id="projects-surface" class="page-surface projects">
         {% for project in projects %}
         <div class="project-card">
             <div class="project-description">

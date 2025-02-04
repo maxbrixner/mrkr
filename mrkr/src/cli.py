@@ -82,27 +82,27 @@ def insert_demo() -> None:
         session.add(project)
         session.commit()
 
-        tag1 = Tag(
+        label1 = Label(
             project=project,
             name="Name",
             color="#648fff"
         )
 
-        tag2 = Tag(
+        label2 = Label(
             project=project,
             name="Street",
             color="#dc267f"
         )
 
-        tag3 = Tag(
+        label3 = Label(
             project=project,
             name="IBAN",
             color="#ffb000"
         )
 
-        session.add(tag1)
-        session.add(tag2)
-        session.add(tag3)
+        session.add(label1)
+        session.add(label2)
+        session.add(label3)
 
         session.commit()
 

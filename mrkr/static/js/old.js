@@ -1,7 +1,6 @@
 
 
 document.addEventListener('DOMContentLoaded', function (evt) {
-    console.log("aaa")
     add_close_dialog_event("dialog-overlay");
     add_close_sidebar_event("sidebar-overlay");
     add_close_sidebar_event2("sidebar-close-button");

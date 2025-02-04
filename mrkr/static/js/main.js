@@ -1,4 +1,10 @@
 
+var current_label = null;
+var current_color = null;
+var linked = false;
+var linked_initialized = false;
+
+/* Document event listeners */
 
 document.addEventListener('DOMContentLoaded', function (evt) {
     console.log('DOMContentLoaded');
@@ -7,32 +13,63 @@ document.addEventListener('DOMContentLoaded', function (evt) {
 
 document.addEventListener('htmx:beforeRequest', function (evt) {
     console.log('htmx:beforeRequest');
-    /*if (evt.detail.target.tagName in ["SPAN", "H1"]) {
-        evt.detail.target.innerHTML = "&nbsp;";
-    } else {
-        evt.detail.target.innerHTML = "";
-    }*/
+    /* todo */
 });
 
 
 document.addEventListener('htmx:afterSwap', function (evt) {
     console.log('htmx:afterSwap');
-    register_event_listeners()
+    register_event_listeners();
+    current_label = null;
+    current_color = null;
+    linked = false;
+    linked_initialized = false;
 });
 
 document.addEventListener('htmx:timeout', function (evt) {
-    return;
+    console.log('htmx:timeout');
+    /* todo */
 });
 
 document.addEventListener('htmx:sendError', function (evt) {
-    return;
+    console.log('htmx:sendError');
+    /* todo */
 });
 
 document.addEventListener('htmx:responseError', function (evt) {
-    return;
+    console.log('htmx:responseError');
+    /* todo */
 });
 
-/* ---- */
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Shift") {
+        linked = true;
+    }
+});
+
+document.addEventListener("keyup", (event) => {
+    if (event.key === "Shift") {
+        linked = false;
+        linked_initialized = false;
+    }
+});
+
+document.addEventListener('keypress', function (evt) {
+    const labelimage = document.getElementById("label-image");
+    if (labelimage === null) {
+        return;
+    }
+    if (evt.key === '+') {
+        width = labelimage.clientWidth
+        labelimage.style.width = Math.round(width * 1.01, 0) + "px";
+    }
+    if (evt.key === '-') {
+        width = labelimage.clientWidth
+        labelimage.style.width = Math.round(width * 0.99, 0) + "px";
+    }
+});
+
+/* Renewable Event Listeners */
 
 function register_event_listeners() {
 
@@ -42,47 +79,80 @@ function register_event_listeners() {
 
     const nav = document.getElementById("nav");
     const nav_items = nav.getElementsByTagName('button');
-    console.log(nav_items);
     for (const item of nav_items) {
         add_event_listener(item, 'click', function (evt) {
             collapse_navigation();
         });
     }
 
-    /* todo */
-    document.getElementById("label-image")?.addEventListener('click', function (e) {
-        console.log(e);
-        width = e.target.clientWidth
-        if (e.altKey === true)
-            e.target.style.width = Math.round(width * 1.1, 0) + "px";
-        else if (e.shiftKey === true)
-            e.target.style.width = Math.round(width * 0.9, 0) + "px";
-    });
+    const labelbuttons = document.getElementsByClassName('label-button');
+    for (const item of labelbuttons) {
+        add_event_listener(item, 'click', function (evt) {
+            const allbuttons = document.getElementsByClassName('label-button');
+            for (const button of allbuttons) {
+                button.classList.remove("selected");
+            }
+            evt.target.classList.add("selected");
+            current_label = evt.target.dataset.label;
+            current_color = evt.target.dataset.color;
+            linked = false;
+            linked_initialized = false;
+        });
+    }
 
-    document.addEventListener('keypress', function (evt) {
-        console.log(evt.key);
-        const labelimage = document.getElementById("label-image");
-        if (labelimage === null) {
-            console.log("nöööö")
-            return;
-        }
-        if (evt.key === '+') {
-            console.log("Plus key pressed!");
-            width = labelimage.clientWidth
-            console.log(width);
-            labelimage.style.width = Math.round(width * 1.01, 0) + "px";
-        }
-        if (evt.key === '-') {
-            console.log("Minus key pressed!");
-            width = labelimage.clientWidth
-            console.log(width);
-            labelimage.style.width = Math.round(width * 0.99, 0) + "px";
-        }
-    });
+    const highlights = document.getElementsByClassName('highlight');
+    for (const highlight of highlights) {
+        add_event_listener(highlight, 'click', function (evt) {
+
+            this.style.backgroundColor = current_color;
+
+            if (!evt.shiftKey || linked_initialized === false) {
+
+                if (evt.shiftKey) {
+                    linked_initialized = true;
+                }
+
+                details = document.getElementById("added-labels");
+
+
+                let new_item = document.createElement("div");
+                new_item.classList.add("labeled-item");
+                new_item.style.borderColor = current_color;
+                new_item.style.backgroundColor = current_color + "20";
+
+                let new_span = document.createElement("span");
+                new_span.innerHTML = current_label;
+
+                let new_input = document.createElement("input");
+                new_input.type = "text";
+                new_input.value = this.dataset.content;
+
+                let new_button = document.createElement("button");
+                let new_img = document.createElement("img");
+                new_img.src = "/static/img/trash-outline.svg";
+
+                new_button.appendChild(new_img);
+                new_item.appendChild(new_span);
+                new_item.appendChild(new_input);
+                new_item.appendChild(new_button);
+
+                details.prepend(new_item);
+
+            } else {
+
+                details = document.getElementById("added-labels");
+
+                let existing_item = details.firstChild;
+
+                let input = existing_item.getElementsByTagName("input")[0];
+
+                input.value = input.value + " " + this.dataset.content;
+
+            }
+        });
+    }
 
 }
-
-/* ---- */
 
 function add_event_listener(element, event_name, callback) {
     if (!element) {
@@ -96,47 +166,21 @@ function add_event_listener(element, event_name, callback) {
     element.dataset.listeners = 'true'
 }
 
-/* ---- */
-
 function expand_navigation() {
-    console.log('expand_navigation');
     const nav = document.getElementById("nav");
     nav.classList.add("expanded");
 }
 
 function collapse_navigation() {
-    console.log('collapse_navigation');
     const nav = document.getElementById("nav");
-    const expandable_nav_items = nav.getElementsByClassName('button-container expandable');
-    for (const item of expandable_nav_items) {
-        collapse_nav_item(item);
-    }
     nav.classList.remove("expanded");
 }
 
 function toggle_navigation() {
-    console.log('toggle_navigation');
     const nav = document.getElementById("nav");
     if (nav.classList.contains("expanded")) {
         collapse_navigation();
     } else {
         expand_navigation();
-    }
-}
-
-function expand_nav_item(element) {
-    expand_navigation();
-    element.classList.add("expanded");
-}
-
-function collapse_nav_item(element) {
-    element.classList.remove("expanded");
-}
-
-function toggle_nav_item(element) {
-    if (element.classList.contains("expanded")) {
-        collapse_nav_item(element);
-    } else {
-        expand_nav_item(element);
     }
 }
