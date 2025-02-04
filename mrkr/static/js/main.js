@@ -104,6 +104,16 @@ function register_event_listeners() {
     for (const highlight of highlights) {
         add_event_listener(highlight, 'click', function (evt) {
 
+            if (current_label === null) {
+                return;
+            }
+
+            if (this.dataset.active === "true") {
+                return;
+            }
+
+            this.dataset.active = "true";
+
             this.style.backgroundColor = current_color;
 
             if (!evt.shiftKey || linked_initialized === false) {
@@ -119,6 +129,7 @@ function register_event_listeners() {
                 new_item.classList.add("labeled-item");
                 new_item.style.borderColor = current_color;
                 new_item.style.backgroundColor = current_color + "20";
+                new_item.dataset.ocr_ids = this.dataset.id;
 
                 let new_span = document.createElement("span");
                 new_span.innerHTML = current_label;
@@ -130,6 +141,9 @@ function register_event_listeners() {
                 let new_button = document.createElement("button");
                 let new_img = document.createElement("img");
                 new_img.src = "/static/img/trash-outline.svg";
+                new_button.addEventListener('click', function (evt) {
+                    remove_label(this);
+                });
 
                 new_button.appendChild(new_img);
                 new_item.appendChild(new_span);
@@ -143,6 +157,8 @@ function register_event_listeners() {
                 details = document.getElementById("added-labels");
 
                 let existing_item = details.firstChild;
+
+                existing_item.dataset.ocr_ids = existing_item.dataset.ocr_ids + "," + this.dataset.id;
 
                 let input = existing_item.getElementsByTagName("input")[0];
 
@@ -183,4 +199,21 @@ function toggle_navigation() {
     } else {
         expand_navigation();
     }
+}
+
+function remove_label(element) {
+
+    ocr_ids = element.parentElement.dataset.ocr_ids.split(",");
+
+    for (const ocr_id of ocr_ids) {
+        highlight = document.querySelector(`.highlight[data-id="${ocr_id}"]`);
+        highlight.style.backgroundColor = "#c0c0c0";
+        highlight.dataset.active = "false";
+    }
+
+    element.parentElement.remove();
+}
+
+function scroll_to_element(element) {
+    element.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
 }
