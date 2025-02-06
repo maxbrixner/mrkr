@@ -455,7 +455,7 @@ async def label_page(
 
     def get_user_label(ocr_id: int) -> UserLabel:
         return next(
-            (user_label for user_label in user_labels if ocr_id in user_label.label.ocr_ids),
+            (user_label for user_label in user_labels if ocr_id in user_label.label["ocr_ids"]),
             None
         )
 
@@ -531,7 +531,7 @@ async def save_labels(
                     label_id=item[0],
                     ocr_ids=item[1].split(","),
                     user_content=item[2]
-                )
+                ).model_dump()
             )
         )
 
