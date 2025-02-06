@@ -7,7 +7,7 @@ import pathlib
 import pdf2image
 import hashlib
 import io
-from typing import List
+from typing import List, Generator
 from PIL import Image
 
 # ---------------------------------------------------------------------------- #
@@ -50,7 +50,7 @@ class BaseFileProvider():
     def read_file(
         self,
         uri: str
-    ):
+    ) -> Generator[io.BufferedReader]:
         """
         Yields a file stream.
         """

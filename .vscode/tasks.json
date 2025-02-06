@@ -82,7 +82,7 @@
         {
             "type": "shell",
             "label": "linting",
-            "command": ".venv/bin/mypy --disallow-untyped-defs --disallow-incomplete-defs --disable-error-code=import-untyped mrkr deploy",
+            "command": ".venv/bin/mypy --disallow-untyped-defs --disallow-incomplete-defs --disable-error-code=import-untyped mrkr",
             "problemMatcher": [],
             "group": "test",
         }

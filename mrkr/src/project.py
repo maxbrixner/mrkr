@@ -3,6 +3,7 @@
 
 import logging
 import sqlmodel
+import pydantic
 from typing import List, Sequence
 
 # ---------------------------------------------------------------------------- #
@@ -29,25 +30,6 @@ class ProjectManager():
         self.logger = logging.getLogger('mrkr.project')
 
         self.session = session
-
-    async def create_project(
-        self,
-        project_name: str,
-        project_description: str
-    ) -> None:
-        """
-        Create a new project.
-        """
-        project = Project(
-            name=project_name,
-            description=project_description,
-            creator=self.session.user
-        )
-
-        self.session.add(project)
-        self.session.commit()
-
-        self.logger.info(f"Project with name = '{project_name}' created.")
 
     async def get_projects(
         self
@@ -88,36 +70,57 @@ class ProjectManager():
         query = sqlmodel.select(Task).where(Task.id == task_id)
         return self.session.exec(query).first()
 
-    async def get_ocr(
-        self,
-        etag: str
-    ) -> OcrResult | None:
-        """
-        Get an OCR result by its E-Tag.
-        """
-        query = sqlmodel.select(OcrResult).where(OcrResult.etag == etag)
-        return self.session.exec(query).first()
-
     async def ocr_exists(
         self,
         etag: str
-    ) -> OcrResult | None:
+    ) -> bool:
         """
         Check if an OCR for a specific E-Tag exists.
         """
         query = sqlmodel.select(sqlmodel.func.count()).where(
             OcrResult.etag == etag)
-        return self.session.exec(query).first() > 0
+        ocr = self.session.exec(query).first()
+        return (ocr is not None and ocr > 0)
 
     async def get_labels(
         self,
         project: Project
     ) -> Sequence[Label]:
         """
-        Get all tags for a project.
+        Get all possible labels for a project.
         """
         query = sqlmodel.select(Label).where(Label.project_id == project.id)
         return self.session.exec(query).all()
+
+    async def get_user_labels(
+        self,
+        task: Task
+    ) -> Sequence[UserLabel]:
+        """
+        Get all userlabels for a task.
+        """
+        query = sqlmodel.select(UserLabel).where(UserLabel.task_id == task.id)
+        return self.session.exec(query).all()
+
+    async def swap_user_labels(
+        self,
+        task: Task,
+        user_labels: List[UserLabel]
+    ) -> None:
+        """
+        Get all userlabels for a task.
+        """
+        query = sqlmodel.select(UserLabel).where(UserLabel.task_id == task.id)
+        existing_labels = self.session.exec(query).all()
+        for user_label in existing_labels:
+            self.session.delete(user_label)
+
+        for user_label in user_labels:
+            if user_label.task_id != task.id:
+                raise Exception("UserLabel does not match task.")
+            self.session.add(user_label)
+
+        self.session.commit()
 
     async def scan_project(
         self,
@@ -127,6 +130,9 @@ class ProjectManager():
         Scan a project's source and update the task list accordingly.
         """
         project = await self.get_project(project_id=project_id)
+
+        if not project:
+            raise Exception("Project not found.")
 
         if project.scan_status != ScanStatus.pending:
             raise Exception("Project is not ready for scanning.")
@@ -149,7 +155,7 @@ class ProjectManager():
     async def is_scannable(
         self,
         project: Project,
-    ) -> None:
+    ) -> bool:
         """
         Determines whether a project is ready to be scanned.
         """
@@ -291,13 +297,13 @@ class ProjectManager():
 
         images = file_provider.file_to_image(uri=task.uri)
 
-        ocr_result = ocr_provider.run_ocr(images=images)
+        ocr = ocr_provider.run_ocr(images=images)
 
         ocr_result = OcrResult(
             etag=etag,
             provider=provider,
             created=datetime.datetime.now(),
-            ocr=ocr_result.model_dump()
+            ocr=ocr.model_dump()
         )
 
         self.session.add(ocr_result)

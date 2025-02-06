@@ -3,7 +3,8 @@
 import pathlib
 import hashlib
 import contextlib
-from typing import List
+import io
+from typing import List, Generator
 
 # ---------------------------------------------------------------------------- #
 
@@ -35,7 +36,7 @@ class LocalFileProvider(BaseFileProvider):
                 FileObject(
                     name=file.name,
                     uri=str(file),
-                    etag=self.get_checksum(file)
+                    etag=self.get_checksum(str(file))
                 )
             )
 
@@ -45,7 +46,7 @@ class LocalFileProvider(BaseFileProvider):
     def read_file(
         self,
         uri: str
-    ):
+    ) -> Generator[io.BufferedReader]:
         """
         Yields a binary file stream.
         """

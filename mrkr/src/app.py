@@ -343,6 +343,9 @@ async def scan_project(
 
     project = await manager.get_project(project_id=id)
 
+    if not project:
+        raise Exception("Project not found.")
+
     if await manager.is_scannable(project=project):
         project.scan_status = ScanStatus.pending
         project.last_scan = datetime.datetime.now()
@@ -386,6 +389,9 @@ async def tasks_page(
 
     project = await manager.get_project(project_id=id)
 
+    if not project:
+        raise Exception("Project not found.")
+
     tasks = await manager.get_tasks(project=project)
 
     return templates.TemplateResponse(
@@ -414,9 +420,50 @@ async def label_page(
 
     task = await manager.get_task(task_id=id)
 
+    if not task:
+        raise Exception("Task not found.")
+
     project = await manager.get_project(project_id=task.project_id)
 
+    if not project:
+        raise Exception("Project not found.")
+
     labels = await manager.get_labels(project=project)
+
+    user_labels = await manager.get_user_labels(task=task)
+
+    """
+    user_labels = [
+        UserLabel(
+            id=1,
+            task_id=1,
+            label=LabelObject(
+                label_id=1,
+                ocr_ids=[4, 5],
+                user_content="Thomas Smith"),
+        ),
+        UserLabel(
+            id=2,
+            task_id=1,
+            label=LabelObject(
+                label_id=1,
+                ocr_ids=[24, 25],
+                user_content="John Doe"),
+        )
+    ]
+    """
+
+    def get_user_label(ocr_id: int) -> UserLabel:
+        return next(
+            (user_label for user_label in user_labels if ocr_id in user_label.label.ocr_ids),
+            None
+        )
+
+    def get_label(id: int) -> Label:
+        return next(
+            (label for label in labels if label.id == id),
+            None
+        )
 
     return templates.TemplateResponse(
         request=session.request,
@@ -425,32 +472,13 @@ async def label_page(
             "config": config.htmx_config,
             "project": project,
             "task": task,
-            "labels": labels
+            "labels": labels,
+            "user_labels": user_labels,
+            "get_label": get_label,
+            "get_user_label": get_user_label
         }
     )
 
-
-# ---------------------------------------------------------------------------- #
-
-@app.get("/content/label-surface")
-async def content_label_surface(
-    session: AuthHttpSessionDep,
-    id: int,
-    page: int
-) -> Response:
-
-    manager = ProjectManager(session=session.database)
-
-    task = await manager.get_task(task_id=id)
-
-    return templates.TemplateResponse(
-        request=session.request,
-        name="content-label-surface.jinja",
-        context={
-            "config": config.htmx_config,
-            "task": task
-        }
-    )
 
 # ---------------------------------------------------------------------------- #
 
@@ -464,9 +492,51 @@ async def label_image(
 
     task = await manager.get_task(task_id=id)
 
+    if not task:
+        raise Exception("Task not found.")
+
     with FileProviderFactory.get_provider("local").read_file(task.uri) as file:
         content = file.read()
 
     return Response(content=content, media_type="image/jpeg")
+
+# ---------------------------------------------------------------------------- #
+
+
+@app.post("/save-labels")
+async def save_labels(
+    session: AuthHttpSessionDep,
+    task_id: Annotated[int, Form()],
+    label_id: Annotated[List[int], Form()],
+    ocr_ids: Annotated[List[str], Form()],
+    user_content: Annotated[List[str], Form()]
+) -> Response:
+
+    manager = ProjectManager(session=session.database)
+
+    task = await manager.get_task(task_id=task_id)
+
+    if not task:
+        raise Exception("Task not found.")
+
+    if len(label_id) != len(ocr_ids) or len(ocr_ids) != len(user_content):
+        raise HTTPException(status_code=400, detail="Bad Request")
+
+    labels = []
+    for item in zip(label_id, ocr_ids, user_content):
+        labels.append(
+            UserLabel(
+                task_id=task_id,
+                label=LabelObject(
+                    label_id=item[0],
+                    ocr_ids=item[1].split(","),
+                    user_content=item[2]
+                )
+            )
+        )
+
+    await manager.swap_user_labels(task=task, user_labels=labels)
+
+    return HTMLResponse("ok")
 
 # ---------------------------------------------------------------------------- #

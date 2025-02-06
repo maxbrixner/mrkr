@@ -17,6 +17,7 @@ class Worker(threading.Thread):
     logger: logging.Logger
     _handlers: dict[str, Callable]
     _queue: Queue
+    _target: Callable
 
     def __init__(
         self,
@@ -74,6 +75,14 @@ class Worker(threading.Thread):
         self.stop_event.set()
 
         self._queue.put(None)
+
+    def join(self, timeout: float | None = None) -> None:
+        """
+        Wait till all processes have finished.
+        """
+        self._queue.join()
+
+        super().join(timeout=timeout)
 
 # ---------------------------------------------------------------------------- #
 
@@ -142,7 +151,7 @@ class WorkerManager():
         """
         Wait till all process have finished.
         """
-        for worker in self._workers:
+        for worker in self._workers.values():
             worker.join()
 
 

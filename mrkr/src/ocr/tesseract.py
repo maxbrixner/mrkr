@@ -81,7 +81,7 @@ class TesseractOcrProvider(BaseOcrProvider):
 
             confidence: float | None = tesseract.conf[index]/100
 
-            if confidence < 0:
+            if confidence and confidence < 0:
                 confidence = None
 
             coordinates = OcrCoordinates(

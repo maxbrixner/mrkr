@@ -42,7 +42,7 @@ class SessionManager():
         self.session = None
 
         self._database = database
-        self._database_session = None
+        self._database_session = self._database.get_database_session()
 
         self._force_authentication = force_authentication
 
@@ -51,8 +51,6 @@ class SessionManager():
         Establish a session by resuming a (non-expired) session or creating a
         new session.
         """
-        self._database_session = self._database.get_database_session()
-
         await self._resume_session()
 
         if not self.session:

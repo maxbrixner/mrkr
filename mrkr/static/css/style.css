@@ -605,7 +605,7 @@ button.label-button {
     border-bottom-width: 2px;
 }
 
-div.labeled-item {
+div.user-label {
     align-items: center;
     display: grid;
     grid-template-columns: 3rem 1fr auto;
@@ -616,17 +616,17 @@ div.labeled-item {
     border-radius: var(--border-radius);
 }
 
-div.labeled-item>button {
+div.user-label>button {
     padding: 1rem;
 }
 
-div.labeled-item>button>img {
+div.user-label>button>img {
     height: 1.5rem;
     width: 1.5rem;
     filter: invert(var(--icon-invert-surface));
 }
 
-div.labeled-item>input {
+div.user-label>input {
     padding: 1rem;
     border-radius: var(--border-radius);
     background-color: var(--surface);
@@ -654,7 +654,7 @@ div.page-details.labeling>div.available-labels {
     padding: 1rem;
 }
 
-div.page-details.labeling>div.added-labels {
+div.page-details.labeling>form.user-labels {
     border-right: 1px solid var(--border-background-surface);
     display: grid;
     grid-template-columns: 1fr;

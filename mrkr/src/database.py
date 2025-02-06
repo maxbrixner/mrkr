@@ -76,7 +76,7 @@ class Project(sqlmodel.SQLModel, table=True):
 
 
 class Label(sqlmodel.SQLModel, table=True):
-    __tablename__ = "tlabeö"
+    __tablename__ = "tlabel"
     id: int = sqlmodel.Field(primary_key=True)
     project_id: int = sqlmodel.Field(foreign_key="tproject.id")
     name: str = sqlmodel.Field(unique=True)
@@ -92,7 +92,7 @@ class OcrResult(sqlmodel.SQLModel, table=True):
     provider: str = sqlmodel.Field()
     created: datetime.datetime = sqlmodel.Field()
     ocr: Optional[OcrObject] = sqlmodel.Field(
-        default_factory=OcrObject, sa_type=sqlmodel.JSON)
+        default=None, sa_type=sqlmodel.JSON)
 
 
 class TaskStatus(str, enum.Enum):
@@ -134,6 +134,19 @@ class Task(sqlmodel.SQLModel, table=True):
     project: Project = sqlmodel.Relationship()
     ocr: OcrResult = sqlmodel.Relationship()
 
+
+class LabelObject(pydantic.BaseModel):
+    label_id: int
+    ocr_ids: List[int]
+    user_content: str
+
+
+class UserLabel(sqlmodel.SQLModel, table=True):
+    __tablename__ = "tuserlabel"
+    id: int = sqlmodel.Field(primary_key=True)
+    task_id: int = sqlmodel.Field(foreign_key="ttask.id")
+    label: Optional[LabelObject] = sqlmodel.Field(
+        default_factory=None, sa_type=sqlmodel.JSON)
 
 # ---------------------------------------------------------------------------- #
 

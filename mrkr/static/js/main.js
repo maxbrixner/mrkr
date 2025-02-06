@@ -1,8 +1,14 @@
-
+var current_id = null;
 var current_label = null;
 var current_color = null;
 var linked = false;
 var linked_initialized = false;
+
+labels = { "labels": ["hallo", "tach"] }
+
+console.log(JSON.stringify(labels))
+
+
 
 /* Document event listeners */
 
@@ -95,6 +101,7 @@ function register_event_listeners() {
             evt.target.classList.add("selected");
             current_label = evt.target.dataset.label;
             current_color = evt.target.dataset.color;
+            current_id = evt.target.dataset.id;
             linked = false;
             linked_initialized = false;
         });
@@ -122,49 +129,35 @@ function register_event_listeners() {
                     linked_initialized = true;
                 }
 
-                details = document.getElementById("added-labels");
-
+                details = document.getElementById("user-labels");
 
                 let new_item = document.createElement("div");
-                new_item.classList.add("labeled-item");
+                new_item.classList.add("user-label");
                 new_item.style.borderColor = current_color;
                 new_item.style.backgroundColor = current_color + "20";
-                new_item.dataset.ocr_ids = this.dataset.id;
-
-                let new_span = document.createElement("span");
-                new_span.innerHTML = current_label;
-
-                let new_input = document.createElement("input");
-                new_input.type = "text";
-                new_input.value = this.dataset.content;
-
-                let new_button = document.createElement("button");
-                let new_img = document.createElement("img");
-                new_img.src = "/static/img/trash-outline.svg";
-                new_button.addEventListener('click', function (evt) {
-                    remove_label(this);
-                });
-
-                new_button.appendChild(new_img);
-                new_item.appendChild(new_span);
-                new_item.appendChild(new_input);
-                new_item.appendChild(new_button);
+                new_item.innerHTML = `<span>` + current_label + `</span>` +
+                    `<input type="hidden" class="label-id-input" name="label_id" value="` + current_id + `">` +
+                    `<input type="hidden" class="ocr-ids-input" name="ocr_ids" value="` + this.dataset.id + `">` +
+                    `<input type="text" class="user-content-input" name="user_content" value="` + this.dataset.content + `">` +
+                    `<button class="delete-label" type="button" aria-label="Delete Label" data-id="` + 99 + `"><img src="/static/img/trash-outline.svg"></button>`
 
                 details.prepend(new_item);
 
             } else {
 
-                details = document.getElementById("added-labels");
+                details = document.getElementById("user-labels");
 
                 let existing_item = details.firstChild;
+                let label_id_input = existing_item.getElementsByClassName("label-id-input")[0];
+                let ocr_ids_input = existing_item.getElementsByClassName("ocr-ids-input")[0];
+                let user_content_input = existing_item.getElementsByClassName("user-content-input")[0];
 
-                existing_item.dataset.ocr_ids = existing_item.dataset.ocr_ids + "," + this.dataset.id;
-
-                let input = existing_item.getElementsByTagName("input")[0];
-
-                input.value = input.value + " " + this.dataset.content;
+                user_content_input.value = user_content_input.value + " " + this.dataset.content;
+                ocr_ids_input.value = ocr_ids_input.value + "," + this.dataset.id;
 
             }
+
+
         });
     }
 
@@ -201,6 +194,7 @@ function toggle_navigation() {
     }
 }
 
+
 function remove_label(element) {
 
     ocr_ids = element.parentElement.dataset.ocr_ids.split(",");
@@ -217,3 +211,4 @@ function remove_label(element) {
 function scroll_to_element(element) {
     element.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
 }
+

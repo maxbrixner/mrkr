@@ -18,22 +18,54 @@
             <h1>{{task.name}}</h1>
         </div>
         <div>
-            <button class="primary" aria-label="Save Changes">Save Changes</button>
+            <button class="primary" id="save-labels-button" aria-label="Save Changes" form="user-labels">Save
+                Changes</button>
         </div>
     </div>
-    <div class="page-surface labeling" id="label-surface"
-        hx-get="{{url_for('content_label_surface')}}?id={{task.id}}&page=1" hx-trigger="load"
-        hx-swap="innerHTML swap:1000ms" hx-indiator="#label-surface" hx-request='{"timeout": {{config.timeout}}}'>
+    <div class="page-surface labeling" id="label-surface">
+        <div class="image-container">
+            <img id="label-image" src="/label-image/?id={{task.id}}" draggable="false">
+            </img>
+            {% if task.ocr %}
+            {% for block in task.ocr.ocr.pages[0].blocks %}
+            {% if get_user_label(block.id) %}
+            <div class="highlight" data-content="{{block.content}}"
+                style="left:{{block.coordinates.left}}%; top:{{block.coordinates.top}}%; width:{{block.coordinates.width}}%; height:{{block.coordinates.height}}%; background-color: {{get_label(get_user_label(block.id).label.label_id).color}};"
+                data-content="{{block.content}}" data-id="{{block.id}}" data-active="true">
+            </div>
+            {% else %}
+            <div class="highlight" data-content="{{block.content}}"
+                style="left:{{block.coordinates.left}}%; top:{{block.coordinates.top}}%; width:{{block.coordinates.width}}%; height:{{block.coordinates.height}}%;"
+                data-content="{{block.content}}" data-id="{{block.id}}" data-active="false">
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+        </div>
     </div>
     <div id="labeling-details" class="page-details labeling">
         <div class="available-labels">
             {% for label in labels %}
             <button class="label-button" style="background-color: {{label.color}}20; border-color: {{label.color}};"
-                data-label="{{label.name}}" data-color="{{label.color}}">{{label.name}}</button>
+                data-id="{{label.id}}" data-label="{{label.name}}" data-color="{{label.color}}">{{label.name}}</button>
             {% endfor %}
         </div>
-        <div id="added-labels" class="added-labels">
-        </div>
+        <form id="user-labels" class="user-labels" hx-post="{{url_for('save_labels')}}?id={{task.id}}">
+            {% for user_label in user_labels %}
+            <div class="user-label"
+                style="background-color: {{get_label(user_label.label.label_id).color}}20; border-color: {{get_label(user_label.label.label_id).color}};">
+                <span>{{get_label(user_label.label.label_id).name}}</span>
+                <input type="hidden" class="label-id-input" name="label_id" value="{{user_label.label.label_id}}">
+                <input type="hidden" class="ocr-ids-input" name="ocr_ids"
+                    value="{%for ocr_id in user_label.label.ocr_ids%}{{ocr_id}}{%if not loop.last%},{%endif%}{%endfor%}">
+                <input type="text" class="user-content-input" name="user_content"
+                    value="{{user_label.label.user_content}}">
+                <button type="button" class="delete-label" aria-label="Delete Label"
+                    data-id="{{user_label.block_id}}"><img src="/static/img/trash-outline.svg"></button>
+            </div>
+            {% endfor %}
+            <input type="hidden" name="csrf_token" value="{{request.state.csrf_token}}">
+            <input type="hidden" name="task_id" value="{{task.id}}">
+        </form>
     </div>
-</div>
-{% endblock %}
+    {% endblock %}
