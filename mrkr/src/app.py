@@ -432,38 +432,20 @@ async def label_page(
 
     user_labels = await manager.get_user_labels(task=task)
 
-    """
-    user_labels = [
-        UserLabel(
-            id=1,
-            task_id=1,
-            label=LabelObject(
-                label_id=1,
-                ocr_ids=[4, 5],
-                user_content="Thomas Smith"),
-        ),
-        UserLabel(
-            id=2,
-            task_id=1,
-            label=LabelObject(
-                label_id=1,
-                ocr_ids=[24, 25],
-                user_content="John Doe"),
-        )
-    ]
-    """
+    def get_user_label(ocr_id: int) -> UserLabel | None:
+        for user_label in user_labels:
+            if not user_label.label:
+                continue
+            # todo: this is wrong somehow (linter)
+            if ocr_id in user_label.label["ocr_ids"]:
+                return user_label
+        return None
 
-    def get_user_label(ocr_id: int) -> UserLabel:
-        return next(
-            (user_label for user_label in user_labels if ocr_id in user_label.label["ocr_ids"]),
-            None
-        )
-
-    def get_label(id: int) -> Label:
-        return next(
-            (label for label in labels if label.id == id),
-            None
-        )
+    def get_label(id: int) -> Label | None:
+        for label in labels:
+            if label.id == id:
+                return label
+        return None
 
     return templates.TemplateResponse(
         request=session.request,
@@ -524,12 +506,14 @@ async def save_labels(
 
     labels = []
     for item in zip(label_id, ocr_ids, user_content):
+        ocr_ids_list = item[1].split(",")
+        ocr_ids_values = [int(ocr_id) for ocr_id in ocr_ids_list]
         labels.append(
             UserLabel(
                 task_id=task_id,
                 label=LabelObject(
                     label_id=item[0],
-                    ocr_ids=item[1].split(","),
+                    ocr_ids=ocr_ids_values,
                     user_content=item[2]
                 ).model_dump()
             )
