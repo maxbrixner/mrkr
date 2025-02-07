@@ -487,6 +487,10 @@ div.page-toolbar>div>h1 {
     text-overflow: ellipsis;
 }
 
+div.page-toolbar>div>button>span {
+    position: relative;
+}
+
 div.page-surface {
     align-items: flex-start;
     display: flex;
@@ -693,6 +697,24 @@ div.page-details.labeling>form.user-labels {
     top: 50%;
     visibility: visible;
     width: 2rem;
+}
+
+span.htmx-request:before,
+span.htmx-swapping:before {
+    animation: spinner .6s linear infinite;
+    border: 2px solid var(--on-primary);
+    border-radius: 50%;
+    border-top-color: transparent;
+    box-sizing: border-box;
+    content: '';
+    height: 1rem;
+    left: 50%;
+    margin-left: -.5rem;
+    margin-top: -.5rem;
+    position: absolute;
+    top: 50%;
+    visibility: visible;
+    width: 1rem;
 }
 
 @keyframes spinner {

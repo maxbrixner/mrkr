@@ -18,8 +18,9 @@
             <h1>{{task.name}}</h1>
         </div>
         <div>
-            <button class="primary" id="save-labels-button" aria-label="Save Changes" form="user-labels">Save
-                Changes</button>
+            <button class="primary" id="save-labels-button" aria-label="Save Changes" form="user-labels">
+                <span id="save-labels-span">Save Changes</span>
+            </button>
         </div>
     </div>
     <div class="page-surface labeling" id="label-surface">
@@ -50,7 +51,9 @@
                 data-id="{{label.id}}" data-label="{{label.name}}" data-color="{{label.color}}">{{label.name}}</button>
             {% endfor %}
         </div>
-        <form id="user-labels" class="user-labels" hx-post="{{url_for('save_labels')}}?id={{task.id}}">
+        <form id="user-labels" class="user-labels" hx-post="{{url_for('save_labels')}}?id={{task.id}}"
+            hx-indicator="#save-labels-span" hx-target="#save-labels-span"
+            hx-swap="innerHTML swap:{{config.swap_delay}}ms">
             {% for user_label in user_labels %}
             <div class="user-label"
                 style="background-color: {{get_label(user_label.label.label_id).color}}20; border-color: {{get_label(user_label.label.label_id).color}};">

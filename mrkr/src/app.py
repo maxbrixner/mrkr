@@ -537,6 +537,6 @@ async def save_labels(
 
     await manager.swap_user_labels(task=task, user_labels=labels)
 
-    return HTMLResponse("ok")
+    return HTMLResponse("Save Changes")
 
 # ---------------------------------------------------------------------------- #
