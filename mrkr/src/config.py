@@ -1,31 +1,10 @@
 # ---------------------------------------------------------------------------- #
 
 import pydantic
-import enum
 
 # ---------------------------------------------------------------------------- #
 
-
-class FlashMessage(str, enum.Enum):
-    session_expired = "INFO_SESSION_EXPIRED"
-    invalid_credentials = "ERROR_INVALID_CREDENTIALS"
-    credentials_exist = "ERROR_CREDENTIALS_EXIST"
-    signup_successful = "INFO_SIGNUP_SUCCESSFUL"
-    signup_disabled = "ERROR_SIGNUP_DISABLED"
-    too_many_login_attempts = "ERROR_TOO_MANY_LOGIN_ATTEMPTS"
-    too_many_requests = "ERROR_TOO_MANY_REQUESTS"
-
-
-class FlashType(str, enum.Enum):
-    error = "ERROR"
-    warning = "WARNING"
-    info = "INFO"
-
-
-class UserFlashMessage(pydantic.BaseModel):
-    message: FlashMessage
-    user_message: str
-    type: FlashType
+from .models import FlashMessage, FlashType, UserFlashMessage
 
 # ---------------------------------------------------------------------------- #
 

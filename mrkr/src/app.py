@@ -7,14 +7,14 @@ from fastapi.templating import Jinja2Templates
 from fastapi.exceptions import RequestValidationError
 from starlette.middleware.gzip import GZipMiddleware
 from starlette.exceptions import HTTPException as StarlettHTTPException
-from typing import Annotated, Callable
+from typing import Annotated, Callable, List
 import datetime
 
 # ---------------------------------------------------------------------------- #
 
 from .logging import Logger
 from .config import config
-from .database import *
+from .database import Database
 from .session import SessionManager
 from .project import ProjectManager
 from .worker import WorkerManager

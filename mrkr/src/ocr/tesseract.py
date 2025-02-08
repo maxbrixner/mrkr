@@ -7,7 +7,8 @@ from typing import List, Tuple
 
 # ---------------------------------------------------------------------------- #
 
-from .base import BaseOcrProvider, OcrObject, OcrPage, OcrBlock, OcrCoordinates
+from .base import BaseOcrProvider
+from ..models import OcrResult, OcrPage, OcrBlock
 
 # ---------------------------------------------------------------------------- #
 
@@ -38,7 +39,7 @@ class TesseractOcrProvider(BaseOcrProvider):
     def run_ocr(
         self,
         images: List[Image.Image]
-    ) -> OcrObject:
+    ) -> OcrResult:
         """
         Use Google's Tesseract to apply OCR to an image and return an
         OcrResult pydantic model.
@@ -67,7 +68,7 @@ class TesseractOcrProvider(BaseOcrProvider):
 
             pages.append(ocr_page)
 
-        return OcrObject(pages=pages)
+        return OcrResult(pages=pages)
 
     def _convert_to_blocks(
         self,

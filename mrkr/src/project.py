@@ -3,15 +3,14 @@
 
 import logging
 import sqlmodel
-import pydantic
 from typing import List, Sequence
 
 # ---------------------------------------------------------------------------- #
 
-from .database import *
-from .session import SessionManager
+from .models import *
+from .database import DatabaseSession
 from .file import FileProviderFactory, FileObject
-from .ocr import OcrProviderFactory, OcrObject
+from .ocr import OcrProviderFactory
 
 # ---------------------------------------------------------------------------- #
 
@@ -85,11 +84,12 @@ class ProjectManager():
     async def get_labels(
         self,
         project: Project
-    ) -> Sequence[Label]:
+    ) -> Sequence[LabelDefinition]:
         """
         Get all possible labels for a project.
         """
-        query = sqlmodel.select(Label).where(Label.project_id == project.id)
+        query = sqlmodel.select(LabelDefinition).where(
+            LabelDefinition.project_id == project.id)
         return self.session.exec(query).all()
 
     async def get_user_labels(

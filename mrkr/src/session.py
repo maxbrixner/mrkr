@@ -12,6 +12,7 @@ from typing import Callable, Self, Optional
 
 from .config import *
 from .database import *
+from .models import *
 
 # ---------------------------------------------------------------------------- #
 
