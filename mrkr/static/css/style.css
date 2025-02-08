@@ -493,6 +493,7 @@ div.page-toolbar>div>button>span {
 
 div.page-surface {
     align-items: flex-start;
+    align-content: flex-start;
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;

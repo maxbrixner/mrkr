@@ -19,6 +19,7 @@ from .session import SessionManager
 from .project import ProjectManager
 from .worker import WorkerManager
 from .file import FileProviderFactory
+from .models import *
 
 # ---------------------------------------------------------------------------- #
 
@@ -316,7 +317,7 @@ async def projects_page(
     """
     manager = ProjectManager(session=session.database)
 
-    projects = await manager.get_projects()
+    projects = await manager.list_projects()
 
     return templates.TemplateResponse(
         request=session.request,
@@ -347,9 +348,10 @@ async def scan_project(
         raise Exception("Project not found.")
 
     if await manager.is_scannable(project=project):
-        project.scan_status = ScanStatus.pending
-        project.last_scan = datetime.datetime.now()
-        session.database.add(project)
+        for source in project.sources:
+            source.status = SourceStatus.pending
+            source.last_scan = datetime.datetime.now()
+            session.database.add(source)
         session.database.commit()
 
         worker.put("scan-project", project_id=project.id)
@@ -372,7 +374,9 @@ async def scan_project_worker(
     with database.session() as session:
         manager = ProjectManager(session=session)
 
-        await manager.scan_project(project_id=project_id)
+        project = await manager.get_project(project_id=project_id)
+
+        await manager.scan_project(project=project)
 
 # ---------------------------------------------------------------------------- #
 
@@ -392,7 +396,7 @@ async def tasks_page(
     if not project:
         raise Exception("Project not found.")
 
-    tasks = await manager.get_tasks(project=project)
+    tasks = project.tasks
 
     return templates.TemplateResponse(
         request=session.request,
@@ -401,6 +405,7 @@ async def tasks_page(
             "config": config.htmx_config,
             "project": project,
             "tasks": tasks,
+            "ready": await manager.is_ready(project=project),
             "scannable": await manager.is_scannable(project=project)
         }
     )

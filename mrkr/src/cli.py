@@ -72,36 +72,52 @@ def insert_demo() -> None:
         project = Project(
             name="Demo Project",
             description="A simple demo project.",
-            creator=user,
-            source_type=SourceType.local,
-            source_uri="*.*",
-            scan_status=ScanStatus.initialized
+            creator=user
         )
 
         session.add(project)
-        session.commit()
 
-        label1 = LabelDefinition(
+        source1 = Source(
+            project=project,
+            uri="*",
+            type=SourceProvider.local,
+            status=SourceStatus.initialized
+        )
+
+        source2 = Source(
+            project=project,
+            uri="*.jpg",
+            type=SourceProvider.local,
+            status=SourceStatus.initialized
+        )
+
+        session.add(source1)
+        session.add(source2)
+
+        labeldef1 = LabelDefinition(
             project=project,
             name="Name",
+            type=LabelType.word,
             color="#648fff"
         )
 
-        label2 = LabelDefinition(
+        labeldef2 = LabelDefinition(
             project=project,
             name="Street",
+            type=LabelType.word,
             color="#dc267f"
         )
 
-        label3 = LabelDefinition(
+        labeldef3 = LabelDefinition(
             project=project,
             name="IBAN",
+            type=LabelType.word,
             color="#ffb000"
         )
 
-        session.add(label1)
-        session.add(label2)
-        session.add(label3)
+        session.add(labeldef1)
+        session.add(labeldef2)
+        session.add(labeldef3)
 
         session.commit()
 

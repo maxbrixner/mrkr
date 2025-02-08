@@ -8,7 +8,7 @@ from typing import List, Tuple
 # ---------------------------------------------------------------------------- #
 
 from .base import BaseOcrProvider
-from ..models import OcrResult, OcrPage, OcrBlock
+from ..models import OcrBlockObject, OcrBlockType
 
 # ---------------------------------------------------------------------------- #
 
@@ -38,43 +38,34 @@ class TesseractOcrProvider(BaseOcrProvider):
 
     def run_ocr(
         self,
-        images: List[Image.Image]
-    ) -> OcrResult:
+        image: Image.Image
+    ) -> List[OcrBlockObject]:
         """
-        Use Google's Tesseract to apply OCR to an image and return an
-        OcrResult pydantic model.
+        Use Google's Tesseract to apply OCR to an image.
         """
         self.logger.debug("Processing image with Tesseract.")
 
-        pages = []
-        for page, image in enumerate(images):
-            boxes = pytesseract.image_to_data(
-                image=image,
-                output_type=pytesseract.Output.DICT,
-                lang="eng",  # todo
-            )
-            tesseract = TesseractResult(**boxes)
+        boxes = pytesseract.image_to_data(
+            image=image,
+            output_type=pytesseract.Output.DICT,
+            lang="eng",  # todo
+        )
+        tesseract = TesseractResult(**boxes)
 
-            blocks = self._convert_to_blocks(
-                tesseract=tesseract,
-                dimensions=(image.width, image.height)
-            )
+        blocks = self._convert_to_blocks(
+            tesseract=tesseract,
+            dimensions=(image.width, image.height)
+        )
 
-            ocr_page = OcrPage(
-                page=page+1,
-                blocks=blocks,
-                dimensions=(image.width, image.height)
-            )
+        self.logger.debug(f"Tesseract successful.")
 
-            pages.append(ocr_page)
-
-        return OcrResult(pages=pages)
+        return blocks
 
     def _convert_to_blocks(
         self,
         tesseract: TesseractResult,
         dimensions: Tuple[int, int]
-    ) -> List[OcrBlock]:
+    ) -> List[OcrBlockObject]:
         blocks = []
         for index, text in enumerate(tesseract.text):
             if len(text) == 0:
@@ -85,19 +76,16 @@ class TesseractOcrProvider(BaseOcrProvider):
             if confidence and confidence < 0:
                 confidence = None
 
-            coordinates = OcrCoordinates(
+            block = OcrBlockObject(
+                id=index,
+                type=OcrBlockType.word,
+                content=text,
+                confidence=confidence,
                 left=round(tesseract.left[index] / dimensions[0] * 100.0, 5),
                 top=round(tesseract.top[index] / dimensions[1] * 100.0, 5),
                 width=round(tesseract.width[index] / dimensions[0] * 100.0, 5),
                 height=round(
                     tesseract.height[index] / dimensions[1] * 100.0, 5)
-            )
-
-            block = OcrBlock(
-                id=index,
-                content=text,
-                confidence=confidence,
-                coordinates=coordinates
             )
 
             blocks.append(block)

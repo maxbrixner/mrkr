@@ -6,6 +6,7 @@ from typing import Optional
 
 from .base import BaseFileProvider
 from .local import LocalFileProvider
+from ..models import SourceProvider
 
 # ---------------------------------------------------------------------------- #
 
@@ -20,7 +21,7 @@ class FileProviderFactory():
         Get OCR provider by name.
         """
         match provider:
-            case "local":
+            case SourceProvider.local:
                 return LocalFileProvider()
             case _:
                 raise Exception(f"Unknown file provider: {provider}")

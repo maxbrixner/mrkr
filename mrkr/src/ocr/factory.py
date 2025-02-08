@@ -1,7 +1,13 @@
+# ---------------------------------------------------------------------------- #
+
 from typing import Optional
+
+# ---------------------------------------------------------------------------- #
 
 from .base import BaseOcrProvider
 from .tesseract import TesseractOcrProvider
+
+# ---------------------------------------------------------------------------- #
 
 
 class OcrProviderFactory():
@@ -18,3 +24,5 @@ class OcrProviderFactory():
                 return TesseractOcrProvider()
             case _:
                 raise Exception(f"Unknown OCR provider: {provider}")
+
+# ---------------------------------------------------------------------------- #

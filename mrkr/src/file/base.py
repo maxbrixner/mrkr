@@ -12,15 +12,7 @@ from PIL import Image
 
 # ---------------------------------------------------------------------------- #
 
-
-class FileObject(pydantic.BaseModel):
-    """
-    A file object.
-    """
-    name: str
-    uri: str
-    etag: str
-
+from ..models import FileObject
 
 # ---------------------------------------------------------------------------- #
 

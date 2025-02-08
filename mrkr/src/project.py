@@ -3,6 +3,7 @@
 
 import logging
 import sqlmodel
+import re
 from typing import List, Sequence
 
 # ---------------------------------------------------------------------------- #
@@ -30,13 +31,13 @@ class ProjectManager():
 
         self.session = session
 
-    async def get_projects(
+    async def list_projects(
         self
     ) -> Sequence[Project]:
         """
         Get all projects.
         """
-        query = sqlmodel.select(Project)
+        query = sqlmodel.select(Project).order_by(Project.name)
         return self.session.exec(query).all()
 
     async def get_project(
@@ -49,109 +50,6 @@ class ProjectManager():
         query = sqlmodel.select(Project).where(Project.id == project_id)
         return self.session.exec(query).first()
 
-    async def get_tasks(
-        self,
-        project: Project
-    ) -> Sequence[Task]:
-        """
-        Get all tasks for a project.
-        """
-        query = sqlmodel.select(Task).where(Task.project_id == project.id)
-        return self.session.exec(query).all()
-
-    async def get_task(
-        self,
-        task_id: int
-    ) -> Task | None:
-        """
-        Get a task by its ID.
-        """
-        query = sqlmodel.select(Task).where(Task.id == task_id)
-        return self.session.exec(query).first()
-
-    async def ocr_exists(
-        self,
-        etag: str
-    ) -> bool:
-        """
-        Check if an OCR for a specific E-Tag exists.
-        """
-        query = sqlmodel.select(sqlmodel.func.count()).where(
-            OcrResult.etag == etag)
-        ocr = self.session.exec(query).first()
-        return (ocr is not None and ocr > 0)
-
-    async def get_labels(
-        self,
-        project: Project
-    ) -> Sequence[LabelDefinition]:
-        """
-        Get all possible labels for a project.
-        """
-        query = sqlmodel.select(LabelDefinition).where(
-            LabelDefinition.project_id == project.id)
-        return self.session.exec(query).all()
-
-    async def get_user_labels(
-        self,
-        task: Task
-    ) -> Sequence[Label]:
-        """
-        Get all userlabels for a task.
-        """
-        query = sqlmodel.select(Label).where(Label.task_id == task.id)
-        return self.session.exec(query).all()
-
-    async def swap_user_labels(
-        self,
-        task: Task,
-        user_labels: List[Label]
-    ) -> None:
-        """
-        Get all userlabels for a task.
-        """
-        query = sqlmodel.select(Label).where(Label.task_id == task.id)
-        existing_labels = self.session.exec(query).all()
-        for user_label in existing_labels:
-            self.session.delete(user_label)
-
-        for user_label in user_labels:
-            if user_label.task_id != task.id:
-                raise Exception("UserLabel does not match task.")
-            self.session.add(user_label)
-
-        self.session.commit()
-
-    async def scan_project(
-        self,
-        project_id: int
-    ) -> None:
-        """
-        Scan a project's source and update the task list accordingly.
-        """
-        project = await self.get_project(project_id=project_id)
-
-        if not project:
-            raise Exception("Project not found.")
-
-        if project.scan_status != ScanStatus.pending:
-            raise Exception("Project is not ready for scanning.")
-
-        self.logger.debug(f"Scan of project {project.name} started.")
-
-        try:
-            project.scan_status = ScanStatus.scanning
-            self.session.add(project)
-            self.session.commit()
-
-            await self._update_tasks(project=project)
-        except Exception as exception:
-            logging.exception(exception)
-            logging.error(f"Scan for {project.name} failed.")
-            project.scan_status = ScanStatus.error
-            self.session.add(project)
-            self.session.commit()
-
     async def is_scannable(
         self,
         project: Project,
@@ -159,165 +57,237 @@ class ProjectManager():
         """
         Determines whether a project is ready to be scanned.
         """
-        if project.last_scan:
-            since_last_scan = (datetime.datetime.now() -
-                               project.last_scan).total_seconds()
-        else:
-            since_last_scan = 0
+        for source in project.sources:
+            if source.last_scan:
+                seconds_since_last_scan = (datetime.datetime.now() -
+                                           source.last_scan).total_seconds()
+            else:
+                seconds_since_last_scan = 0
 
-        self.logger.debug(f"Time since last scan: {since_last_scan}s.")
-
-        if project.scan_status == ScanStatus.pending and \
-                not since_last_scan > 15:
-            return False
-
-        if project.scan_status == ScanStatus.scanning and \
-                not since_last_scan > 15:
-            return False
+            if source.status in (SourceStatus.pending, SourceStatus.scanning) \
+                    and not seconds_since_last_scan > 5:  # todo
+                return False
 
         return True
 
-    async def _update_tasks(self, project: Project) -> None:
-        """
-        Update tasks in the database with current file information.
-        """
-        self.logger.debug(f"Updating tasks for project {project.name}.")
-        tasks = await self.get_tasks(project=project)
-        files = await self._get_project_files(project=project)
-
-        for task in tasks:
-            if task.uri not in [file.uri for file in files]:
-                self.logger.debug(f"Task file not found: {task.name}.")
-                task.file_status = FileStatus.missing
-            else:
-                self.logger.debug(f"Task file found: {task.name}.")
-                task.file_status = FileStatus.found
-
-            self.session.add(task)
-
-        for file in files:
-            if file.uri not in [task.uri for task in tasks]:
-                self.logger.debug(f"New task found: {file.name}.")
-                task = Task(
-                    project=project,
-                    ocr=None,
-                    name=file.name,
-                    created=datetime.datetime.now(),
-                    modified=None,
-                    uri=file.uri,
-                    task_status=TaskStatus.open,
-                    file_status=FileStatus.found,
-                    ocr_status=OcrStatus.initialized
-                )
-
-                self.session.add(task)
-
-        self.session.commit()
-
-        self.logger.debug(f"Tasks updated for {project.name}.")
-
-        await self.run_ocr(project=project)
-
-        project.scan_status = ScanStatus.ready
-        self.session.add(project)
-
-        self.session.commit()
-
-    async def _get_project_files(
-        self,
-        project: Project
-    ) -> Sequence[FileObject]:
-        connector = FileProviderFactory.get_provider("local")  # todo
-
-        files = connector.list_files(uri=project.source_uri)
-
-        self.logger.debug(f"Found {len(files)} files in project source.")
-
-        return files
-
-    async def run_ocr(
+    async def is_pending(
         self,
         project: Project,
-        provider: str = "tesseract",
-        force: bool = False
-    ) -> None:
+    ) -> bool:
         """
-        Run OCR for a project.
+        Determines whether a project's scan is pending.
         """
-        self.logger.debug(f"Running OCR for project {project.name}.")
-        tasks = await self.get_tasks(project=project)
+        for source in project.sources:
+            if source.status != SourceStatus.pending:
+                return False
 
-        for task in tasks:
-            try:
-                if task.file_status == FileStatus.missing:
-                    continue
+        return True
 
-                task.ocr_status = OcrStatus.scanning
-                self.session.add(task)
-                self.session.commit()
-
-                await self._run_task_ocr(task=task)
-
-            except Exception as exception:
-                logging.exception(exception)
-                logging.error(f"OCR for {task.name} failed.")
-                task.ocr_status = OcrStatus.error
-                self.session.add(task)
-                self.session.commit()
-
-        self.logger.debug(f"OCR finished for {project.name}.")
-
-    async def _run_task_ocr(
+    async def is_ready(
         self,
-        task: Task,
-        provider: str = "tesseract",
-        force: bool = False
+        project: Project,
+    ) -> bool:
+        """
+        Determines whether a project is ready to be displayed.
+        """
+        for source in project.sources:
+            if source.status != SourceStatus.ready:
+                return False
+
+        return True
+
+    async def scan_project(
+        self,
+        project: Project
     ) -> None:
         """
-        Run OCR for a task.
+        Scan a project's sources.
         """
-        self.logger.debug(f"OCR for task with id={task.id} started.")
+        if not await self.is_pending(project=project):
+            self.logger.debug(f"Project {project.name} is not pending.")
+            return
+
+        self.logger.debug(f"Scan of project {project.name} started.")
+
+        for source in project.sources:
+            source.status = SourceStatus.scanning
+            self.session.add(project)
+            self.session.commit()
+
+            try:
+                self.logger.debug(f"Scan of source '{source.id}' started.")
+                await self._scan_source(
+                    source=source,
+                    ocr_provider=OcrProvider.tesseract
+                )
+                self.logger.debug(f"Scan of source '{source.id}' successful.")
+
+                source.status = SourceStatus.ready
+                self.session.add(project)
+                self.session.commit()
+            except Exception as exception:
+                self.logger.exception(exception)
+                self.logger.debug(f"Scan of source {source.uri} failed.")
+                source.status = SourceStatus.error
+                self.session.add(project)
+                self.session.commit()
+
+    async def _scan_source(
+        self,
+        source: Source,
+        ocr_provider: OcrProvider | None = None,
+        force_ocr: bool = False
+    ) -> None:
+        """
+        Scan a source for files.
+        """
+        files = source.files
+        for file in files:
+            file.status = FileStatus.missing
+            self.session.add(file)
+
+        connector = FileProviderFactory.get_provider(provider=source.type)
+        connector_files = connector.list_files(uri=source.uri)
+
+        for connector_file in connector_files:
+            database_file: File | None = next(
+                (file for file in files
+                 if file.uri == connector_file.uri),
+                None
+            )
+
+            if not database_file:
+                self.logger.debug(f"New file '{connector_file.uri}' "
+                                  f"found. Adding.")
+                file = await self._add_file(source=source, file=connector_file)
+            else:
+                self.logger.debug(f"Existing file '{connector_file.uri}' "
+                                  f"found. Updating.")
+                database_file.status = FileStatus.found
+                self.session.add(database_file)
+                file = database_file
+
+            try:
+                await self._run_ocr(
+                    file=file,
+                    provider=ocr_provider,
+                    force_ocr=force_ocr
+                )
+            except Exception as exception:
+                self.logger.exception(exception)
+                self.logger.debug(f"OCR for file {file.name} failed.")
+
+        self.session.commit()
+
+    async def _add_file(
+        self,
+        source: Source,
+        file: FileObject
+    ) -> File:
+        """
+        Add a file to a source.
+        """
+        new_file = File(
+            source=source,
+            name=file.name,
+            uri=file.uri,
+            etag=file.etag,
+            status=FileStatus.found
+        )
+
+        task: Task | None = None
+        for task in source.project.tasks:
+            # todo: test this
+            if re.fullmatch(task.pattern, file.name):
+                association = TaskFileAssociation(
+                    task=task,
+                    file=file
+                )
+
+        if not task:
+            task = Task(
+                project=source.project,
+                name=file.name,
+                created=datetime.datetime.now(),
+                modified=None,
+                status=TaskStatus.open,
+                pattern=file.name  # todo
+            )
+
+        self.session.add(task)
+        self.session.add(new_file)
+
+        association = TaskFileAssociation(
+            task=task,
+            file=new_file
+        )
+
+        self.session.add(association)
+
+        return new_file
+
+    async def _run_ocr(
+        self,
+        file: File,
+        provider: OcrProvider | None,
+        force_ocr: bool = False
+    ) -> None:
+        """
+        Run OCR for a file.
+        """
+        if not provider:
+            return
 
         file_provider = FileProviderFactory.get_provider(
-            provider="local")
+            provider=file.source.type)
 
         ocr_provider = OcrProviderFactory.get_provider(
             provider=provider
         )
 
-        force = True  # todo
+        query = sqlmodel.select(OcrResult).where(
+            OcrResult.etag == file.etag and OcrResult.provider == provider)
+        ocr_result = self.session.exec(query).first()
 
-        if task.ocr_id and not force:
-            self.logger.debug("OCR for this content already exists.")
+        if ocr_result and not force_ocr:
+            self.logger.debug(
+                f"OCR for file '{file.name}' already found. Skipping.")
             return
 
-        etag = file_provider.get_checksum(uri=task.uri)
-
-        # todo: if another task has the same etag, just use that OCR result
-
-        images = file_provider.file_to_image(uri=task.uri)
-
-        ocr = ocr_provider.run_ocr(images=images)
-
         ocr_result = OcrResult(
-            etag=etag,
+            etag=file.etag,
             provider=provider,
-            created=datetime.datetime.now(),
-            ocr=ocr.model_dump()
+            created=datetime.datetime.now()
         )
 
+        images = file_provider.file_to_image(uri=file.uri)
+
+        for index, image in enumerate(images):
+            page = OcrPage(
+                ocr_result=ocr_result,
+                page=index,
+                width=image.width,
+                height=image.height
+            )
+
+            ocr = ocr_provider.run_ocr(image=image)
+
+            self.session.add(page)
+
+            for block in ocr:
+                block = OcrBlock(
+                    page=page,
+                    type=block.type,
+                    content=block.content,
+                    confidence=block.confidence,
+                    left=block.left,
+                    top=block.top,
+                    width=block.width,
+                    height=block.height
+                )
+
+                self.session.add(block)
+
         self.session.add(ocr_result)
-        self.session.commit()
-        self.session.refresh(ocr_result)
-
-        task.ocr_id = ocr_result.id
-        task.ocr_status = OcrStatus.ready
-
-        self.session.add(task)
-
-        self.session.commit()
-
-        self.logger.debug(f"OCR for task with id={task.id} successful.")
-
 
 # ---------------------------------------------------------------------------- #

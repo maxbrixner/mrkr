@@ -1,13 +1,12 @@
 # ---------------------------------------------------------------------------- #
 
 import logging
-import pydantic
-from typing import List, Optional, Tuple
+from typing import List
 from PIL import Image
 
 # ---------------------------------------------------------------------------- #
 
-from ..models import OcrResult
+from ..models import OcrBlockObject
 
 # ---------------------------------------------------------------------------- #
 
@@ -24,16 +23,10 @@ class BaseOcrProvider():
         """
         self.logger = logging.getLogger("mrkr.ocr")
 
-    def get_images(self) -> None:
-        """
-        Get the document as images.
-        """
-        raise NotImplementedError
-
     def run_ocr(
         self,
-        images: List[Image.Image]
-    ) -> OcrResult:
+        image: Image.Image
+    ) -> List[OcrBlockObject]:
         """
         Process an image and return the OCR results.
         """

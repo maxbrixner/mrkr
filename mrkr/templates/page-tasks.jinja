@@ -27,37 +27,20 @@
         </div>
     </div>
     <div id="tasks-surface" class="page-surface tasks">
-        {% if not project.scan_status == 'ready' %}
+        {% if not ready %}
         <div class="status-card">
-            {% if project.scan_status == 'initialized' %}
-            <span><b>No scan has been queued for this project.</b></span>
-            {% elif project.scan_status == 'pending' %}
-            <span><b>A scan of this project is pending.</b></span>
-            {% elif project.scan_status == 'scanning' %}
-            <span><b>A scan of this project is currently running.</b></span>
-            {% elif project.scan_status == 'error' %}
-            <span>The last scan of this project resulted in an error.</span>
-            {% endif %}
             {% if scannable %}
-            <span>You can queue a new scan now.</span>
+            <span>No valid scan detected. Please queue a new scan.</span>
             {% else %}
-            <span>Please wait and then refresh the page.</span>
+            <span>A scan is pending. Please wait a couple of minutes and then refresh the page.</span>
             {% endif %}
-            <!--
-            {% if project.last_scan %}
-            <span>List scan: {{project.last_scan}}</span>
-            {% endif %}
-            -->
         </div>
-
         {% else %}
         {% for task in tasks %}
         <div class="task-card">
             <div class="task-description">
                 <h2>{{task.name}}</h2>
-                <p>{{task.task_status.value}}</p>
-                <p>{{task.file_status.value}}</p>
-                <p>{{task.ocr_status.value}}</p>
+                <p>{{task.status.value}}</p>
             </div>
             <div class="task-options">
                 <button class="image small" aria-label="Edit Task {{task.name}}"><img

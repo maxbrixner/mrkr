@@ -25,7 +25,7 @@ class LocalFileProvider(BaseFileProvider):
         """
         List all files in a directory.
         """
-        files = sorted(pathlib.Path("test").glob(uri))
+        files = sorted(pathlib.Path("data").glob(uri))
 
         if len(files) == 0:
             return []
@@ -35,7 +35,7 @@ class LocalFileProvider(BaseFileProvider):
             result.append(
                 FileObject(
                     name=file.name,
-                    uri=str(file),
+                    uri=str(file.resolve()),
                     etag=self.get_checksum(str(file))
                 )
             )
