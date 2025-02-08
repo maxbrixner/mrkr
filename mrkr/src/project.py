@@ -95,22 +95,22 @@ class ProjectManager():
     async def get_user_labels(
         self,
         task: Task
-    ) -> Sequence[UserLabel]:
+    ) -> Sequence[Label]:
         """
         Get all userlabels for a task.
         """
-        query = sqlmodel.select(UserLabel).where(UserLabel.task_id == task.id)
+        query = sqlmodel.select(Label).where(Label.task_id == task.id)
         return self.session.exec(query).all()
 
     async def swap_user_labels(
         self,
         task: Task,
-        user_labels: List[UserLabel]
+        user_labels: List[Label]
     ) -> None:
         """
         Get all userlabels for a task.
         """
-        query = sqlmodel.select(UserLabel).where(UserLabel.task_id == task.id)
+        query = sqlmodel.select(Label).where(Label.task_id == task.id)
         existing_labels = self.session.exec(query).all()
         for user_label in existing_labels:
             self.session.delete(user_label)

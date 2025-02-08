@@ -182,17 +182,12 @@ class Task(sqlmodel.SQLModel, table=True):
     ocr: OcrResult = sqlmodel.Relationship()
 
 
-class LabelObject(pydantic.BaseModel):
-    label_id: int
-    ocr_ids: List[int]
-    user_content: str
-
-
-class UserLabel(sqlmodel.SQLModel, table=True):
-    __tablename__ = "tuserlabel"
+class Label(sqlmodel.SQLModel, table=True):
+    __tablename__ = "tlabel"
     id: int = sqlmodel.Field(primary_key=True)
     task_id: int = sqlmodel.Field(foreign_key="ttask.id")
-    label_id: int = sqlmodel.Field(foreign_key="tlabel.id")
+    label_definition_id: int = sqlmodel.Field(
+        foreign_key="tlabeldefinition.id")
     user_content: str = sqlmodel.Field()
 
 # ---------------------------------------------------------------------------- #

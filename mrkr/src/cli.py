@@ -2,16 +2,15 @@
 
 import typer
 import bcrypt
-import logging
-import pathlib
 import dotenv
 from typing import Optional
 
 # ---------------------------------------------------------------------------- #
 
-from .database import *
+from .database import Database
 from .logging import Logger
 from .config import config
+from .models import *
 
 # ---------------------------------------------------------------------------- #
 
@@ -82,19 +81,19 @@ def insert_demo() -> None:
         session.add(project)
         session.commit()
 
-        label1 = Label(
+        label1 = LabelDefinition(
             project=project,
             name="Name",
             color="#648fff"
         )
 
-        label2 = Label(
+        label2 = LabelDefinition(
             project=project,
             name="Street",
             color="#dc267f"
         )
 
-        label3 = Label(
+        label3 = LabelDefinition(
             project=project,
             name="IBAN",
             color="#ffb000"
