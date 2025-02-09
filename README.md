@@ -49,4 +49,4 @@ Create a demo user and a demo project:
 python -m mrkr insert-demo
 ```
 
-The demo user's email is ``spongebob@bb.com``, his password is ``test``.
+The demo user's email is ``spongebob@bb.com``, his password is ``krabby``.

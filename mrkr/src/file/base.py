@@ -66,6 +66,24 @@ class BaseFileProvider():
             self.logger.exception(exception)
             raise Exception(f"File '{uri}' could not be read.")
 
+    def file_to_jpeg_bytes(
+        self,
+        uri: str,
+        page: int = 0,
+        quality: int = 95
+    ) -> bytes:
+        images = self.file_to_image(uri=uri)
+
+        image_bytes = io.BytesIO()
+
+        images[page].save(image_bytes, format="JPEG", quality=quality)
+
+        image_bytes.seek(0)
+
+        content = image_bytes.getvalue()
+
+        return content
+
     def get_checksum(self, uri: str) -> str:
         """
         Get the checksum of a file.

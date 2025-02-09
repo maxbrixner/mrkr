@@ -42,7 +42,7 @@
         </div>
         {% else %}
         <div class="image-container">
-            <img id="label-image" src="{{url_for('task_image')}}?id={{task.id}}" draggable="false">
+            <img id="label-image" src="{{url_for('task_image')}}?id={{task.id}}&page={{page}}" draggable="false">
             </img>
             {% if task.ocr %}
             {% for block in task.ocr.pages[page].blocks %}

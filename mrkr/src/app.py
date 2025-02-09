@@ -459,12 +459,8 @@ async def task_image(
     if not task:
         raise HTTPException(status_code=400, detail="Bad Request")
 
-    # todo: allow for pdfs or multiple files
-
-    with FileProviderFactory.get_provider(
-        task.project.provider
-    ).read_file(task.uri) as file:
-        content = file.read()
+    content = FileProviderFactory.get_provider(
+        task.project.provider).file_to_jpeg_bytes(uri=task.uri, page=page)
 
     return Response(content=content, media_type="image/jpeg")
 

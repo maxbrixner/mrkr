@@ -58,7 +58,7 @@ def insert_demo() -> None:
         )
 
         salt = bcrypt.gensalt()
-        password_hash = bcrypt.hashpw("test".encode(), salt).decode()
+        password_hash = bcrypt.hashpw("krabby".encode(), salt).decode()
 
         authentication = Authentication(
             email="spongebob@bb.com",
