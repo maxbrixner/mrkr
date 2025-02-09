@@ -67,11 +67,11 @@ document.addEventListener('keypress', function (evt) {
     }
     if (evt.key === '+') {
         width = labelimage.clientWidth
-        labelimage.style.width = Math.round(width * 1.01, 0) + "px";
+        labelimage.style.width = Math.round(width * 1.03, 0) + "px";
     }
     if (evt.key === '-') {
         width = labelimage.clientWidth
-        labelimage.style.width = Math.round(width * 0.99, 0) + "px";
+        labelimage.style.width = Math.round(width * 0.97, 0) + "px";
     }
 });
 

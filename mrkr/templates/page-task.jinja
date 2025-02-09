@@ -25,7 +25,7 @@
                 hx-select-oob="#page-back-button,#page-forward-button"><img
                     src="/static/img/chevron-back-outline.svg"></button>
             {% else %}
-            <button class="secondary" id="page-back-button" inert><img
+            <button class="secondary" id="page-back-button" disabled><img
                     src="/static/img/chevron-back-outline.svg"></button>
             {% endif %}
             {% if page < max_pages-1 %} <button class="secondary" id="page-forward-button"
@@ -35,7 +35,7 @@
                 hx-select-oob="#page-back-button,#page-forward-button">
                 <img src="/static/img/chevron-forward-outline.svg"></button>
                 {% else %}
-                <button class="secondary" id="page-forward-button" inert><img
+                <button class="secondary" id="page-forward-button" disabled><img
                         src="/static/img/chevron-forward-outline.svg"></button>
                 {% endif %}
         </div>
@@ -66,24 +66,26 @@
             {% endif %}
         </div>
         {% else %}
-        <div class="image-container">
-            <img id="label-image" src="{{url_for('task_image')}}?id={{task.id}}&page={{page}}" draggable="false">
-            </img>
-            {% if task.ocr %}
-            {% for block in task.ocr.pages[page].blocks %}
-            {% if block.link %}
-            <div class="highlight"
-                style="left:{{block.left}}%; top:{{block.top}}%; width:{{block.width}}%; height:{{block.height}}%; background-color: {{block.link.label.labeltype.color}};"
-                data-content="{{block.content}}" data-id="{{block.id}}" data-active="true">
+        <div class="page-image">
+            <div class="image-container">
+                <img id="label-image" src="{{url_for('task_image')}}?id={{task.id}}&page={{page}}" draggable="false">
+                </img>
+                {% if task.ocr %}
+                {% for block in task.ocr.pages[page].blocks %}
+                {% if block.link %}
+                <div class="highlight"
+                    style="left:{{block.left}}%; top:{{block.top}}%; width:{{block.width}}%; height:{{block.height}}%; background-color: {{block.link.label.labeltype.color}};"
+                    data-content="{{block.content}}" data-id="{{block.id}}" data-active="true">
+                </div>
+                {% else %}
+                <div class="highlight"
+                    style="left:{{block.left}}%; top:{{block.top}}%; width:{{block.width}}%; height:{{block.height}}%;"
+                    data-content="{{block.content}}" data-id="{{block.id}}" data-active="false">
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% endif %}
             </div>
-            {% else %}
-            <div class="highlight"
-                style="left:{{block.left}}%; top:{{block.top}}%; width:{{block.width}}%; height:{{block.height}}%;"
-                data-content="{{block.content}}" data-id="{{block.id}}" data-active="false">
-            </div>
-            {% endif %}
-            {% endfor %}
-            {% endif %}
         </div>
         {% endif %}
     </div>

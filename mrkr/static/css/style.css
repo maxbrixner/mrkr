@@ -185,6 +185,10 @@ button.secondary:focus {
     color: var(--on-secondary-focus);
 }
 
+button:disabled {
+    opacity: 0.5;
+}
+
 input {
     background-color: inherit;
     border: none;
@@ -581,24 +585,24 @@ div.page-surface.labeling {
     padding: 1px;
 }
 
-div.page-surface.labeling>div.image-container {
+div.page-surface.labeling>div.page-image>div.image-container {
     position: relative;
     flex-basis: 0;
 }
 
-div.page-surface.labeling>div.image-container>img {
+div.page-surface.labeling>div.page-image>div.image-container>img {
     z-index: 1;
     display: block;
 }
 
-div.page-surface.labeling>div.image-container>div.highlight {
+div.page-surface.labeling>div.page-image>div.image-container>div.highlight {
     position: absolute;
     z-index: 2;
     background-color: #c0c0c0;
     opacity: 0.5;
 }
 
-div.page-surface.labeling>div.image-container>div.highlight:hover {
+div.page-surface.labeling>div.page-image>div.image-container>div.highlight:hover {
     opacity: 0.8;
 }
 
