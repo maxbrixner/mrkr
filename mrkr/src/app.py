@@ -342,7 +342,7 @@ async def scan_project(
     """
     manager = ProjectManager(session=session.database)
 
-    project = await manager.get_project(project_id=id)
+    project = await manager.get_project(id=id)
 
     if not project:
         raise Exception("Project not found.")
@@ -354,7 +354,7 @@ async def scan_project(
             session.database.add(source)
         session.database.commit()
 
-        worker.put("scan-project", project_id=project.id)
+        worker.put("scan-project", id=project.id)
         logger.debug("Project scan initialized.")
     else:
         logger.debug("Project is not ready to be scanned.")
@@ -366,7 +366,7 @@ async def scan_project(
 
 @worker.workermethod("scan-project")
 async def scan_project_worker(
-    project_id: int
+    id: int
 ) -> None:
     """
     Scan a project's source and update the task list accordingly.
@@ -374,9 +374,32 @@ async def scan_project_worker(
     with database.session() as session:
         manager = ProjectManager(session=session)
 
-        project = await manager.get_project(project_id=project_id)
+        project = await manager.get_project(id=id)
 
         await manager.scan_project(project=project)
+
+        worker.put("run-project-ocr", id=project.id)
+
+# ---------------------------------------------------------------------------- #
+
+
+@worker.workermethod("run-project-ocr")
+async def scan_project_worker(
+    id: int
+) -> None:
+    """
+    Run OCR for a project's tasks anf files.
+    """
+    with database.session() as session:
+        manager = ProjectManager(session=session)
+
+        project = await manager.get_project(id=id)
+
+        await manager.run_project_ocr(
+            project=project,
+            provider=OcrProvider.tesseract,  # todo
+            force_ocr=False
+        )
 
 # ---------------------------------------------------------------------------- #
 
@@ -391,12 +414,10 @@ async def tasks_page(
     """
     manager = ProjectManager(session=session.database)
 
-    project = await manager.get_project(project_id=id)
+    project = await manager.get_project(id=id)
 
     if not project:
         raise Exception("Project not found.")
-
-    tasks = project.tasks
 
     return templates.TemplateResponse(
         request=session.request,
@@ -404,8 +425,8 @@ async def tasks_page(
         context={
             "config": config.htmx_config,
             "project": project,
-            "tasks": tasks,
-            "ready": await manager.is_ready(project=project),
+            "ready": await manager.has_status(project=project,
+                                              status=SourceStatus.ready),
             "scannable": await manager.is_scannable(project=project)
         }
     )
@@ -416,40 +437,36 @@ async def tasks_page(
 @app.get("/label")
 async def label_page(
     session: AuthHttpSessionDep,
-    id: int
+    id: int,
+    file_id: Optional[int] = None,
+    page_id: Optional[int] = None
 ) -> Response:
     """
     Display the labeling page.
     """
     manager = ProjectManager(session=session.database)
 
-    task = await manager.get_task(task_id=id)
+    task = await manager.get_task(id=id)
 
     if not task:
         raise Exception("Task not found.")
 
-    project = await manager.get_project(project_id=task.project_id)
+    if file_id:
+        file: File | None = next(
+            (file for file in task.files if file.id == file_id), None)
+    else:
+        file = task.files[0]
 
-    if not project:
-        raise Exception("Project not found.")
+    if not file or file.status == FileStatus.missing:
+        raise Exception("File not found.")
 
-    labels = await manager.get_labels(project=project)
+    ocr = await manager.get_ocr(file=file)
 
-    user_labels = await manager.get_user_labels(task=task)
-
-    def get_user_label(ocr_id: int) -> UserLabel | None:
-        for user_label in user_labels:
-            if not user_label.label:
-                continue
-            # todo: this is wrong somehow (linter)
-            if ocr_id in user_label.label["ocr_ids"]:
-                return user_label
-        return None
-
-    def get_label(id: int) -> Label | None:
-        for label in labels:
-            if label.id == id:
-                return label
+    def label_associated_with(block_id: int) -> Label | None:
+        for label in file.labels:
+            for association in label.associations:
+                if association.block_id == block_id:
+                    return label
         return None
 
     return templates.TemplateResponse(
@@ -457,12 +474,10 @@ async def label_page(
         name="page-label.jinja",
         context={
             "config": config.htmx_config,
-            "project": project,
             "task": task,
-            "labels": labels,
-            "user_labels": user_labels,
-            "get_label": get_label,
-            "get_user_label": get_user_label
+            "file": file,
+            "ocr": ocr,
+            "label_associated_with": label_associated_with
         }
     )
 
@@ -477,12 +492,14 @@ async def label_image(
 ) -> Response:
     manager = ProjectManager(session=session.database)
 
-    task = await manager.get_task(task_id=id)
+    file = await manager.get_file(id=id)
 
-    if not task:
-        raise Exception("Task not found.")
+    if not file or file.status == FileStatus.missing:
+        raise Exception("File not found.")
 
-    with FileProviderFactory.get_provider("local").read_file(task.uri) as file:
+    # todo: allow for pdfs or multiple files
+
+    with FileProviderFactory.get_provider("local").read_file(file.uri) as file:
         content = file.read()
 
     return Response(content=content, media_type="image/jpeg")
@@ -493,38 +510,67 @@ async def label_image(
 @app.post("/save-labels")
 async def save_labels(
     session: AuthHttpSessionDep,
-    task_id: Annotated[int, Form()],
-    label_id: Annotated[List[int], Form()],
-    ocr_ids: Annotated[List[str], Form()],
+    file_id: int,
+    label_definition_id: Annotated[List[int], Form()],
+    block_ids: Annotated[List[str], Form()],
     user_content: Annotated[List[str], Form()]
 ) -> Response:
 
     manager = ProjectManager(session=session.database)
 
-    task = await manager.get_task(task_id=task_id)
-
-    if not task:
-        raise Exception("Task not found.")
-
-    if len(label_id) != len(ocr_ids) or len(ocr_ids) != len(user_content):
+    if len(label_definition_id) != len(block_ids) or \
+            len(block_ids) != len(user_content):
         raise HTTPException(status_code=400, detail="Bad Request")
 
+    file = await manager.get_file(id=file_id)
+
+    if not file:
+        raise Exception("File not found.")
+
+    for label in file.labels:
+        for association in label.associations:
+            session.database.delete(association)
+        session.database.delete(label)
+
+    session.database.commit()
+
     labels = []
-    for item in zip(label_id, ocr_ids, user_content):
-        ocr_ids_list = item[1].split(",")
-        ocr_ids_values = [int(ocr_id) for ocr_id in ocr_ids_list]
-        labels.append(
-            UserLabel(
-                task_id=task_id,
-                label=LabelObject(
-                    label_id=item[0],
-                    ocr_ids=ocr_ids_values,
-                    user_content=item[2]
-                ).model_dump()
-            )
+    associations = []
+    for item in zip(label_definition_id, block_ids, user_content):
+        block_ids_list = item[1].split(",")
+        block_ids_values = [int(block_id) for block_id in block_ids_list]
+
+        label = Label(
+            file_id=file_id,
+            label_definition_id=item[0],
+            user_content=item[2]
         )
 
-    await manager.swap_user_labels(task=task, user_labels=labels)
+        labels.append(
+            label
+        )
+
+        session.database.add(label)
+
+        session.database.commit()
+        session.database.refresh(label)
+
+        print("aaa", label)
+
+        for block_id in block_ids_values:
+            association = LabelAssociation(
+                label_id=label.id,
+                block_id=block_id
+            )
+
+            associations.append(
+                association
+            )
+            session.database.add(association)
+
+    session.database.commit()
+
+    # await manager.swap_user_labels(task=task, user_labels=labels)
 
     return HTMLResponse("Save Changes")
 

@@ -8,11 +8,11 @@
 <div class="labeling">
     <div class="page-toolbar labeling">
         <div>
-            <button class="secondary" aria-label="Back to Tasks" hx-get="{{url_for('tasks_page')}}?id={{project.id}}"
-                hx-trigger="click" hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main"
-                hx-push-url="true" hx-indicator="#main" hx-request='{"timeout": {{config.timeout}}}'><img
+            <button class="secondary" aria-label="Back to Tasks"
+                hx-get="{{url_for('tasks_page')}}?id={{task.source.project.id}}" hx-trigger="click"
+                hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main" hx-push-url="true"
+                hx-indicator="#main" hx-request='{"timeout": {{config.timeout}}}'><img
                     src="/static/img/arrow-back-outline.svg"></button>
-
         </div>
         <div>
             <h1>{{task.name}}</h1>
@@ -25,18 +25,18 @@
     </div>
     <div class="page-surface labeling" id="label-surface">
         <div class="image-container">
-            <img id="label-image" src="/label-image/?id={{task.id}}" draggable="false">
+            <img id="label-image" src="/label-image/?id={{file.id}}" draggable="false">
             </img>
-            {% if task.ocr %}
-            {% for block in task.ocr.ocr.pages[0].blocks %}
-            {% if get_user_label(block.id) %}
+            {% if ocr %}
+            {% for block in ocr.pages[0].blocks %}
+            {% if label_associated_with(block.id) %}
             <div class="highlight" data-content="{{block.content}}"
-                style="left:{{block.coordinates.left}}%; top:{{block.coordinates.top}}%; width:{{block.coordinates.width}}%; height:{{block.coordinates.height}}%; background-color: {{get_label(get_user_label(block.id).label.label_id).color}};"
+                style="left:{{block.left}}%; top:{{block.top}}%; width:{{block.width}}%; height:{{block.height}}%; background-color: {{label_associated_with(block.id).label_definition.color}};"
                 data-content="{{block.content}}" data-id="{{block.id}}" data-active="true">
             </div>
             {% else %}
             <div class="highlight" data-content="{{block.content}}"
-                style="left:{{block.coordinates.left}}%; top:{{block.coordinates.top}}%; width:{{block.coordinates.width}}%; height:{{block.coordinates.height}}%;"
+                style="left:{{block.left}}%; top:{{block.top}}%; width:{{block.width}}%; height:{{block.height}}%;"
                 data-content="{{block.content}}" data-id="{{block.id}}" data-active="false">
             </div>
             {% endif %}
@@ -46,25 +46,25 @@
     </div>
     <div id="labeling-details" class="page-details labeling">
         <div class="available-labels">
-            {% for label in labels %}
+            {% for label in task.source.project.labels %}
             <button class="label-button" style="background-color: {{label.color}}20; border-color: {{label.color}};"
                 data-id="{{label.id}}" data-label="{{label.name}}" data-color="{{label.color}}">{{label.name}}</button>
             {% endfor %}
         </div>
-        <form id="user-labels" class="user-labels" hx-post="{{url_for('save_labels')}}?id={{task.id}}"
+        <form id="user-labels" class="user-labels" hx-post="{{url_for('save_labels')}}?file_id={{file.id}}"
             hx-indicator="#save-labels-span" hx-target="#save-labels-span"
             hx-swap="innerHTML swap:{{config.swap_delay}}ms">
-            {% for user_label in user_labels %}
+            {% for label in file.labels %}
             <div class="user-label"
-                style="background-color: {{get_label(user_label.label.label_id).color}}20; border-color: {{get_label(user_label.label.label_id).color}};">
-                <span>{{get_label(user_label.label.label_id).name}}</span>
-                <input type="hidden" class="label-id-input" name="label_id" value="{{user_label.label.label_id}}">
-                <input type="hidden" class="ocr-ids-input" name="ocr_ids"
-                    value="{%for ocr_id in user_label.label.ocr_ids%}{{ocr_id}}{%if not loop.last%},{%endif%}{%endfor%}">
-                <input type="text" class="user-content-input" name="user_content"
-                    value="{{user_label.label.user_content}}">
-                <button type="button" class="delete-label" aria-label="Delete Label"
-                    data-id="{{user_label.block_id}}"><img src="/static/img/trash-outline.svg"></button>
+                style="background-color: {{label.label_definition.color}}20; border-color: {{label.label_definition.color}};">
+                <span>{{label.label_definition.name}}</span>
+                <input type="hidden" class="label-definition-id-input" name="label_definition_id"
+                    value="{{label.label_definition.id}}">
+                <input type="hidden" class="block-ids-input" name="block_ids"
+                    value="{%for association in label.associations%}{{association.block_id}}{%if not loop.last%},{%endif%}{%endfor%}">
+                <input type="text" class="user-content-input" name="user_content" value="{{label.user_content}}">
+                <button type="button" class="delete-label" aria-label="Delete Label" data-id="98"><img
+                        src="/static/img/trash-outline.svg"></button>
             </div>
             {% endfor %}
             <input type="hidden" name="csrf_token" value="{{request.state.csrf_token}}">

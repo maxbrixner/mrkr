@@ -73,7 +73,23 @@ class Project(sqlmodel.SQLModel, table=True):
 
     creator: User = sqlmodel.Relationship()
     sources: List["Source"] = sqlmodel.Relationship(back_populates="project")
-    tasks: List["Task"] = sqlmodel.Relationship(back_populates="project")
+    labels: List["LabelDefinition"] = sqlmodel.Relationship(
+        back_populates="project")
+
+
+class LabelType(str, enum.Enum):
+    word = "word"
+
+
+class LabelDefinition(sqlmodel.SQLModel, table=True):
+    __tablename__ = "tlabeldefinition"
+    id: int = sqlmodel.Field(primary_key=True)
+    project_id: int = sqlmodel.Field(foreign_key="tproject.id")
+    name: str = sqlmodel.Field(unique=True)
+    type: LabelType = sqlmodel.Field()
+    color: str = sqlmodel.Field()
+
+    project: Project = sqlmodel.Relationship()
 
 
 class SourceProvider(str, enum.Enum):
@@ -99,7 +115,27 @@ class Source(sqlmodel.SQLModel, table=True):
     last_scan: Optional[datetime.datetime] = sqlmodel.Field(nullable=True)
 
     project: Project = sqlmodel.Relationship()
-    files: List["File"] = sqlmodel.Relationship(back_populates="source")
+    tasks: List["Task"] = sqlmodel.Relationship(back_populates="source")
+
+
+class TaskStatus(str, enum.Enum):
+    open = "open"
+    progress = "progress"
+    complete = "complete"
+
+
+class Task(sqlmodel.SQLModel, table=True):
+    __tablename__ = "ttask"
+    id: int = sqlmodel.Field(primary_key=True)
+    source_id: int = sqlmodel.Field(foreign_key="tsource.id")
+    name: str = sqlmodel.Field()
+    created: datetime.datetime = sqlmodel.Field()
+    modified: datetime.datetime = sqlmodel.Field(nullable=True)
+    status: TaskStatus = sqlmodel.Field()
+    pattern: str = sqlmodel.Field()
+
+    source: Source = sqlmodel.Relationship()
+    files: List["File"] = sqlmodel.Relationship(back_populates="task")
 
 
 class FileStatus(str, enum.Enum):
@@ -116,25 +152,11 @@ class FileObject(sqlmodel.SQLModel, table=False):
 class File(FileObject, table=True):
     __tablename__ = "tfile"
     id: int = sqlmodel.Field(primary_key=True)
-    source_id: int = sqlmodel.Field(foreign_key="tsource.id")
+    task_id: int = sqlmodel.Field(foreign_key="ttask.id")
     status: FileStatus = sqlmodel.Field()
 
-    source: Source = sqlmodel.Relationship()
-
-
-class LabelType(str, enum.Enum):
-    word = "word"
-
-
-class LabelDefinition(sqlmodel.SQLModel, table=True):
-    __tablename__ = "tlabeldefinition"
-    id: int = sqlmodel.Field(primary_key=True)
-    project_id: int = sqlmodel.Field(foreign_key="tproject.id")
-    name: str = sqlmodel.Field(unique=True)
-    type: LabelType = sqlmodel.Field()
-    color: str = sqlmodel.Field()
-
-    project: Project = sqlmodel.Relationship()
+    task: Task = sqlmodel.Relationship()
+    labels: List["Label"] = sqlmodel.Relationship(back_populates="file")
 
 
 # ---------------------------------------------------------------------------- #
@@ -162,6 +184,7 @@ class OcrPage(sqlmodel.SQLModel, table=True):
     height: float = sqlmodel.Field()
 
     ocr_result: OcrResult = sqlmodel.Relationship()
+    blocks: List["OcrBlock"] = sqlmodel.Relationship(back_populates="page")
 
 
 class OcrBlockType(str, enum.Enum):
@@ -192,47 +215,24 @@ class OcrBlock(OcrBlockObject, table=True):
 class Label(sqlmodel.SQLModel, table=True):
     __tablename__ = "tlabel"
     id: int = sqlmodel.Field(primary_key=True)
-    file_id: int = sqlmodel.Field(foreign_key="ttask.id")
+    file_id: int = sqlmodel.Field(foreign_key="tfile.id")
     label_definition_id: int = sqlmodel.Field(
         foreign_key="tlabeldefinition.id")
     user_content: str = sqlmodel.Field()
 
+    file: File = sqlmodel.Relationship()
+    associations: List["LabelAssociation"] = sqlmodel.Relationship(
+        back_populates="label")
+    label_definition: LabelDefinition = sqlmodel.Relationship()
 
-class LabelOcrAssociation(sqlmodel.SQLModel, table=True):
-    __tablename__ = "tlabelocrassociation"
+
+class LabelAssociation(sqlmodel.SQLModel, table=True):
+    __tablename__ = "tlabelassociation"
     id: int = sqlmodel.Field(primary_key=True)
     label_id: int = sqlmodel.Field(foreign_key="tlabel.id")
-    ocr_block_id: int = sqlmodel.Field(foreign_key="tocrblock.id")
+    block_id: int = sqlmodel.Field(foreign_key="tocrblock.id")
 
-# ---------------------------------------------------------------------------- #
-
-
-class TaskStatus(str, enum.Enum):
-    open = "open"
-    progress = "progress"
-    complete = "complete"
-
-
-class Task(sqlmodel.SQLModel, table=True):
-    __tablename__ = "ttask"
-    id: int = sqlmodel.Field(primary_key=True)
-    project_id: int = sqlmodel.Field(foreign_key="tproject.id")
-    name: str = sqlmodel.Field()
-    created: datetime.datetime = sqlmodel.Field()
-    modified: datetime.datetime = sqlmodel.Field(nullable=True)
-    status: TaskStatus = sqlmodel.Field()
-    pattern: str = sqlmodel.Field()
-
-    project: Project = sqlmodel.Relationship()
-
-
-class TaskFileAssociation(sqlmodel.SQLModel, table=True):
-    __tablename__ = "ttaskfileassociation"
-    id: int = sqlmodel.Field(primary_key=True)
-    task_id: int = sqlmodel.Field(foreign_key="ttask.id")
-    file_id: int = sqlmodel.Field(foreign_key="tfile.id")
-
-    task: Task = sqlmodel.Relationship()
-    file: File = sqlmodel.Relationship()
+    label: Label = sqlmodel.Relationship()
+    block: OcrBlock = sqlmodel.Relationship()
 
 # ---------------------------------------------------------------------------- #

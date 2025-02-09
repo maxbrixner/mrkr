@@ -36,11 +36,13 @@
             {% endif %}
         </div>
         {% else %}
-        {% for task in tasks %}
+        {% for source in project.sources %}
+        {% for task in source.tasks %}
         <div class="task-card">
             <div class="task-description">
                 <h2>{{task.name}}</h2>
                 <p>{{task.status.value}}</p>
+                <p>{{source.type.value}}</p>
             </div>
             <div class="task-options">
                 <button class="image small" aria-label="Edit Task {{task.name}}"><img
@@ -53,6 +55,7 @@
                 </button>
             </div>
         </div>
+        {% endfor %}
         {% endfor %}
         {%endif%}
     </div>
