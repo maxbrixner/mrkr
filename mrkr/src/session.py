@@ -407,7 +407,7 @@ class SessionManager():
         length: int = 32
     ) -> str:
         """
-        Create a nonce for the content security policy.
+        Create a secure token of a given length.
         """
         return secrets.token_hex(nbytes=length)
 

@@ -436,7 +436,7 @@ async def task_page(
             "config": config.htmx_config,
             "task": task,
             "page": page,
-            "max_pages": len(task.ocr.pages)
+            "max_pages": len(task.ocr.pages) if task.ocr else 0,
         }
     )
 
