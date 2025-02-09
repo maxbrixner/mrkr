@@ -17,6 +17,27 @@
                 hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#label-surface" hx-select="#label-surface"
                 hx-request='{"timeout": {{config.timeout}}}' hx-indicator="#label-surface"><img
                     src="/static/img/reload-outline.svg"></button>
+            {% if page > 0 %}
+            <button class="secondary" id="page-back-button"
+                hx-get="{{url_for('task_page')}}?id={{task.id}}&page={{page-1}}" hx-trigger="click"
+                hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#label-surface" hx-select="#label-surface"
+                hx-request='{"timeout": {{config.timeout}}}' hx-indicator="#label-surface" hx-push-url="true"
+                hx-select-oob="#page-back-button,#page-forward-button"><img
+                    src="/static/img/chevron-back-outline.svg"></button>
+            {% else %}
+            <button class="secondary" id="page-back-button" inert><img
+                    src="/static/img/chevron-back-outline.svg"></button>
+            {% endif %}
+            {% if page < max_pages-1 %} <button class="secondary" id="page-forward-button"
+                hx-get="{{url_for('task_page')}}?id={{task.id}}&page={{page+1}}" hx-trigger="click"
+                hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#label-surface" hx-select="#label-surface"
+                hx-request='{"timeout": {{config.timeout}}}' hx-indicator="#label-surface" hx-push-url="true"
+                hx-select-oob="#page-back-button,#page-forward-button">
+                <img src="/static/img/chevron-forward-outline.svg"></button>
+                {% else %}
+                <button class="secondary" id="page-forward-button" inert><img
+                        src="/static/img/chevron-forward-outline.svg"></button>
+                {% endif %}
         </div>
         <div>
             <h1>{{task.name}}</h1>
