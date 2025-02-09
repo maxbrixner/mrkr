@@ -63,6 +63,17 @@ class Session(sqlmodel.SQLModel, table=True):
 
 # ---------------------------------------------------------------------------- #
 
+class SourceProvider(str, enum.Enum):
+    local = "local"
+    s3 = "s3"
+
+
+class ProjectStatus(str, enum.Enum):
+    scan_pending = "scan_pending"
+    scan_running = "scan_running"
+    scan_failed = "scan_failed"
+    ready = "ready"
+
 
 class Project(sqlmodel.SQLModel, table=True):
     __tablename__ = "tproject"
@@ -70,77 +81,30 @@ class Project(sqlmodel.SQLModel, table=True):
     name: str = sqlmodel.Field()
     description: str = sqlmodel.Field()
     creator_id: int = sqlmodel.Field(foreign_key="tuser.id")
+    provider: SourceProvider = sqlmodel.Field()
+    uri: str = sqlmodel.Field()
+    status: ProjectStatus = sqlmodel.Field()
+    last_scan: Optional[datetime.datetime] = sqlmodel.Field()
 
     creator: User = sqlmodel.Relationship()
-    sources: List["Source"] = sqlmodel.Relationship(back_populates="project")
-    labels: List["LabelDefinition"] = sqlmodel.Relationship(
+    tasks: List["Task"] = sqlmodel.Relationship(back_populates="project")
+    labeltypes: List["LabelType"] = sqlmodel.Relationship(
         back_populates="project")
 
 
-class LabelType(str, enum.Enum):
+class LabelCategory(str, enum.Enum):
     word = "word"
 
 
-class LabelDefinition(sqlmodel.SQLModel, table=True):
-    __tablename__ = "tlabeldefinition"
+class LabelType(sqlmodel.SQLModel, table=True):
+    __tablename__ = "tlabeltype"
     id: int = sqlmodel.Field(primary_key=True)
     project_id: int = sqlmodel.Field(foreign_key="tproject.id")
     name: str = sqlmodel.Field(unique=True)
-    type: LabelType = sqlmodel.Field()
+    category: LabelCategory = sqlmodel.Field()
     color: str = sqlmodel.Field()
 
     project: Project = sqlmodel.Relationship()
-
-
-class SourceProvider(str, enum.Enum):
-    local = "local"
-    s3 = "s3"
-
-
-class SourceStatus(str, enum.Enum):
-    initialized = "initialized"
-    pending = "pending"
-    scanning = "scanning"
-    ready = "ready"
-    error = "error"
-
-
-class Source(sqlmodel.SQLModel, table=True):
-    __tablename__ = "tsource"
-    id: int = sqlmodel.Field(primary_key=True)
-    project_id: int = sqlmodel.Field(foreign_key="tproject.id")
-    uri: str = sqlmodel.Field()
-    type: SourceProvider = sqlmodel.Field()  # rename provider?
-    status: SourceStatus = sqlmodel.Field()
-    last_scan: Optional[datetime.datetime] = sqlmodel.Field(nullable=True)
-
-    project: Project = sqlmodel.Relationship()
-    tasks: List["Task"] = sqlmodel.Relationship(back_populates="source")
-
-
-class TaskStatus(str, enum.Enum):
-    open = "open"
-    progress = "progress"
-    complete = "complete"
-
-
-class Task(sqlmodel.SQLModel, table=True):
-    __tablename__ = "ttask"
-    id: int = sqlmodel.Field(primary_key=True)
-    source_id: int = sqlmodel.Field(foreign_key="tsource.id")
-    name: str = sqlmodel.Field()
-    created: datetime.datetime = sqlmodel.Field()
-    modified: datetime.datetime = sqlmodel.Field(nullable=True)
-    status: TaskStatus = sqlmodel.Field()
-    pattern: str = sqlmodel.Field()
-
-    source: Source = sqlmodel.Relationship()
-    files: List["File"] = sqlmodel.Relationship(back_populates="task")
-
-
-class FileStatus(str, enum.Enum):
-    found = "found"
-    missing = "missing"
 
 
 class FileObject(sqlmodel.SQLModel, table=False):
@@ -149,50 +113,64 @@ class FileObject(sqlmodel.SQLModel, table=False):
     etag: str = sqlmodel.Field()
 
 
-class File(FileObject, table=True):
-    __tablename__ = "tfile"
+class TaskStatus(str, enum.Enum):
+    ocr_pending = "ocr_pending"
+    ocr_running = "ocr_running"
+    ocr_failed = "ocr_failed"
+    ready = "ready"
+    error = "error"
+
+
+class Task(sqlmodel.SQLModel, table=True):
+    __tablename__ = "ttask"
     id: int = sqlmodel.Field(primary_key=True)
-    task_id: int = sqlmodel.Field(foreign_key="ttask.id")
-    status: FileStatus = sqlmodel.Field()
+    project_id: int = sqlmodel.Field(foreign_key="tproject.id")
+    name: str = sqlmodel.Field()
+    created: datetime.datetime = sqlmodel.Field()
+    status: TaskStatus = sqlmodel.Field()
+    abandoned: bool = sqlmodel.Field()
+    uri: str = sqlmodel.Field()
+    last_ocr: Optional[datetime.datetime] = sqlmodel.Field()
 
-    task: Task = sqlmodel.Relationship()
-    labels: List["Label"] = sqlmodel.Relationship(back_populates="file")
+    project: Project = sqlmodel.Relationship()
+    ocr: Optional["Ocr"] = sqlmodel.Relationship(back_populates="task")
+    labels: List["Label"] = sqlmodel.Relationship(back_populates="task")
 
-
-# ---------------------------------------------------------------------------- #
 
 class OcrProvider(str, enum.Enum):
     tesseract = "tesseract"
 
 
-class OcrResult(sqlmodel.SQLModel, table=True):
-    __tablename__ = "tocrresult"
+class Ocr(sqlmodel.SQLModel, table=True):
+    __tablename__ = "tocr"
     id: int = sqlmodel.Field(primary_key=True)
+    task_id: int = sqlmodel.Field(foreign_key="ttask.id")
     etag: str = sqlmodel.Field()
     provider: OcrProvider = sqlmodel.Field()
     created: datetime.datetime = sqlmodel.Field()
 
-    pages: List["OcrPage"] = sqlmodel.Relationship(back_populates="ocr_result")
+    task: Task = sqlmodel.Relationship()
+    pages: List["Page"] = sqlmodel.Relationship(back_populates="ocr")
 
 
-class OcrPage(sqlmodel.SQLModel, table=True):
-    __tablename__ = "tocrpage"
+class Page(sqlmodel.SQLModel, table=True):
+    __tablename__ = "tpage"
     id: int = sqlmodel.Field(primary_key=True)
-    ocr_id: int = sqlmodel.Field(foreign_key="tocrresult.id")
+    ocr_id: int = sqlmodel.Field(foreign_key="tocr.id")
     page: int = sqlmodel.Field()
     width: float = sqlmodel.Field()
     height: float = sqlmodel.Field()
 
-    ocr_result: OcrResult = sqlmodel.Relationship()
-    blocks: List["OcrBlock"] = sqlmodel.Relationship(back_populates="page")
+    ocr: Ocr = sqlmodel.Relationship()
+    blocks: List["Block"] = sqlmodel.Relationship(back_populates="page")
 
 
-class OcrBlockType(str, enum.Enum):
+class BlockType(str, enum.Enum):
     word = "word"
 
 
-class OcrBlockObject(sqlmodel.SQLModel, table=False):
-    type: OcrBlockType = sqlmodel.Field()
+class BlockObject(sqlmodel.SQLModel, table=False):
+    type: BlockType = sqlmodel.Field()
     content: str = sqlmodel.Field()
     confidence: Optional[float] = sqlmodel.Field()
     left: float = sqlmodel.Field()
@@ -201,38 +179,37 @@ class OcrBlockObject(sqlmodel.SQLModel, table=False):
     height: float = sqlmodel.Field()
 
 
-class OcrBlock(OcrBlockObject, table=True):
-    __tablename__ = "tocrblock"
+class Block(BlockObject, table=True):
+    __tablename__ = "tblock"
     id: int = sqlmodel.Field(primary_key=True)
-    page_id: int = sqlmodel.Field(foreign_key="tocrpage.id")
+    page_id: int = sqlmodel.Field(foreign_key="tpage.id")
 
-    page: OcrPage = sqlmodel.Relationship()
-
-
-# ---------------------------------------------------------------------------- #
+    page: Page = sqlmodel.Relationship()
+    link: Optional["LabelLink"] = sqlmodel.Relationship(
+        back_populates="block")
 
 
 class Label(sqlmodel.SQLModel, table=True):
     __tablename__ = "tlabel"
     id: int = sqlmodel.Field(primary_key=True)
-    file_id: int = sqlmodel.Field(foreign_key="tfile.id")
-    label_definition_id: int = sqlmodel.Field(
-        foreign_key="tlabeldefinition.id")
+    task_id: int = sqlmodel.Field(foreign_key="ttask.id")
+    labeltype_id: int = sqlmodel.Field(
+        foreign_key="tlabeltype.id")
     user_content: str = sqlmodel.Field()
 
-    file: File = sqlmodel.Relationship()
-    associations: List["LabelAssociation"] = sqlmodel.Relationship(
+    task: Task = sqlmodel.Relationship()
+    links: List["LabelLink"] = sqlmodel.Relationship(
         back_populates="label")
-    label_definition: LabelDefinition = sqlmodel.Relationship()
+    labeltype: LabelType = sqlmodel.Relationship()
 
 
-class LabelAssociation(sqlmodel.SQLModel, table=True):
-    __tablename__ = "tlabelassociation"
+class LabelLink(sqlmodel.SQLModel, table=True):
+    __tablename__ = "tlabellink"
     id: int = sqlmodel.Field(primary_key=True)
     label_id: int = sqlmodel.Field(foreign_key="tlabel.id")
-    block_id: int = sqlmodel.Field(foreign_key="tocrblock.id")
+    block_id: int = sqlmodel.Field(foreign_key="tblock.id")
 
     label: Label = sqlmodel.Relationship()
-    block: OcrBlock = sqlmodel.Relationship()
+    block: Block = sqlmodel.Relationship()
 
 # ---------------------------------------------------------------------------- #

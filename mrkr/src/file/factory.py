@@ -1,9 +1,5 @@
 # ---------------------------------------------------------------------------- #
 
-from typing import Optional
-
-# ---------------------------------------------------------------------------- #
-
 from .base import BaseFileProvider
 from .local import LocalFileProvider
 from ..models import SourceProvider

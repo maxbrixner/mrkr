@@ -136,7 +136,7 @@ function register_event_listeners() {
                 new_item.style.borderColor = current_color;
                 new_item.style.backgroundColor = current_color + "20";
                 new_item.innerHTML = `<span>` + current_label + `</span>` +
-                    `<input type="hidden" class="label-definition-id-input" name="label_definition_id" value="` + current_id + `">` +
+                    `<input type="hidden" class="labeltype-id-input" name="labeltype_id" value="` + current_id + `">` +
                     `<input type="hidden" class="block-ids-input" name="block_ids" value="` + this.dataset.id + `">` +
                     `<input type="text" class="user-content-input" name="user_content" value="` + this.dataset.content + `">` +
                     `<button class="delete-label" type="button" aria-label="Delete Label" data-id="` + 99 + `"><img src="/static/img/trash-outline.svg"></button>`
@@ -148,7 +148,6 @@ function register_event_listeners() {
                 details = document.getElementById("user-labels");
 
                 let existing_item = details.firstChild;
-                let label_defintion_id_input = existing_item.getElementsByClassName("label-definition-id-input")[0];
                 let block_ids_input = existing_item.getElementsByClassName("block-ids-input")[0];
                 let user_content_input = existing_item.getElementsByClassName("user-content-input")[0];
 

@@ -28,7 +28,7 @@
                 <button class="image small" aria-label="Edit project {{project.name}}"><img
                         src="/static/img/create-outline.svg" alt="Edit Icon" draggable="false"></button>
                 <button class="image small" aria-label="View {{project.name}}"
-                    hx-get="{{url_for('tasks_page')}}?id={{project.id}}" hx-trigger="click"
+                    hx-get="{{url_for('project_page')}}?id={{project.id}}" hx-trigger="click"
                     hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main"
                     hx-push-url="true" hx-request='{"timeout": {{config.timeout}}}' hx-indicator="#main">
                     <img src="/static/img/arrow-forward-outline.svg" alt="View Project Icon" draggable="false">

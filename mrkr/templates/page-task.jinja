@@ -1,0 +1,93 @@
+{% extends "base.jinja" %}
+
+{% block nav %}
+{% include 'content-nav.jinja' %}
+{% endblock %}
+
+{% block main %}
+<div class="labeling">
+    <div class="page-toolbar labeling">
+        <div>
+            <button class="secondary" aria-label="Back to Tasks"
+                hx-get="{{url_for('project_page')}}?id={{task.project.id}}" hx-trigger="click"
+                hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main" hx-push-url="true"
+                hx-indicator="#main" hx-request='{"timeout": {{config.timeout}}}'><img
+                    src="/static/img/arrow-back-outline.svg"></button>
+        </div>
+        <div>
+            <h1>{{task.name}}</h1>
+        </div>
+        <div>
+            <button class="primary" aria-label="Queue OCR" hx-post="{{url_for('run_ocr')}}?id={{task.id}}"
+                hx-trigger="click" hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main"
+                hx-indicator="#main" hx-request='{"timeout": {{config.timeout}}}'>Queue
+                OCR</button>
+            <button class="primary" id="save-labels-button" aria-label="Save Changes" form="user-labels">
+                <span id="save-labels-span">Save Changes</span>
+            </button>
+        </div>
+    </div>
+    <div class="page-surface labeling" id="label-surface">
+        {% if task.status != "ready" %}
+        <div class="status-card">
+            {% if task.status == "ocr_pending" %}
+            <span>An OCR is pending. Please wait a couple of minutes and then refresh the page.</span>
+            {% elif task.status == "ocr_running" %}
+            <span>An OCR is running. Please wait a couple of minutes and then refresh the page.</span>
+            {% elif task.status == "ocr_failed" %}
+            <span>The last OCR failed. Please try again later.</span>
+            {% else %}
+            <span>The task has an invalid status.</span>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="image-container">
+            <img id="label-image" src="{{url_for('task_image')}}?id={{task.id}}" draggable="false">
+            </img>
+            {% if task.ocr %}
+            {% for block in task.ocr.pages[page].blocks %}
+            {% if block.link %}
+            <div class="highlight"
+                style="left:{{block.left}}%; top:{{block.top}}%; width:{{block.width}}%; height:{{block.height}}%; background-color: {{block.link.label.labeltype.color}};"
+                data-content="{{block.content}}" data-id="{{block.id}}" data-active="true">
+            </div>
+            {% else %}
+            <div class="highlight"
+                style="left:{{block.left}}%; top:{{block.top}}%; width:{{block.width}}%; height:{{block.height}}%;"
+                data-content="{{block.content}}" data-id="{{block.id}}" data-active="false">
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    <div id="labeling-details" class="page-details labeling">
+        <div class="available-labels">
+            {% for labeltype in task.project.labeltypes %}
+            <button class="label-button"
+                style="background-color: {{labeltype.color}}20; border-color: {{labeltype.color}};"
+                data-id="{{labeltype.id}}" data-label="{{labeltype.name}}"
+                data-color="{{labeltype.color}}">{{labeltype.name}}</button>
+            {% endfor %}
+        </div>
+        <form id="user-labels" class="user-labels" hx-post="{{url_for('save_labels')}}?id={{task.id}}"
+            hx-indicator="#save-labels-span" hx-target="#save-labels-span"
+            hx-swap="innerHTML swap:{{config.swap_delay}}ms">
+            {% for label in task.labels %}
+            <div class="user-label"
+                style="background-color: {{label.labeltype.color}}20; border-color: {{label.labeltype.color}};">
+                <span>{{label.labeltype.name}}</span>
+                <input type="hidden" class="labeltype-id-input" name="labeltype_id" value="{{label.labeltype.id}}">
+                <input type="hidden" class="block-ids-input" name="block_ids"
+                    value="{%for link in label.links %}{{link.block_id}}{%if not loop.last%},{%endif%}{%endfor%}">
+                <input type="text" class="user-content-input" name="user_content" value="{{label.user_content}}">
+                <button type="button" class="delete-label" aria-label="Delete Label" data-id="98"><img
+                        src="/static/img/trash-outline.svg"></button>
+            </div>
+            {% endfor %}
+            <input type="hidden" name="csrf_token" value="{{request.state.csrf_token}}">
+            <input type="hidden" name="task_id" value="{{task.id}}">
+        </form>
+    </div>
+    {% endblock %}

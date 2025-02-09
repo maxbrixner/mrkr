@@ -332,6 +332,35 @@ async def projects_page(
 # ---------------------------------------------------------------------------- #
 
 
+@app.get("/project")
+async def project_page(
+    session: AuthHttpSessionDep,
+    id: int
+) -> Response:
+    """
+    Display the project page.
+    """
+    manager = ProjectManager(session=session.database)
+
+    project = await manager.get_project(id=id)
+
+    if not project:
+        raise HTTPException(status_code=400, detail="Bad Request")
+
+    return templates.TemplateResponse(
+        request=session.request,
+        name="page-project.jinja",
+        context={
+            "config": config.htmx_config,
+            "project": project,
+            "scannable": await manager.project_is_scannable(
+                project=project)
+        }
+    )
+
+# ---------------------------------------------------------------------------- #
+
+
 @app.post("/scan-project")
 async def scan_project(
     session: AuthHttpSessionDep,
@@ -345,21 +374,20 @@ async def scan_project(
     project = await manager.get_project(id=id)
 
     if not project:
-        raise Exception("Project not found.")
+        raise HTTPException(status_code=400, detail="Bad Request")
 
-    if await manager.is_scannable(project=project):
-        for source in project.sources:
-            source.status = SourceStatus.pending
-            source.last_scan = datetime.datetime.now()
-            session.database.add(source)
+    if await manager.project_is_scannable(project=project):
+        project.status = ProjectStatus.scan_pending
+        project.last_scan = datetime.datetime.now()
+        session.database.add(project)
         session.database.commit()
 
         worker.put("scan-project", id=project.id)
-        logger.debug("Project scan initialized.")
+        logger.debug("Project scan queued.")
     else:
         logger.debug("Project is not ready to be scanned.")
 
-    return await tasks_page(session=session, id=project.id)
+    return await project_page(session=session, id=project.id)
 
 # ---------------------------------------------------------------------------- #
 
@@ -378,106 +406,32 @@ async def scan_project_worker(
 
         await manager.scan_project(project=project)
 
-        worker.put("run-project-ocr", id=project.id)
-
 # ---------------------------------------------------------------------------- #
 
 
-@worker.workermethod("run-project-ocr")
-async def scan_project_worker(
-    id: int
-) -> None:
-    """
-    Run OCR for a project's tasks anf files.
-    """
-    with database.session() as session:
-        manager = ProjectManager(session=session)
-
-        project = await manager.get_project(id=id)
-
-        await manager.run_project_ocr(
-            project=project,
-            provider=OcrProvider.tesseract,  # todo
-            force_ocr=False
-        )
-
-# ---------------------------------------------------------------------------- #
-
-
-@app.get("/tasks")
-async def tasks_page(
-    session: AuthHttpSessionDep,
-    id: int
-) -> Response:
-    """
-    Display the projects page.
-    """
-    manager = ProjectManager(session=session.database)
-
-    project = await manager.get_project(id=id)
-
-    if not project:
-        raise Exception("Project not found.")
-
-    return templates.TemplateResponse(
-        request=session.request,
-        name="page-tasks.jinja",
-        context={
-            "config": config.htmx_config,
-            "project": project,
-            "ready": await manager.has_status(project=project,
-                                              status=SourceStatus.ready),
-            "scannable": await manager.is_scannable(project=project)
-        }
-    )
-
-# ---------------------------------------------------------------------------- #
-
-
-@app.get("/label")
-async def label_page(
+@app.get("/task")
+async def task_page(
     session: AuthHttpSessionDep,
     id: int,
-    file_id: Optional[int] = None,
-    page_id: Optional[int] = None
+    page: int = 0
 ) -> Response:
     """
-    Display the labeling page.
+    Display the task page.
     """
     manager = ProjectManager(session=session.database)
 
     task = await manager.get_task(id=id)
 
     if not task:
-        raise Exception("Task not found.")
-
-    if file_id:
-        file: File | None = next(
-            (file for file in task.files if file.id == file_id), None)
-    else:
-        file = task.files[0]
-
-    if not file or file.status == FileStatus.missing:
-        raise Exception("File not found.")
-
-    ocr = await manager.get_ocr(file=file)
-
-    def label_associated_with(block_id: int) -> Label | None:
-        for label in file.labels:
-            for association in label.associations:
-                if association.block_id == block_id:
-                    return label
-        return None
+        raise HTTPException(status_code=400, detail="Bad Request")
 
     return templates.TemplateResponse(
         request=session.request,
-        name="page-label.jinja",
+        name="page-task.jinja",
         context={
             "config": config.htmx_config,
             "task": task,
-            "file": file,
-            "ocr": ocr,
-            "label_associated_with": label_associated_with
+            "page": page
         }
     )
 
@@ -485,21 +439,27 @@ async def label_page(
 # ---------------------------------------------------------------------------- #
 
 
-@app.get("/label-image")
-async def label_image(
+@app.get("/task/image")
+async def task_image(
     session: AuthHttpSessionDep,
-    id: int
+    id: int,
+    page: int = 0
 ) -> Response:
+    """
+    Return a source file's page as an image.
+    """
     manager = ProjectManager(session=session.database)
 
-    file = await manager.get_file(id=id)
+    task = await manager.get_task(id=id)
 
-    if not file or file.status == FileStatus.missing:
-        raise Exception("File not found.")
+    if not task:
+        raise HTTPException(status_code=400, detail="Bad Request")
 
     # todo: allow for pdfs or multiple files
 
-    with FileProviderFactory.get_provider("local").read_file(file.uri) as file:
+    with FileProviderFactory.get_provider(
+        task.project.provider
+    ).read_file(task.uri) as file:
         content = file.read()
 
     return Response(content=content, media_type="image/jpeg")
@@ -507,66 +467,99 @@ async def label_image(
 # ---------------------------------------------------------------------------- #
 
 
+@app.post("/run_ocr")
+async def run_ocr(
+    session: AuthHttpSessionDep,
+    id: int
+) -> Response:
+    """
+    Run OCR for a project's task.
+    """
+    manager = ProjectManager(session=session.database)
+
+    task = await manager.get_task(id=id)
+
+    if not task:
+        raise HTTPException(status_code=400, detail="Bad Request")
+
+    if await manager.task_is_scannable(task=task):
+        task.status = TaskStatus.ocr_pending
+        task.last_ocr = datetime.datetime.now()
+        session.database.add(task)
+        session.database.commit()
+
+        worker.put("run-ocr", id=task.id)
+        logger.debug("Task OCR queued.")
+    else:
+        logger.debug("Task is not ready for OCR.")
+
+    return await task_page(session=session, id=task.id)
+
+# ---------------------------------------------------------------------------- #
+
+
+@worker.workermethod("run-ocr")
+async def run_ocr_worker(
+    id: int
+) -> None:
+    """
+    Run OCR on a task.
+    """
+    with database.session() as session:
+        manager = ProjectManager(session=session)
+
+        task = await manager.get_task(id=id)
+
+        await manager.run_ocr(task=task)
+
+# ---------------------------------------------------------------------------- #
+
+
 @app.post("/save-labels")
 async def save_labels(
     session: AuthHttpSessionDep,
-    file_id: int,
-    label_definition_id: Annotated[List[int], Form()],
+    id: int,
+    labeltype_id: Annotated[List[int], Form()],
     block_ids: Annotated[List[str], Form()],
     user_content: Annotated[List[str], Form()]
 ) -> Response:
 
     manager = ProjectManager(session=session.database)
 
-    if len(label_definition_id) != len(block_ids) or \
+    if len(labeltype_id) != len(block_ids) or \
             len(block_ids) != len(user_content):
         raise HTTPException(status_code=400, detail="Bad Request")
 
-    file = await manager.get_file(id=file_id)
+    task = await manager.get_task(id=id)
 
-    if not file:
-        raise Exception("File not found.")
+    if not task:
+        raise HTTPException(status_code=400, detail="Bad Request")
 
-    for label in file.labels:
-        for association in label.associations:
-            session.database.delete(association)
+    for label in task.labels:
+        for link in label.links:
+            session.database.delete(link)
         session.database.delete(label)
 
-    session.database.commit()
-
-    labels = []
-    associations = []
-    for item in zip(label_definition_id, block_ids, user_content):
+    for item in zip(labeltype_id, block_ids, user_content):
         block_ids_list = item[1].split(",")
         block_ids_values = [int(block_id) for block_id in block_ids_list]
 
         label = Label(
-            file_id=file_id,
-            label_definition_id=item[0],
+            task=task,
+            labeltype_id=item[0],
             user_content=item[2]
         )
 
-        labels.append(
-            label
-        )
-
         session.database.add(label)
-
-        session.database.commit()
-        session.database.refresh(label)
-
-        print("aaa", label)
+        # session.database.commit()
 
         for block_id in block_ids_values:
-            association = LabelAssociation(
-                label_id=label.id,
+            link = LabelLink(
+                label=label,
                 block_id=block_id
             )
 
-            associations.append(
-                association
-            )
-            session.database.add(association)
+            session.database.add(link)
 
     session.database.commit()
 

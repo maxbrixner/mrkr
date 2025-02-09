@@ -8,7 +8,7 @@ from typing import List, Tuple
 # ---------------------------------------------------------------------------- #
 
 from .base import BaseOcrProvider
-from ..models import OcrBlockObject, OcrBlockType
+from ..models import BlockObject, BlockType
 
 # ---------------------------------------------------------------------------- #
 
@@ -39,7 +39,7 @@ class TesseractOcrProvider(BaseOcrProvider):
     def run_ocr(
         self,
         image: Image.Image
-    ) -> List[OcrBlockObject]:
+    ) -> List[BlockObject]:
         """
         Use Google's Tesseract to apply OCR to an image.
         """
@@ -65,7 +65,7 @@ class TesseractOcrProvider(BaseOcrProvider):
         self,
         tesseract: TesseractResult,
         dimensions: Tuple[int, int]
-    ) -> List[OcrBlockObject]:
+    ) -> List[BlockObject]:
         blocks = []
         for index, text in enumerate(tesseract.text):
             if len(text) == 0:
@@ -76,9 +76,9 @@ class TesseractOcrProvider(BaseOcrProvider):
             if confidence and confidence < 0:
                 confidence = None
 
-            block = OcrBlockObject(
+            block = BlockObject(
                 id=index,
-                type=OcrBlockType.word,
+                type=BlockType.word,
                 content=text,
                 confidence=confidence,
                 left=round(tesseract.left[index] / dimensions[0] * 100.0, 5),

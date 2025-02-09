@@ -6,7 +6,7 @@ from PIL import Image
 
 # ---------------------------------------------------------------------------- #
 
-from ..models import OcrBlockObject
+from ..models import BlockObject
 
 # ---------------------------------------------------------------------------- #
 
@@ -26,7 +26,7 @@ class BaseOcrProvider():
     def run_ocr(
         self,
         image: Image.Image
-    ) -> List[OcrBlockObject]:
+    ) -> List[BlockObject]:
         """
         Process an image and return the OCR results.
         """

@@ -519,7 +519,6 @@ div.status-card {
     background-color: var(--surface);
     font-size: 1rem;
     color: var(--on-surface);
-    opacity: 0.5;
     padding: 2rem;
 }
 
@@ -535,6 +534,13 @@ div.task-card {
     max-width: 20rem;
     width: 100%;
     min-width: 10rem;
+}
+
+div.project-card>div>h2,
+div.task-card>div>h2 {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 div.project-card>div.project-description,

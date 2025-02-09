@@ -1,7 +1,6 @@
 # ---------------------------------------------------------------------------- #
 
 import pathlib
-import hashlib
 import contextlib
 import io
 from typing import List, Generator

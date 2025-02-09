@@ -12,7 +12,7 @@
                 hx-trigger="click" hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main"
                 hx-push-url="true" hx-indicator="#main" hx-request='{"timeout": {{config.timeout}}}'><img
                     src="/static/img/arrow-back-outline.svg"></button>
-            <button class="secondary" hx-get="{{url_for('tasks_page')}}?id={{project.id}}" hx-trigger="click"
+            <button class="secondary" hx-get="{{url_for('project_page')}}?id={{project.id}}" hx-trigger="click"
                 hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#tasks-surface" hx-select="#tasks-surface"
                 hx-request='{"timeout": {{config.timeout}}}' hx-indicator="#tasks-surface"><img
                     src="/static/img/reload-outline.svg"></button>
@@ -27,35 +27,40 @@
         </div>
     </div>
     <div id="tasks-surface" class="page-surface tasks">
-        {% if not ready %}
+        {% if project.status != "ready" %}
         <div class="status-card">
-            {% if scannable %}
-            <span>No valid scan detected. Please queue a new scan.</span>
-            {% else %}
+            {% if project.status == "scan_pending" %}
             <span>A scan is pending. Please wait a couple of minutes and then refresh the page.</span>
+            {% elif project.status == "scan_running" %}
+            <span>A scan is running. Please wait a couple of minutes and then refresh the page.</span>
+            {% elif project.status == "scan_failed" %}
+            <span>The last scan of this project failed. Please try again later.</span>
+            {% else %}
+            <span>The project has an invalid status.</span>
             {% endif %}
         </div>
+        {% elif project.tasks|length == 0 %}
+        <div class="status-card">
+            <span>No tasks have been added yet. Consider scanning the project.</span>
+        </div>
         {% else %}
-        {% for source in project.sources %}
-        {% for task in source.tasks %}
+        {% for task in project.tasks %}
         <div class="task-card">
             <div class="task-description">
                 <h2>{{task.name}}</h2>
                 <p>{{task.status.value}}</p>
-                <p>{{source.type.value}}</p>
             </div>
             <div class="task-options">
                 <button class="image small" aria-label="Edit Task {{task.name}}"><img
                         src="/static/img/create-outline.svg" alt="Edit Icon" draggable="false"></button>
                 <button class="image small" aria-label="View task {{task.name}}"
-                    hx-get="{{url_for('label_page')}}?id={{task.id}}" hx-trigger="click"
+                    hx-get="{{url_for('task_page')}}?id={{task.id}}" hx-trigger="click"
                     hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main"
                     hx-push-url="true" hx-indicator="#main" hx-request='{"timeout": {{config.timeout}}}'>
                     <img alt="View Task Icon" src="/static/img/arrow-forward-outline.svg" draggable="false">
                 </button>
             </div>
         </div>
-        {% endfor %}
         {% endfor %}
         {%endif%}
     </div>
