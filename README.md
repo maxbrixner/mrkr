@@ -4,7 +4,7 @@ A lighweight labeling solution for text in images.
 
 ## Requirements
 
-Mrkr uses Google's Tesseract as one of its OCR providers. As an example, you can install Tesseract on Debian-like systems by
+Mrkr uses Google's Tesseract as one of its OCR providers. As an example, you can install Tesseract on Debian-like systems as follows:
 
 ```bash
 sudo apt-get install tesseract-ocr
@@ -13,7 +13,7 @@ sudo apt-get install tesseract-ocr-deu
 ...
 ```
 
-Install the requirements using pip.
+Install the requirements using pip:
 
 ```bash
 python -m venv .venv
