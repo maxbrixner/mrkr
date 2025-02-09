@@ -4,6 +4,8 @@ A lighweight labeling solution for text in images.
 
 ## Requirements
 
+Mrkr uses Google's Tesseract as one of its OCR providers. As an example, you can install Tesseract on Debian-like systems by
+
 ```bash
 sudo apt-get install tesseract-ocr
 sudo apt-get install tesseract-ocr-eng
@@ -15,14 +17,28 @@ sudo apt-get install tesseract-ocr-deu
 
 You can use the CLI to set up MRKR.
 
-Before you start, enable logging by
+Before you start, enable logging:
 
 ```bash
 export LOGGING_CONFIG=logging.dev
 ```
 
-Create the database tables by
+Then, create the database tables:
 
 ```bash
 python -m mrkr create-tables
 ```
+
+You can also drop the tables (i.e. delete all data):
+
+```bash
+python -m mrkr drop-tables
+```
+
+Create a demo user and a demo project:
+
+```bash
+python -m mrkr insert-demo
+```
+
+The demo user's email is ``spongebob@bb.com``, his password is ``test``.
