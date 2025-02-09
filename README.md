@@ -13,6 +13,14 @@ sudo apt-get install tesseract-ocr-deu
 ...
 ```
 
+Install the requirements using pip.
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
 ## Command Line Interface
 
 You can use the CLI to set up MRKR.
