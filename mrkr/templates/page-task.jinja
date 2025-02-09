@@ -13,6 +13,10 @@
                 hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main" hx-push-url="true"
                 hx-indicator="#main" hx-request='{"timeout": {{config.timeout}}}'><img
                     src="/static/img/arrow-back-outline.svg"></button>
+            <button class="secondary" hx-get="{{url_for('task_page')}}?id={{task.id}}" hx-trigger="click"
+                hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#label-surface" hx-select="#label-surface"
+                hx-request='{"timeout": {{config.timeout}}}' hx-indicator="#label-surface"><img
+                    src="/static/img/reload-outline.svg"></button>
         </div>
         <div>
             <h1>{{task.name}}</h1>
