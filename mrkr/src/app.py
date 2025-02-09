@@ -535,6 +535,8 @@ async def save_labels(
     if not task:
         raise HTTPException(status_code=400, detail="Bad Request")
 
+    # todo: put code in project manager
+
     for label in task.labels:
         for link in label.links:
             session.database.delete(link)
