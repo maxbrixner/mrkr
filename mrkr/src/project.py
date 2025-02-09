@@ -141,7 +141,7 @@ class ProjectManager():
             self.logger.exception(exception)
             self.logger.debug(f"Scan of project {project.id} failed.")
 
-            project.status = ProjectStatus.error
+            project.status = ProjectStatus.scan_failed
             self.session.add(project)
             self.session.commit()
 
@@ -159,6 +159,7 @@ class ProjectManager():
 
             if not file:
                 task.abandoned = True
+                continue
             else:
                 task.abandoned = False
 
@@ -247,9 +248,9 @@ class ProjectManager():
 
                 self.session.add(page)
 
-                ocr = ocr_provider.run_ocr(image=image)
+                blocks = ocr_provider.run_ocr(image=image)
 
-                for block in ocr:
+                for block in blocks:
                     block = Block(
                         page=page,
                         type=block.type,

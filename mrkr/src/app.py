@@ -404,6 +404,10 @@ async def scan_project_worker(
 
         project = await manager.get_project(id=id)
 
+        if not project:
+            logger.error("Project not found.")
+            return
+
         await manager.scan_project(project=project)
 
 # ---------------------------------------------------------------------------- #
@@ -509,6 +513,10 @@ async def run_ocr_worker(
         manager = ProjectManager(session=session)
 
         task = await manager.get_task(id=id)
+
+        if not task:
+            logger.error("Task not found.")
+            return
 
         await manager.run_ocr(task=task)
 
