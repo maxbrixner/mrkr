@@ -5,8 +5,8 @@
 {% endblock %}
 
 {% block main %}
-<div class="tasks">
-    <div class="page-toolbar tasks">
+<div class="tasks-layout">
+    <div class="page-toolbar">
         <div>
             <button class="secondary" aria-label="Back to Projects" hx-get="{{url_for('projects_page')}}"
                 hx-trigger="click" hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main"
@@ -26,7 +26,7 @@
                 hx-indicator="#tasks-surface" hx-request='{"timeout": {{config.timeout}}}'>Queue Scan</button>
         </div>
     </div>
-    <div id="tasks-surface" class="page-surface tasks">
+    <div id="tasks-surface" class="page-surface">
         {% if project.status != "ready" %}
         <div class="status-card">
             {% if project.status == "scan_pending" %}

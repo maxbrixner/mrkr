@@ -5,8 +5,8 @@
 {% endblock %}
 
 {% block main %}
-<div class="projects">
-    <div class="page-toolbar projects">
+<div class="projects-layout">
+    <div class="page-toolbar">
         <div><button class="secondary" hx-get="{{url_for('projects_page')}}" hx-trigger="click"
                 hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#projects-surface"
                 hx-select="#projects-surface" hx-request='{"timeout": {{config.timeout}}}'
@@ -16,7 +16,7 @@
             <button class="primary">New Project</button>
         </div>
     </div>
-    <div id="projects-surface" class="page-surface projects">
+    <div id="projects-surface" class="page-surface">
         {% for project in projects %}
         <div class="project-card">
             <div class="project-description">

@@ -1,7 +1,7 @@
 {% extends "base.jinja" %}
 
 {% block main %}
-<div id="login-container" class="login-container">
+<div class="login">
     <form id="login-form" method="POST" action="{{url_for('login')}}">
         <h1>MRKR</h1>
         {% if flash %}

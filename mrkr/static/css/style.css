@@ -84,7 +84,6 @@
         --scrollbar-background: #1a2b3b;
         --scrollbar-thumb: #334654;
         --scrollbar-hover: #4a6f8c;
-
     }
 }
 
@@ -101,9 +100,29 @@ img {
     display: block;
 }
 
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-background);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-hover);
+}
+
 h1,
 h2,
 h3,
+h4,
+h5,
+h6,
 p {
     margin: 0;
     margin-block: 0;
@@ -167,26 +186,31 @@ button.secondary>img {
     filter: invert(var(--icon-invert-primary));
 }
 
-button:hover,
-button:focus {
+button:hover:not(:disabled),
+button:focus:not(:disabled) {
     background-color: var(--input-focus);
     color: var(--on-surface);
 }
 
-button.primary:hover,
-button.primary:focus {
+button.primary:hover:not(:disabled),
+button.primary:focus:not(:disabled) {
     background-color: var(--primary-focus);
     color: var(--on-primary-focus);
 }
 
-button.secondary:hover,
-button.secondary:focus {
+button.secondary:hover:not(:disabled),
+button.secondary:focus:not(:disabled) {
     background-color: var(--secondary-focus);
     color: var(--on-secondary-focus);
 }
 
 button:disabled {
     opacity: 0.5;
+    cursor: not-allowed;
+}
+
+button>span {
+    position: relative;
 }
 
 input {
@@ -214,23 +238,6 @@ select:-webkit-autofill:focus {
     -webkit-text-fill-color: var(--on-surface);
     font-family: inherit;
     font-size: inherit;
-}
-
-::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--scrollbar-background);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--scrollbar-thumb);
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--scrollbar-hover);
 }
 
 .input-wrapper {
@@ -324,8 +331,11 @@ main {
     position: relative;
 }
 
+/* -------------------------------------------------------------------------- */
+/* Navigation                                                                 */
+/* -------------------------------------------------------------------------- */
+
 nav {
-    /*border-right: 1px solid var(--border-background-surface);*/
     background-color: var(--surface);
     display: grid;
     gap: .5rem;
@@ -423,13 +433,13 @@ nav.expanded>button>span {
 /* Specific Layouts: Login                                                    */
 /* -------------------------------------------------------------------------- */
 
-div.login-container {
+div.login {
     align-items: center;
     display: flex;
     justify-content: center;
 }
 
-div.login-container>form {
+div.login>form {
     background-color: var(--surface);
     border: 2px solid var(--border-background-surface);
     border-radius: var(--border-radius);
@@ -442,35 +452,21 @@ div.login-container>form {
     width: 90%;
 }
 
-div.login-container>form>h1 {
+div.login>form>h1 {
     text-align: center;
 }
 
 /* -------------------------------------------------------------------------- */
-/* Specific Layouts: Projects                                                    */
+/* Specific Layouts: Top Toolbar                                              */
 /* -------------------------------------------------------------------------- */
-
-div.projects,
-div.tasks,
-div.labeling {
-    display: grid;
-    grid-template-rows: 5.5rem 1fr;
-    overflow: hidden;
-}
-
-div.labeling {
-    grid-template-rows: 5.5rem .7fr .3fr;
-}
 
 div.page-toolbar {
     align-items: center;
     border-bottom: 1px solid var(--border-background-surface);
-    /*background-color: var(--surface);*/
     display: grid;
     gap: 1rem;
     grid-template-rows: 1fr;
-    grid-auto-columns: min-content 1fr min-content;
-    grid-auto-flow: column;
+    grid-template-columns: min-content 1fr min-content;
     padding: 1rem 1.5rem;
     overflow-x: auto;
     overflow-y: hidden;
@@ -479,7 +475,6 @@ div.page-toolbar {
 div.page-toolbar>div {
     display: grid;
     gap: 1rem;
-    grid-template-rows: 1fr;
     grid-auto-columns: min-content;
     grid-auto-flow: column;
     justify-content: center;
@@ -491,9 +486,9 @@ div.page-toolbar>div>h1 {
     text-overflow: ellipsis;
 }
 
-div.page-toolbar>div>button>span {
-    position: relative;
-}
+/* -------------------------------------------------------------------------- */
+/* Specific Layouts: Page Surface                                             */
+/* -------------------------------------------------------------------------- */
 
 div.page-surface {
     align-items: flex-start;
@@ -506,14 +501,6 @@ div.page-surface {
     overflow: auto;
 }
 
-div.page-details {
-    border-top: 1px solid var(--border-background-surface);
-}
-
-div.page-surface:has(div.status-card) {
-    justify-content: center;
-}
-
 div.status-card {
     display: grid;
     grid-auto-rows: min-content;
@@ -524,6 +511,21 @@ div.status-card {
     font-size: 1rem;
     color: var(--on-surface);
     padding: 2rem;
+}
+
+div.page-surface:has(div.status-card) {
+    justify-content: center;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Specific Layouts: Projects and Tasks                                       */
+/* -------------------------------------------------------------------------- */
+
+div.projects-layout,
+div.tasks-layout {
+    display: grid;
+    grid-template-rows: 5.5rem 1fr;
+    overflow: hidden;
 }
 
 div.project-card,
@@ -573,18 +575,27 @@ div.task-card>div.task-options>button>img {
     width: 1.5rem;
 }
 
-
 /* -------------------------------------------------------------------------- */
 /* Specific Layouts: Labeling                                                 */
 /* -------------------------------------------------------------------------- */
 
-div.page-surface.labeling {
+div.labeling-layout {
     display: grid;
-    grid-template-columns: min-content;
-    grid-template-rows: min-content;
-    padding: 1px;
+    grid-template-rows: 5.5rem 1fr 15rem;
+    overflow: hidden;
 }
 
+div.page-surface.labeling {
+    padding: 0;
+}
+
+
+div.page-surface.labeling>div.image-container {
+    position: relative;
+    flex-basis: 0;
+}
+
+/*
 div.page-surface.labeling>div.page-image>div.image-container {
     position: relative;
     flex-basis: 0;
@@ -594,15 +605,16 @@ div.page-surface.labeling>div.page-image>div.image-container>img {
     z-index: 1;
     display: block;
 }
+    */
 
-div.page-surface.labeling>div.page-image>div.image-container>div.highlight {
+div.highlight {
     position: absolute;
     z-index: 2;
     background-color: #c0c0c0;
     opacity: 0.5;
 }
 
-div.page-surface.labeling>div.page-image>div.image-container>div.highlight:hover {
+div.highlight:hover {
     opacity: 0.8;
 }
 
@@ -648,17 +660,17 @@ div.user-label>input {
     border: 1px solid var(--border-background-surface);
 }
 
-
 button.label-button.selected {
     border-bottom-style: solid;
 }
 
-div.page-details.labeling {
+div.labeling-details {
+    border-top: 1px solid var(--border-background-surface);
     display: grid;
     grid-template-columns: 15rem 1fr;
-    grid-template-rows: 1fr;
 }
 
+/*
 div.page-details.labeling>div.available-labels {
     border-right: 1px solid var(--border-background-surface);
     display: grid;
@@ -678,10 +690,7 @@ div.page-details.labeling>form.user-labels {
     overflow-y: auto;
     padding: 1rem;
 }
-
-
-
-
+*/
 
 /* -------------------------------------------------------------------------- */
 /* HTMX styles                                                                */

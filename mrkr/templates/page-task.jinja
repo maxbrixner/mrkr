@@ -5,8 +5,8 @@
 {% endblock %}
 
 {% block main %}
-<div class="labeling">
-    <div class="page-toolbar labeling">
+<div class="labeling-layout">
+    <div class="page-toolbar">
         <div>
             <button class="secondary" aria-label="Back to Tasks"
                 hx-get="{{url_for('project_page')}}?id={{task.project.id}}" hx-trigger="click"
@@ -44,8 +44,9 @@
         </div>
         <div>
             <button class="primary" aria-label="Queue OCR" hx-post="{{url_for('run_ocr')}}?id={{task.id}}"
-                hx-trigger="click" hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main"
-                hx-indicator="#main" hx-request='{"timeout": {{config.timeout}}}'>Queue
+                hx-trigger="click" hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#label-surface"
+                hx-select="#label-surface" hx-indicator="#label-surface"
+                hx-request='{"timeout": {{config.timeout}}}'>Queue
                 OCR</button>
             <button class="primary" id="save-labels-button" aria-label="Save Changes" form="user-labels">
                 <span id="save-labels-span">Save Changes</span>
@@ -66,30 +67,27 @@
             {% endif %}
         </div>
         {% else %}
-        <div class="page-image">
-            <div class="image-container">
-                <img id="label-image" src="{{url_for('task_image')}}?id={{task.id}}&page={{page}}" draggable="false">
-                </img>
-                {% if task.ocr %}
-                {% for block in task.ocr.pages[page].blocks %}
-                {% if block.link %}
-                <div class="highlight"
-                    style="left:{{block.left}}%; top:{{block.top}}%; width:{{block.width}}%; height:{{block.height}}%; background-color: {{block.link.label.labeltype.color}};"
-                    data-content="{{block.content}}" data-id="{{block.id}}" data-active="true">
-                </div>
-                {% else %}
-                <div class="highlight"
-                    style="left:{{block.left}}%; top:{{block.top}}%; width:{{block.width}}%; height:{{block.height}}%;"
-                    data-content="{{block.content}}" data-id="{{block.id}}" data-active="false">
-                </div>
-                {% endif %}
-                {% endfor %}
-                {% endif %}
+        <div class="image-container">
+            <img id="label-image" src="{{url_for('task_image')}}?id={{task.id}}&page={{page}}" draggable="false">
+            </img>
+            {% if task.ocr %}
+            {% for block in task.ocr.pages[page].blocks %}
+            {% if block.link %}
+            <div class="highlight"
+                style="left:{{block.left}}%; top:{{block.top}}%; width:{{block.width}}%; height:{{block.height}}%; background-color: {{block.link.label.labeltype.color}};"
+                data-content="{{block.content}}" data-id="{{block.id}}" data-active="true">
             </div>
+            {% else %}
+            <div class="highlight"
+                style="left:{{block.left}}%; top:{{block.top}}%; width:{{block.width}}%; height:{{block.height}}%;"
+                data-content="{{block.content}}" data-id="{{block.id}}" data-active="false">
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
         </div>
-        {% endif %}
     </div>
-    <div id="labeling-details" class="page-details labeling">
+    <div id="labeling-details" class="labeling-details">
         <div class="available-labels">
             {% for labeltype in task.project.labeltypes %}
             <button class="label-button"
@@ -117,4 +115,6 @@
             <input type="hidden" name="task_id" value="{{task.id}}">
         </form>
     </div>
-    {% endblock %}
+    {% endif %}
+</div>
+{% endblock %}
