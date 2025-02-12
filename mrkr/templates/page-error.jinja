@@ -9,12 +9,11 @@
 {% endblock %}
 
 {% block main %}
-<main class="main-error" id="main">
-    <div class="error-wrapper">
+<div class="error">
+    <div class="error-card">
         <h1>We are terrible sorry, but something went wrong!</h1>
-        <h2>{{status_code}} &mdash; {{error_message}}</h2>
-        <br><br>
-        <a class="inline bold underlined" href="{{projects_url}}">Return home</a>
+        <p>{{status_code}} &mdash; {{error_message}}</p>
+        <a class="primary" href="{{url_for('projects_page')}}">Return home</a>
     </div>
-</main>
+</div>
 {% endblock %}

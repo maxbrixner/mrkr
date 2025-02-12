@@ -430,6 +430,28 @@ nav.expanded>button>span {
 }
 
 /* -------------------------------------------------------------------------- */
+/* Specific Layouts: Error                                                    */
+/* -------------------------------------------------------------------------- */
+
+div.error {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+div.error-card {
+    display: grid;
+    grid-auto-rows: min-content;
+    gap: 1rem;
+    margin-top: 2rem;
+    border-radius: var(--border-radius);
+    background-color: var(--surface);
+    font-size: 1rem;
+    color: var(--on-surface);
+    padding: 2rem;
+}
+
+/* -------------------------------------------------------------------------- */
 /* Specific Layouts: Login                                                    */
 /* -------------------------------------------------------------------------- */
 
