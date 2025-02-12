@@ -1,35 +1,58 @@
 /* -------------------------------------------------------------------------- */
 
 :root {
-    --max-width: 1170px;
-    --min-width: 320px;
-
-    --body-font: 'Geist', 'Helvetica', 'sans-serif';
-
-    --border: #cbd9e4;
-
-    --background: #ffffff;
-    --on-background: #31373d;
-    --icon-invert-background: 0%;
-
-    --surface: #f0f8ff;
-    --on-surface: #000000;
-    --icon-invert-surface: 0%;
-
-    --primary: #006ac7;
-    --on-primary: #ffffff;
-    --icon-invert-primary: 100%;
-
-    --overlay-start: #00000000;
-    --overlay-end: #000000ce;
-
-    --scrollbar-background: #f0f0f0;
-    --scrollbar-thumb: #c0c0c0;
-    --scrollbar-hover: #a0a0a0;
-
     --nav-width: 15rem;
     --nav-animation: .5s;
     --border-radius: 10px;
+
+    --body-font: 'Roboto', sans-serif;
+
+    --border-background-surface: #cdcfce;
+    --border-surface-input: #808493;
+    --border-focus: #3177b3;
+
+    --background: #ffffff;
+    --on-background: #000000;
+    --icon-invert-background: 0%;
+
+    --surface: #ecf0ef;
+    --on-surface: #181a1b;
+    --on-surface-subdued: #617686;
+    --icon-invert-surface: 0%;
+
+    --input: #ffffff;
+    --on-input: #000000;
+    --icon-invert-input: 0%;
+
+    --input-focus: #ffffff;
+    --on-input-focus: #000000;
+    --icon-invert-input-focus: 0%;
+
+    --primary: #3177b3;
+    --on-primary: #ffffff;
+    --icon-invert-primary: 0%;
+
+    --primary-focus: #2c69a0;
+    --on-primary-focus: #ffffff;
+    --icon-invert-primary-focus: 0%;
+
+    --secondary: #e8f5ff;
+    --on-secondary: #3471cb;
+    --icon-invert-secondary: 0%;
+
+    --secondary-focus: #d1ebff;
+    --on-secondary-focus: #0d81e0;
+    --icon-invert-secondary-focus: 0%;
+
+    --primary-text: #3177b3;
+    --primary-text-hover: #2c69a0;
+
+    --error: #bb3f29;
+
+    --scrollbar-background: #1a2b3b;
+    --scrollbar-thumb: #334654;
+    --scrollbar-hover: #4a6f8c;
+
 }
 
 @media (max-width: 800px) {
@@ -144,6 +167,11 @@ a {
 
 a.primary {
     color: var(--primary-text);
+    font-weight: 700;
+}
+
+a.primary:hover {
+    color: var(--primary-text-hover);
     font-weight: 700;
 }
 
@@ -313,7 +341,7 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
-    font-family: "Roboto", sans-serif;
+    font-family: var(--body-font);
 }
 
 body {
