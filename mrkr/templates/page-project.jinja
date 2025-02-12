@@ -8,11 +8,11 @@
 <div class="tasks-layout">
     <div class="page-toolbar">
         <div>
-            <button class="secondary" aria-label="Back to Projects" hx-get="{{url_for('projects_page')}}"
+            <button class="surface" aria-label="Back to Projects" hx-get="{{url_for('projects_page')}}"
                 hx-trigger="click" hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main"
                 hx-push-url="true" hx-indicator="#main" hx-request='{"timeout": {{config.timeout}}}'><img
                     src="/static/img/arrow-back-outline.svg"></button>
-            <button class="secondary" hx-get="{{url_for('project_page')}}?id={{project.id}}" hx-trigger="click"
+            <button class="surface" hx-get="{{url_for('project_page')}}?id={{project.id}}" hx-trigger="click"
                 hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#tasks-surface" hx-select="#tasks-surface"
                 hx-request='{"timeout": {{config.timeout}}}' hx-indicator="#tasks-surface"><img
                     src="/static/img/reload-outline.svg"></button>
@@ -47,7 +47,7 @@
         {% for task in project.tasks %}
         <div class="task-card">
             <div class="task-description">
-                <h2>{{task.name}}</h2>
+                <h3>{{task.name}}</h3>
                 <p>{{task.status.value}}</p>
             </div>
             <div class="task-options">

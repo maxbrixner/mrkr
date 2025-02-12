@@ -7,106 +7,84 @@
 
     --body-font: 'Roboto', sans-serif;
 
-    --border-background-surface: #cdcfce;
-    --border-surface-input: #808493;
-    --border-focus: #3177b3;
+    --primary: #773ffc;
+    --on-primary: #ffffff;
+    --icon-invert-primary: 100%;
 
-    --background: #ffffff;
-    --on-background: #000000;
-    --icon-invert-background: 0%;
+    --primary-variant1: #7c48ee;
+    --on-primary-variant1: #ffffff;
+    --icon-invert-primary-variant1: 100%;
 
-    --surface: #ecf0ef;
-    --on-surface: #181a1b;
-    --on-surface-subdued: #617686;
+    --primary-variant2: #8051e0;
+    --on-primary-variant2: #ffffff;
+    --icon-invert-primary-variant2: 100%;
+
+    --surface: #ffffff;
+    --on-surface: #000000;
     --icon-invert-surface: 0%;
 
-    --input: #ffffff;
-    --on-input: #000000;
-    --icon-invert-input: 0%;
+    --surface-variant1: #f0f0f0;
+    --on-surface-variant1: #000000;
+    --icon-invert-surface-variant1: 0%;
 
-    --input-focus: #ffffff;
-    --on-input-focus: #000000;
-    --icon-invert-input-focus: 0%;
+    --surface-variant2: #e1e1e1;
+    --on-surface-variant2: #000000;
+    --icon-invert-surface-variant2: 0%;
 
-    --primary: #3177b3;
-    --on-primary: #ffffff;
-    --icon-invert-primary: 0%;
+    --surface-tonal: #f4ecff;
+    --on-surface-tonal: #000000;
+    --icon-invert-surface-tonal: 0%;
 
-    --primary-focus: #2c69a0;
-    --on-primary-focus: #ffffff;
-    --icon-invert-primary-focus: 0%;
+    --surface-tonal-variant1: #e6dff0;
+    --on-surface-tonal-variant1: #000000;
+    --icon-invert-surface-tonal-variant1: 0%;
 
-    --secondary: #e8f5ff;
-    --on-secondary: #3471cb;
-    --icon-invert-secondary: 0%;
+    --surface-tonal-variant2: #d9d3e1;
+    --on-surface-tonal-variant2: #000000;
+    --icon-invert-surface-tonal-variant2: 0%;
 
-    --secondary-focus: #d1ebff;
-    --on-secondary-focus: #0d81e0;
-    --icon-invert-secondary-focus: 0%;
-
-    --primary-text: #3177b3;
-    --primary-text-hover: #2c69a0;
-
-    --error: #bb3f29;
-
-    --scrollbar-background: #1a2b3b;
-    --scrollbar-thumb: #334654;
-    --scrollbar-hover: #4a6f8c;
-
-}
-
-@media (max-width: 800px) {
-    :root {
-        --nav-width: 21rem;
-    }
+    --error-border: #d13d3d;
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --border-background-surface: #2d3e4b;
-        --border-surface-input: #859eb2;
-        --border-focus: #1b7eca;
-
-        --background: #09141c;
-        --on-background: #e0ebf2;
-        --icon-invert-background: 100%;
-
-        --surface: #131f29;
-        --on-surface: #e0ebf2;
-        --on-surface-subdued: #859ca1;
-        --icon-invert-surface: 100%;
-
-        --input: #132535;
-        --on-input: #edf4f7;
-        --icon-invert-input: 0%;
-
-        --input-focus: #13324b;
-        --on-input-focus: #edf4f7;
-        --icon-invert-input-focus: 0%;
-
-        --primary: #0a59a8;
+        --primary: #773ffc;
         --on-primary: #ffffff;
         --icon-invert-primary: 100%;
 
-        --secondary: #132c40;
-        --on-secondary: #2c9ff6;
-        --icon-invert-secondary: 100%;
+        --primary-variant1: #8b55fd;
+        --on-primary-variant1: #000000;
+        --icon-invert-primary-variant1: 0%;
 
-        --secondary-focus: #133a57;
-        --on-secondary-focus: #2c9ff6;
-        --icon-invert-secondary-focus: 100%;
+        --primary-variant2: #9d6bfe;
+        --on-primary-variant2: #000000;
+        --icon-invert-primary-variant2: 0%;
 
-        --primary-focus: #0976d6;
-        --on-primary-focus: #ffffff;
-        --icon-invert-primary-focus: 0%;
+        --surface: #121212;
+        --on-surface: #ffffff;
+        --icon-invert-surface: 100%;
 
-        --primary-text: #34a6fc;
+        --surface-variant1: #282828;
+        --on-surface-variant1: #ffffff;
+        --icon-invert-surface-variant1: 100%;
 
-        --error: #9c1c08;
+        --surface-variant2: #3f3f3f;
+        --on-surface-variant2: #ffffff;
+        --icon-invert-surface-variant2: 100%;
 
-        --scrollbar-background: #1a2b3b;
-        --scrollbar-thumb: #334654;
-        --scrollbar-hover: #4a6f8c;
+        --surface-tonal: #1d1826;
+        --on-surface-tonal: #ffffff;
+        --icon-invert-surface-tonal: 100%;
+
+        --surface-tonal-variant1: #322d3a;
+        --on-surface-tonal-variant1: #ffffff;
+        --icon-invert-surface-tonal-variant1: 100%;
+
+        --surface-tonal-variant2: #484450;
+        --on-surface-tonal-variant2: #ffffff;
+        --icon-invert-surface-tonal-variant2: 100%;
+
+        --error-border: #c74747;
     }
 }
 
@@ -130,14 +108,17 @@ img {
 
 ::-webkit-scrollbar-track {
     background: var(--scrollbar-background);
+    /* todo */
 }
 
 ::-webkit-scrollbar-thumb {
     background: var(--scrollbar-thumb);
+    /* todo */
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--scrollbar-hover);
+    /* todo */
 }
 
 h1,
@@ -152,11 +133,6 @@ p {
     padding: 0;
 }
 
-h1 {
-    font-size: 1.5rem;
-    font-weight: 700;
-}
-
 a {
     text-decoration: none;
     color: inherit;
@@ -166,18 +142,18 @@ a {
 }
 
 a.primary {
-    color: var(--primary-text);
+    color: var(--primary);
     font-weight: 700;
 }
 
-a.primary:hover {
-    color: var(--primary-text-hover);
-    font-weight: 700;
+a.primary:hover,
+a.primary:focus {
+    text-decoration: underline;
 }
 
 button {
     background-color: inherit;
-    border: none;
+    border: 2px solid transparent;
     border-radius: var(--border-radius);
     color: inherit;
     cursor: pointer;
@@ -190,11 +166,12 @@ button {
 }
 
 button.primary,
-button.secondary {
+button.surface {
     align-items: center;
     display: grid;
     grid-template-rows: 1.2rem;
     background-color: var(--primary);
+    border: 2px solid var(--primary);
     color: var(--on-primary);
     padding: 1rem;
     text-overflow: ellipsis;
@@ -202,34 +179,30 @@ button.secondary {
     overflow: hidden;
 }
 
-button.secondary {
-    background-color: var(--secondary);
-    color: var(--on-secondary);
+button.surface {
+    background-color: var(--surface-variant1);
+    color: var(--on-surface-variant1);
+    border: 2px solid var(--surface-variant1);
 }
 
-button.primary>img,
-button.secondary>img {
+button.primary>img {
     width: 1.2rem;
     height: 1.2rem;
     filter: invert(var(--icon-invert-primary));
 }
 
-button:hover:not(:disabled),
-button:focus:not(:disabled) {
-    background-color: var(--input-focus);
-    color: var(--on-surface);
+button.surface>img {
+    width: 1.2rem;
+    height: 1.2rem;
+    filter: invert(var(--icon-invert-surface-variant1));
 }
 
-button.primary:hover:not(:disabled),
-button.primary:focus:not(:disabled) {
-    background-color: var(--primary-focus);
-    color: var(--on-primary-focus);
+button.primary:focus {
+    border: 2px solid var(--on-surface);
 }
 
-button.secondary:hover:not(:disabled),
-button.secondary:focus:not(:disabled) {
-    background-color: var(--secondary-focus);
-    color: var(--on-secondary-focus);
+button.surface:focus {
+    border: 2px solid var(--primary);
 }
 
 button:disabled {
@@ -263,14 +236,14 @@ select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
     -webkit-background-clip: text;
-    -webkit-text-fill-color: var(--on-surface);
+    -webkit-text-fill-color: var(--on-surface-variant1);
     font-family: inherit;
     font-size: inherit;
 }
 
 .input-wrapper {
-    background-color: var(--input);
-    border: 2px solid var(--border-surface-input);
+    background-color: var(--surface-variant1);
+    border: 2px solid var(--surface-variant2);
     border-radius: var(--border-radius);
     color: var(--on-input);
     display: grid;
@@ -283,8 +256,8 @@ select:-webkit-autofill:focus {
 .input-wrapper>input[type="text"],
 .input-wrapper>input[type="email"],
 .input-wrapper>input[type="password"] {
-    background-color: var(--input);
-    color: var(--on-input);
+    background-color: var(--surface-variant1);
+    color: var(--on-surface-variant1);
     padding: 1rem;
 }
 
@@ -295,7 +268,7 @@ select:-webkit-autofill:focus {
 }
 
 .input-wrapper:focus-within {
-    border-color: var(--border-focus);
+    border-color: var(--primary);
 }
 
 .input-wrapper>label,
@@ -327,6 +300,11 @@ select:-webkit-autofill:focus {
     visibility: visible;
 }
 
+.input-wrapper:has(:user-invalid):not(:has(:placeholder-shown)),
+.input-wrapper:has(input.invalid) {
+    border-color: var(--error-border);
+}
+
 .input-wrapper:has(:user-invalid):not(:has(:placeholder-shown))>span,
 .input-wrapper:has(input.invalid)>span {
     visibility: visible;
@@ -347,8 +325,8 @@ body {
 body {
     display: grid;
     grid-template-columns: auto 1fr;
-    background-color: var(--background);
-    color: var(--on-background);
+    background-color: var(--surface);
+    color: var(--on-surface);
 }
 
 main {
@@ -364,7 +342,7 @@ main {
 /* -------------------------------------------------------------------------- */
 
 nav {
-    background-color: var(--surface);
+    background-color: var(--surface-variant1);
     display: grid;
     gap: .5rem;
     grid-auto-rows: min-content;
@@ -394,11 +372,16 @@ nav>div.header>h1 {
 
 nav>div.header>button {
     padding: 1rem;
+    border: 2px solid transparent;
+}
+
+nav>div.header>button:focus {
+    border: 2px solid var(--primary);
 }
 
 nav>div.header>button>img {
     height: 1.5rem;
-    filter: invert(var(--icon-invert-background));
+    filter: invert(var(--icon-invert-surface-variant1));
     transform: rotate(0deg);
     transition: transform var(--nav-animation) ease;
     width: 1.5rem;
@@ -422,14 +405,19 @@ nav>button {
     align-items: center;
     display: grid;
     font-size: 1.2rem;
+    border: 2px solid transparent;
     gap: 0rem;
     grid-template-columns: min-content 0rem;
     padding: 1rem;
     transition: grid-template-columns var(--nav-animation) ease, grid-gap var(--nav-animation) ease, border-radius var(--nav-animation) ease;
 }
 
+nav>button:focus {
+    border: 2px solid var(--primary);
+}
+
 nav>button>img {
-    filter: invert(var(--icon-invert-background));
+    filter: invert(var(--icon-invert-surface-variant1));
     height: 1.5rem;
     width: 1.5rem;
 }
@@ -465,19 +453,22 @@ div.error {
     align-items: flex-start;
     display: flex;
     justify-content: center;
-    padding: 10rem 0 0 0;
 }
 
 div.error-card {
     display: grid;
     grid-auto-rows: min-content;
     gap: 1rem;
-    margin-top: 2rem;
+    margin-top: 10rem;
     border-radius: var(--border-radius);
     background-color: var(--surface);
     font-size: 1rem;
     color: var(--on-surface);
     padding: 2rem;
+}
+
+div.error-card>a {
+    margin-top: 3rem;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -493,7 +484,6 @@ div.login {
 
 div.login>form {
     background-color: var(--surface);
-    border: 2px solid var(--border-background-surface);
     border-radius: var(--border-radius);
     color: var(--on-surface);
     display: grid;
@@ -508,13 +498,28 @@ div.login>form>h1 {
     text-align: center;
 }
 
+div.login>form>div.input-wrapper:first-of-type {
+    margin-top: 1.5rem;
+}
+
+div.login>form>button {
+    margin-top: 1.5rem;
+}
+
+div.login>form>div.flash {
+    border: 2px solid var(--error-border);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    text-align: center;
+}
+
 /* -------------------------------------------------------------------------- */
 /* Specific Layouts: Top Toolbar                                              */
 /* -------------------------------------------------------------------------- */
 
 div.page-toolbar {
     align-items: center;
-    border-bottom: 1px solid var(--border-background-surface);
+    border-bottom: 1px solid var(--surface-variant2);
     display: grid;
     gap: 1rem;
     grid-template-rows: 1fr;
@@ -536,6 +541,7 @@ div.page-toolbar>div>h1 {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-size: 1.5rem;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -559,9 +565,9 @@ div.status-card {
     gap: 1rem;
     margin-top: 2rem;
     border-radius: var(--border-radius);
-    background-color: var(--surface);
+    background-color: var(--surface-variant1);
     font-size: 1rem;
-    color: var(--on-surface);
+    color: var(--on-surface-variant1);
     padding: 2rem;
 }
 
@@ -583,8 +589,7 @@ div.tasks-layout {
 div.project-card,
 div.task-card {
     display: grid;
-    background-color: var(--surface);
-    border: 2px solid var(--border-background-surface);
+    background-color: var(--surface-variant1);
     border-radius: 1rem;
     display: grid;
     overflow: hidden;
@@ -607,7 +612,7 @@ div.task-card>div.task-description {
     padding: 2rem;
     grid-auto-rows: min-content;
     gap: 1rem;
-    border-bottom: 2px solid var(--border-background-surface);
+    border-bottom: 2px solid var(--surface);
 }
 
 div.project-card>div.project-options,
@@ -639,12 +644,15 @@ div.labeling-layout {
 
 div.page-surface.labeling {
     padding: 0;
+    background-color: var(--surface);
 }
 
 
 div.page-surface.labeling>div.image-container {
     position: relative;
     flex-basis: 0;
+    border-right: 1px solid var(--surface-variant2);
+    border-bottom: 1px solid var(--surface-variant2);
 }
 
 div.highlight {
@@ -659,13 +667,13 @@ div.highlight:hover {
 }
 
 div.labeling-details {
-    border-top: 1px solid var(--border-background-surface);
+    border-top: 1px solid var(--surface-variant2);
     display: grid;
     grid-template-columns: 15rem 1fr;
 }
 
 div.labeling-details>div.labeltypes {
-    border-right: 1px solid var(--border-background-surface);
+    border-right: 1px solid var(--surface-variant2);
     display: grid;
     grid-template-columns: 1fr;
     grid-auto-rows: min-content;
@@ -685,15 +693,18 @@ button.labeltype-button {
     overflow: hidden;
     text-overflow: ellipsis;
     border-bottom-style: hidden;
+    border-top-style: hidden;
+    border-right-style: hidden;
     border-bottom-width: 2px;
 }
 
 button.labeltype-button.selected {
     border-bottom-style: solid;
+    border-top-style: solid;
+    border-right-style: solid;
 }
 
 div.labeling-details>form.labels-list {
-    border-right: 1px solid var(--border-background-surface);
     display: grid;
     grid-template-columns: 1fr;
     grid-auto-rows: min-content;
@@ -726,8 +737,12 @@ div.label>button>img {
 div.label>input {
     padding: 1rem;
     border-radius: var(--border-radius);
-    background-color: var(--surface);
-    border: 1px solid var(--border-background-surface);
+    background-color: var(--surface-variant1);
+    border: 2px solid var(--surface-variant2);
+}
+
+div.label>input:focus {
+    border: 2px solid var(--primary);
 }
 
 /* -------------------------------------------------------------------------- */
