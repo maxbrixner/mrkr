@@ -20,9 +20,8 @@
             {% if page > 0 %}
             <button class="secondary" id="page-back-button"
                 hx-get="{{url_for('task_page')}}?id={{task.id}}&page={{page-1}}" hx-trigger="click"
-                hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#label-surface" hx-select="#label-surface"
-                hx-request='{"timeout": {{config.timeout}}}' hx-indicator="#label-surface" hx-push-url="true"
-                hx-select-oob="#page-back-button,#page-forward-button"><img
+                hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main"
+                hx-request='{"timeout": {{config.timeout}}}' hx-indicator="#main" hx-push-url="true"><img
                     src="/static/img/chevron-back-outline.svg"></button>
             {% else %}
             <button class="secondary" id="page-back-button" disabled><img
@@ -30,9 +29,8 @@
             {% endif %}
             {% if page < max_pages-1 %} <button class="secondary" id="page-forward-button"
                 hx-get="{{url_for('task_page')}}?id={{task.id}}&page={{page+1}}" hx-trigger="click"
-                hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#label-surface" hx-select="#label-surface"
-                hx-request='{"timeout": {{config.timeout}}}' hx-indicator="#label-surface" hx-push-url="true"
-                hx-select-oob="#page-back-button,#page-forward-button">
+                hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main"
+                hx-request='{"timeout": {{config.timeout}}}' hx-indicator="#main" hx-push-url="true">
                 <img src="/static/img/chevron-forward-outline.svg"></button>
                 {% else %}
                 <button class="secondary" id="page-forward-button" disabled><img
@@ -48,7 +46,7 @@
                 hx-select="#label-surface" hx-indicator="#label-surface"
                 hx-request='{"timeout": {{config.timeout}}}'>Queue
                 OCR</button>
-            <button class="primary" id="save-labels-button" aria-label="Save Changes" form="user-labels">
+            <button class="primary" id="save-labels-button" aria-label="Save Changes" form="labels-list">
                 <span id="save-labels-span">Save Changes</span>
             </button>
         </div>
@@ -87,20 +85,20 @@
             {% endif %}
         </div>
     </div>
-    <div id="labeling-details" class="labeling-details">
-        <div class="available-labels">
+    <div class="labeling-details">
+        <div class="labeltypes">
             {% for labeltype in task.project.labeltypes %}
-            <button class="label-button"
+            <button class="labeltype-button"
                 style="background-color: {{labeltype.color}}20; border-color: {{labeltype.color}};"
                 data-id="{{labeltype.id}}" data-label="{{labeltype.name}}"
                 data-color="{{labeltype.color}}">{{labeltype.name}}</button>
             {% endfor %}
         </div>
-        <form id="user-labels" class="user-labels" hx-post="{{url_for('save_labels')}}?id={{task.id}}"
+        <form id="labels-list" class="labels-list" hx-post="{{url_for('save_labels')}}?id={{task.id}}"
             hx-indicator="#save-labels-span" hx-target="#save-labels-span"
             hx-swap="innerHTML swap:{{config.swap_delay}}ms">
             {% for label in task.labels %}
-            <div class="user-label"
+            <div class="label"
                 style="background-color: {{label.labeltype.color}}20; border-color: {{label.labeltype.color}};">
                 <span>{{label.labeltype.name}}</span>
                 <input type="hidden" class="labeltype-id-input" name="labeltype_id" value="{{label.labeltype.id}}">

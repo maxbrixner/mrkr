@@ -91,10 +91,10 @@ function register_event_listeners() {
         });
     }
 
-    const labelbuttons = document.getElementsByClassName('label-button');
+    const labelbuttons = document.getElementsByClassName('labeltype-button');
     for (const item of labelbuttons) {
         add_event_listener(item, 'click', function (evt) {
-            const allbuttons = document.getElementsByClassName('label-button');
+            const allbuttons = document.getElementsByClassName('labeltype-button');
             for (const button of allbuttons) {
                 button.classList.remove("selected");
             }
@@ -129,10 +129,10 @@ function register_event_listeners() {
                     linked_initialized = true;
                 }
 
-                details = document.getElementById("user-labels");
+                details = document.getElementById("labels-list");
 
                 let new_item = document.createElement("div");
-                new_item.classList.add("user-label");
+                new_item.classList.add("label");
                 new_item.style.borderColor = current_color;
                 new_item.style.backgroundColor = current_color + "20";
                 new_item.innerHTML = `<span>` + current_label + `</span>` +
@@ -145,7 +145,7 @@ function register_event_listeners() {
 
             } else {
 
-                details = document.getElementById("user-labels");
+                details = document.getElementById("labels-list");
 
                 let existing_item = details.firstChild;
                 let block_ids_input = existing_item.getElementsByClassName("block-ids-input")[0];
