@@ -105,7 +105,7 @@
                 <input type="hidden" class="block-ids-input" name="block_ids"
                     value="{%for link in label.links %}{{link.block_id}}{%if not loop.last%},{%endif%}{%endfor%}">
                 <input type="text" class="user-content-input" name="user_content" value="{{label.user_content}}">
-                <button type="button" class="delete-label" aria-label="Delete Label" data-id="98"><img
+                <button type="button" class="delete-label-button" aria-label="Delete Label"><img
                         src="/static/img/trash-outline.svg"></button>
             </div>
             {% endfor %}

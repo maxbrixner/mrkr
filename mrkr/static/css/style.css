@@ -726,6 +726,12 @@ div.label {
 
 div.label>button {
     padding: 1rem;
+    background-color: var(--surface-variant1);
+    border: 2px solid transparent;
+}
+
+div.label>button:focus {
+    border: 2px solid var(--primary);
 }
 
 div.label>button>img {

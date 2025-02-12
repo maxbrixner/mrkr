@@ -107,6 +107,13 @@ function register_event_listeners() {
         });
     }
 
+    const deletebuttons = document.getElementsByClassName('delete-label-button');
+    for (const item of deletebuttons) {
+        add_event_listener(item, 'click', function (evt) {
+            remove_label(this);
+        });
+    }
+
     const highlights = document.getElementsByClassName('highlight');
     for (const highlight of highlights) {
         add_event_listener(highlight, 'click', function (evt) {
@@ -139,7 +146,7 @@ function register_event_listeners() {
                     `<input type="hidden" class="labeltype-id-input" name="labeltype_id" value="` + current_id + `">` +
                     `<input type="hidden" class="block-ids-input" name="block_ids" value="` + this.dataset.id + `">` +
                     `<input type="text" class="user-content-input" name="user_content" value="` + this.dataset.content + `">` +
-                    `<button class="delete-label" type="button" aria-label="Delete Label" data-id="` + 99 + `"><img src="/static/img/trash-outline.svg"></button>`
+                    `<button class="delete-label-button" type="button" aria-label="Delete Label"><img src="/static/img/trash-outline.svg"></button>`
 
                 details.prepend(new_item);
 
@@ -196,10 +203,12 @@ function toggle_navigation() {
 
 function remove_label(element) {
 
-    ocr_ids = element.parentElement.dataset.ocr_ids.split(",");
+    const block_ids_input = element.parentElement.getElementsByClassName("block-ids-input")[0];
 
-    for (const ocr_id of ocr_ids) {
-        highlight = document.querySelector(`.highlight[data-id="${ocr_id}"]`);
+    const block_ids = block_ids_input.value.split(",");
+
+    for (const block_id of block_ids) {
+        var highlight = document.querySelector(`.highlight[data-id="${block_id}"]`);
         highlight.style.backgroundColor = "#c0c0c0";
         highlight.dataset.active = "false";
     }
