@@ -6,10 +6,10 @@
     "entrypoint": "mrkr:app"
   },
   "python": {
-    "version": "3.13.1",
+    "version": "3.10.12",
     "package_manager": {
       "name": "pip",
-      "version": "25.0",
+      "version": "22.0.2",
       "package_file": "requirements.txt"
     }
   },
