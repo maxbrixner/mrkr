@@ -6,7 +6,7 @@ import sqlmodel
 import bcrypt
 import logging
 import datetime
-from typing import Callable, Self, Optional
+from typing import Callable
 
 # ---------------------------------------------------------------------------- #
 
