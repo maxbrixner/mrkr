@@ -92,7 +92,7 @@ async def add_process_time_header(
         "max-age=63072000; includeSubDomains; preload"
     )
     response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["X-Frame-Options"] = "DENY"
+    # response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-XSS-Protection"] = "1; mode=block"
 
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
