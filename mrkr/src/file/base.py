@@ -42,7 +42,7 @@ class BaseFileProvider():
     def read_file(
         self,
         uri: str
-    ) -> Generator[io.BufferedReader]:
+    ) -> Generator[io.BufferedReader, None, None]:
         """
         Yields a file stream.
         """

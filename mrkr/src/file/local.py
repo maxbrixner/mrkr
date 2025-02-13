@@ -45,7 +45,7 @@ class LocalFileProvider(BaseFileProvider):
     def read_file(
         self,
         uri: str
-    ) -> Generator[io.BufferedReader]:
+    ) -> Generator[io.BufferedReader, None, None]:
         """
         Yields a binary file stream.
         """

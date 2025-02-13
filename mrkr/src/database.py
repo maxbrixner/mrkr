@@ -127,7 +127,7 @@ class Database():
         return DatabaseSession(self.engine)
 
     @contextmanager
-    def session(self) -> Generator[DatabaseSession]:
+    def session(self) -> Generator[DatabaseSession, None, None]:
         """
         Get a session from the database engine.
         """
