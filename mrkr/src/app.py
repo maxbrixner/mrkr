@@ -9,6 +9,7 @@ from starlette.middleware.gzip import GZipMiddleware
 from starlette.exceptions import HTTPException as StarlettHTTPException
 from typing import Annotated, Callable, List
 import datetime
+import os
 
 # ---------------------------------------------------------------------------- #
 
@@ -53,6 +54,11 @@ async def add_process_time_header(
     """
     Add security headers to the response (if not static).
     """
+    if os.environ.get("BASE_URL"):
+        request.state.base_url = os.environ.get("BASE_URL")
+    else:
+        request.state.base_url = request.base_url
+
     response = await call_next(request)
 
     if "/static" in request.url.path:

@@ -33,12 +33,12 @@
         rel="stylesheet">
 
     {% block stylesheets %}
-    <link rel="stylesheet" href="{{url_for('home_page')}}static/css/style.css">
+    <link rel="stylesheet" href="{{request.state.base_url}}static/css/style.css">
     {% endblock %}
 
     {% block scripts %}
-    <script src="{{url_for('home_page')}}static/js/htmx-2.0.4.js"></script>
-    <script src="{{url_for('home_page')}}static/js/main.js"></script>
+    <script src="{{request.state.base_url}}static/js/htmx-2.0.4.js"></script>
+    <script src="{{request.state.base_url}}static/js/main.js"></script>
     {% endblock %}
 </head>
 
