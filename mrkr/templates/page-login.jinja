@@ -2,7 +2,7 @@
 
 {% block main %}
 <div class="login">
-    <form id="login-form" method="POST" action="{{url_for('login')}}">
+    <form id="login-form" method="POST" action="{{url_path_for('login')}}">
         <h1>MRKR</h1>
         {% if flash %}
         <div class="flash">{{ flash.user_message }}</div>
@@ -25,9 +25,10 @@
 
         <span>
             Don't have an account yet?
-            <a class="primary" href="{{url_for('signup_page')}}" hx-get="{{url_for('signup_page')}}" hx-trigger="click"
-                hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#login-form" hx-select="#signup-form"
-                hx-push-url="true" hx-indicator="#login-form" hx-request='{"timeout": {{config.timeout}}}'>Sign
+            <a class="primary" href="{{url_path_for('signup_page')}}" hx-get="{{url_path_for('signup_page')}}"
+                hx-trigger="click" hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#login-form"
+                hx-select="#signup-form" hx-push-url="true" hx-indicator="#login-form"
+                hx-request='{"timeout": {{config.timeout}}}'>Sign
                 up!</a>
             </a>
         </span>

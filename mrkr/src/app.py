@@ -219,6 +219,7 @@ async def login_page(
         request=session.request,
         name="page-login.jinja",
         context={
+            "url_path_for": url_path_for,
             "config": config.htmx_config,
             "flash": await session.pop_flash_message()
         },
