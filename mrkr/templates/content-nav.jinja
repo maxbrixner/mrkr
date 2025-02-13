@@ -1,22 +1,23 @@
 <div class="header">
     <h1>MRKR</h1>
     <button aria-label="Expand Navigation" id="toggle-nav-button">
-        <img src="/static/img/chevron-forward-outline.svg" alt="Expand Navigation Icon" draggable="false">
+        <img src="{{url_path_for('home_page')}}static/img/chevron-forward-outline.svg" alt="Expand Navigation Icon"
+            draggable="false">
     </button>
 </div>
 <button aria-label="Home" hx-get="{{url_for('projects_page')}}" hx-trigger="click"
     hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main" hx-push-url="true"
     hx-indicator="#main" hx-request='{"timeout": {{config.timeout}}}'>
-    <img src="/static/img/home-outline.svg" alt="Home Icon" draggable="false">
+    <img src="{{url_path_for('home_page')}}static/img/home-outline.svg" alt="Home Icon" draggable="false">
     <span>Home</span>
 </button>
 <button aria-label="Settings">
-    <img src="/static/img/settings-outline.svg" alt="Settings Icon" draggable="false">
+    <img src="{{url_path_for('home_page')}}static/img/settings-outline.svg" alt="Settings Icon" draggable="false">
     <span>Settings</span>
 </button>
 <button aria-label="Logout" hx-post="{{url_for('logout')}}" hx-trigger="click"
     hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-target="body" hx-push-url="true" hx-indicator="body"
     hx-request='{"timeout": {{config.timeout}}}'>
-    <img src="/static/img/log-out-outline.svg" alt="Logout Icon" draggable="false">
+    <img src="{{url_path_for('home_page')}}static/img/log-out-outline.svg" alt="Logout Icon" draggable="false">
     <span>Logout</span>
 </button>
