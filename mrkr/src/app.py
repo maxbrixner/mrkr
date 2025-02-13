@@ -50,9 +50,10 @@ def url_path_for(name: str) -> str:
     """
     Return the URL path for a named route.
     """
+    base_url = os.environ.get("BASE_URL")
     if os.environ.get("BASE_URL"):
-        return os.environ.get("BASE_URL").rstrip('/') + url_path_for(name)
-    return url_path_for(name)
+        return base_url.rstrip('/') + app.url_path_for(name)
+    return app.url_path_for(name)
 
 # ---------------------------------------------------------------------------- #
 
