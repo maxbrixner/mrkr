@@ -436,7 +436,7 @@ class SessionManager():
         """
         Close the database session.
         """
-        if self._database_session:
+        if hasattr(self, "_database_session") and self._database_session:
             self._database_session.close()
         self.logger.debug("Database session closed.")
 
