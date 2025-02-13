@@ -342,6 +342,7 @@ async def projects_page(
         request=session.request,
         name="page-projects.jinja",
         context={
+            "url_path_for": url_path_for,
             "config": config.htmx_config,
             "projects": projects,
         }
