@@ -46,6 +46,17 @@ AuthHttpSessionDep = Annotated[
 # ---------------------------------------------------------------------------- #
 
 
+def url_path_for(name: str) -> str:
+    """
+    Return the URL path for a named route.
+    """
+    if os.environ.get("BASE_URL"):
+        return os.environ.get("BASE_URL").rstrip('/') + app.url_path_for(name)
+    return app.url_path_for(name)
+
+# ---------------------------------------------------------------------------- #
+
+
 @app.middleware("http")
 async def add_process_time_header(
     request: Request,
@@ -127,7 +138,7 @@ async def http_exception_handler(
     """
     if isinstance(exception, HTTPException) and exception.status_code == 401:
         return RedirectResponse(
-            url=app.url_path_for("login_page") + "?unauthorized_redirect=true",
+            url=url_path_for("login_page") + "?unauthorized_redirect=true",
             # this is important to change from post to get
             # on invalid login attempt
             status_code=302
@@ -176,12 +187,12 @@ async def home_page(
     """
     if await session.is_authenticated():
         return RedirectResponse(
-            url=app.url_path_for("projects_page"),
+            url=url_path_for("projects_page"),
             status_code=303
         )
     else:
         return RedirectResponse(
-            url=app.url_path_for("login_page"),
+            url=url_path_for("login_page"),
             status_code=303
         )
 
