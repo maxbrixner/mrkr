@@ -8,20 +8,20 @@
 <div class="tasks-layout">
     <div class="page-toolbar">
         <div>
-            <button class="surface" aria-label="Back to Projects" hx-get="{{url_for('projects_page')}}"
+            <button class="surface" aria-label="Back to Projects" hx-get="{{url_path_for('projects_page')}}"
                 hx-trigger="click" hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main"
                 hx-push-url="true" hx-indicator="#main" hx-request='{"timeout": {{config.timeout}}}'><img
-                    src="/static/img/arrow-back-outline.svg"></button>
-            <button class="surface" hx-get="{{url_for('project_page')}}?id={{project.id}}" hx-trigger="click"
+                    src="{{url_path_for('home_page')}}static/img/arrow-back-outline.svg"></button>
+            <button class="surface" hx-get="{{url_path_for('project_page')}}?id={{project.id}}" hx-trigger="click"
                 hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#tasks-surface" hx-select="#tasks-surface"
                 hx-request='{"timeout": {{config.timeout}}}' hx-indicator="#tasks-surface"><img
-                    src="/static/img/reload-outline.svg"></button>
+                    src="{{url_path_for('home_page')}}static/img/reload-outline.svg"></button>
         </div>
         <div>
             <h1>{{project.name}}</h1>
         </div>
         <div class="toolbar-buttons">
-            <button class="primary" hx-post="{{url_for('scan_project')}}?id={{project.id}}" hx-trigger="click"
+            <button class="primary" hx-post="{{url_path_for('scan_project')}}?id={{project.id}}" hx-trigger="click"
                 hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#tasks-surface" hx-select="#tasks-surface"
                 hx-indicator="#tasks-surface" hx-request='{"timeout": {{config.timeout}}}'>Queue Scan</button>
         </div>
@@ -52,12 +52,14 @@
             </div>
             <div class="task-options">
                 <button class="image small" aria-label="Edit Task {{task.name}}"><img
-                        src="/static/img/create-outline.svg" alt="Edit Icon" draggable="false"></button>
+                        src="{{url_path_for('home_page')}}static/img/create-outline.svg" alt="Edit Icon"
+                        draggable="false"></button>
                 <button class="image small" aria-label="View task {{task.name}}"
-                    hx-get="{{url_for('task_page')}}?id={{task.id}}" hx-trigger="click"
+                    hx-get="{{url_path_for('task_page')}}?id={{task.id}}" hx-trigger="click"
                     hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main"
                     hx-push-url="true" hx-indicator="#main" hx-request='{"timeout": {{config.timeout}}}'>
-                    <img alt="View Task Icon" src="/static/img/arrow-forward-outline.svg" draggable="false">
+                    <img alt="View Task Icon" src="{{url_path_for('home_page')}}static/img/arrow-forward-outline.svg"
+                        draggable="false">
                 </button>
             </div>
         </div>

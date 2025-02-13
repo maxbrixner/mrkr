@@ -10,7 +10,8 @@
         <div><button class="surface" hx-get="{{url_path_for('projects_page')}}" hx-trigger="click"
                 hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#projects-surface"
                 hx-select="#projects-surface" hx-request='{"timeout": {{config.timeout}}}'
-                hx-indicator="#projects-surface"><img src="/static/img/reload-outline.svg"></button></div>
+                hx-indicator="#projects-surface"><img
+                    src="{{url_path_for('home_page')}}static/img/reload-outline.svg"></button></div>
         <div></div>
         <div class="toolbar-buttons">
             <button class="primary">New Project</button>

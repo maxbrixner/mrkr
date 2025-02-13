@@ -371,6 +371,7 @@ async def project_page(
         request=session.request,
         name="page-project.jinja",
         context={
+            "url_path_for": url_path_for,
             "config": config.htmx_config,
             "project": project,
             "scannable": await manager.project_is_scannable(
