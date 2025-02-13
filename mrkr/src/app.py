@@ -51,8 +51,8 @@ def url_path_for(name: str) -> str:
     Return the URL path for a named route.
     """
     if os.environ.get("BASE_URL"):
-        return os.environ.get("BASE_URL").rstrip('/') + app.url_path_for(name)
-    return app.url_path_for(name)
+        return os.environ.get("BASE_URL").rstrip('/') + url_path_for(name)
+    return url_path_for(name)
 
 # ---------------------------------------------------------------------------- #
 
@@ -166,7 +166,7 @@ async def http_exception_handler(
         request=request,
         name="page-error.jinja",
         context={
-            "projects_url": app.url_path_for("projects_page"),
+            "projects_url": url_path_for("projects_page"),
             "status_code": status_code,
             "error_message": error_message
         },
@@ -210,7 +210,7 @@ async def login_page(
     Display the login page.
     """
     if unauthorized_redirect:
-        headers = {"HX-Redirect": app.url_path_for("login_page")}
+        headers = {"HX-Redirect": url_path_for("login_page")}
     else:
         headers = {}
 
@@ -246,7 +246,7 @@ async def login(
     )
 
     response = RedirectResponse(
-        url=app.url_path_for("projects_page"),
+        url=url_path_for("projects_page"),
         status_code=303
     )
 
@@ -267,7 +267,7 @@ async def logout(
     await session.logout()
 
     response = RedirectResponse(
-        url=app.url_path_for("login_page"),
+        url=url_path_for("login_page"),
         status_code=303
     )
 
@@ -316,7 +316,7 @@ async def signup(
     )
 
     response = RedirectResponse(
-        url=app.url_path_for("login_page"),
+        url=url_path_for("login_page"),
         status_code=303
     )
 
