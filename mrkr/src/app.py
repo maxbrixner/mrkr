@@ -455,6 +455,7 @@ async def task_page(
         request=session.request,
         name="page-task.jinja",
         context={
+            "url_path_for": url_path_for,
             "config": config.htmx_config,
             "task": task,
             "page": page,
