@@ -50,3 +50,18 @@ python -m mrkr insert-demo
 ```
 
 The demo user's email is ``spongebob@bb.com``, his password is ``krabby``.
+
+## Deploy using Posit Connect
+
+First, install rsconnect:
+
+```bash
+source .venv/bin/activate
+pip install rsconnect
+```
+
+Then, create a manifest (if it does not exist):
+
+```bash
+rsconnect write-manifest fastapi --entrypoint mrkr:app .
+```
