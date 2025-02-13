@@ -9,39 +9,39 @@
     <div class="page-toolbar">
         <div>
             <button class="surface" aria-label="Back to Tasks"
-                hx-get="{{url_for('project_page')}}?id={{task.project.id}}" hx-trigger="click"
+                hx-get="{{url_path_for('project_page')}}?id={{task.project.id}}" hx-trigger="click"
                 hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main" hx-push-url="true"
                 hx-indicator="#main" hx-request='{"timeout": {{config.timeout}}}'><img
-                    src="/static/img/arrow-back-outline.svg"></button>
-            <button class="surface" hx-get="{{url_for('task_page')}}?id={{task.id}}" hx-trigger="click"
+                    src="{{url_path_for('home_page')}}static/img/arrow-back-outline.svg"></button>
+            <button class="surface" hx-get="{{url_path_for('task_page')}}?id={{task.id}}" hx-trigger="click"
                 hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#label-surface" hx-select="#label-surface"
                 hx-request='{"timeout": {{config.timeout}}}' hx-indicator="#label-surface"><img
-                    src="/static/img/reload-outline.svg"></button>
+                    src="{{url_path_for('home_page')}}static/img/reload-outline.svg"></button>
             {% if page > 0 %}
             <button class="surface" id="page-back-button"
-                hx-get="{{url_for('task_page')}}?id={{task.id}}&page={{page-1}}" hx-trigger="click"
+                hx-get="{{url_path_for('task_page')}}?id={{task.id}}&page={{page-1}}" hx-trigger="click"
                 hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main"
                 hx-request='{"timeout": {{config.timeout}}}' hx-indicator="#main" hx-push-url="true"><img
-                    src="/static/img/chevron-back-outline.svg"></button>
+                    src="{{url_path_for('home_page')}}static/img/chevron-back-outline.svg"></button>
             {% else %}
             <button class="surface" id="page-back-button" disabled><img
-                    src="/static/img/chevron-back-outline.svg"></button>
+                    src="{{url_path_for('home_page')}}static/img/chevron-back-outline.svg"></button>
             {% endif %}
             {% if page < max_pages-1 %} <button class="surface" id="page-forward-button"
-                hx-get="{{url_for('task_page')}}?id={{task.id}}&page={{page+1}}" hx-trigger="click"
+                hx-get="{{url_path_for('task_page')}}?id={{task.id}}&page={{page+1}}" hx-trigger="click"
                 hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main"
                 hx-request='{"timeout": {{config.timeout}}}' hx-indicator="#main" hx-push-url="true">
-                <img src="/static/img/chevron-forward-outline.svg"></button>
+                <img src="{{url_path_for('home_page')}}static/img/chevron-forward-outline.svg"></button>
                 {% else %}
                 <button class="surface" id="page-forward-button" disabled><img
-                        src="/static/img/chevron-forward-outline.svg"></button>
+                        src="{{url_path_for('home_page')}}static/img/chevron-forward-outline.svg"></button>
                 {% endif %}
         </div>
         <div>
             <h1>{{task.name}}</h1>
         </div>
         <div>
-            <button class="primary" aria-label="Queue OCR" hx-post="{{url_for('run_ocr')}}?id={{task.id}}"
+            <button class="primary" aria-label="Queue OCR" hx-post="{{url_path_for('run_ocr')}}?id={{task.id}}"
                 hx-trigger="click" hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#label-surface"
                 hx-select="#label-surface" hx-indicator="#label-surface"
                 hx-request='{"timeout": {{config.timeout}}}'>Queue
@@ -66,7 +66,7 @@
         </div>
         {% else %}
         <div class="image-container">
-            <img id="label-image" src="{{url_for('task_image')}}?id={{task.id}}&page={{page}}" draggable="false">
+            <img id="label-image" src="{{url_path_for('task_image')}}?id={{task.id}}&page={{page}}" draggable="false">
             </img>
             {% if task.ocr %}
             {% for block in task.ocr.pages[page].blocks %}
@@ -94,7 +94,7 @@
                 data-color="{{labeltype.color}}">{{labeltype.name}}</button>
             {% endfor %}
         </div>
-        <form id="labels-list" class="labels-list" hx-post="{{url_for('save_labels')}}?id={{task.id}}"
+        <form id="labels-list" class="labels-list" hx-post="{{url_path_for('save_labels')}}?id={{task.id}}"
             hx-indicator="#save-labels-span" hx-target="#save-labels-span"
             hx-swap="innerHTML swap:{{config.swap_delay}}ms">
             {% for label in task.labels %}
@@ -106,7 +106,7 @@
                     value="{%for link in label.links %}{{link.block_id}}{%if not loop.last%},{%endif%}{%endfor%}">
                 <input type="text" class="user-content-input" name="user_content" value="{{label.user_content}}">
                 <button type="button" class="delete-label-button" aria-label="Delete Label"><img
-                        src="/static/img/trash-outline.svg"></button>
+                        src="{{url_path_for('home_page')}}static/img/trash-outline.svg"></button>
             </div>
             {% endfor %}
             <input type="hidden" name="csrf_token" value="{{request.state.csrf_token}}">

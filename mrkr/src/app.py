@@ -167,7 +167,7 @@ async def http_exception_handler(
         request=request,
         name="page-error.jinja",
         context={
-            "projects_url": url_path_for("projects_page"),
+            "url_path_for": url_path_for,
             "status_code": status_code,
             "error_message": error_message
         },
@@ -292,6 +292,7 @@ async def signup_page(
         request=session.request,
         name="page-signup.jinja",
         context={
+            "url_path_for": url_path_for,
             "config": config.htmx_config,
         }
     )

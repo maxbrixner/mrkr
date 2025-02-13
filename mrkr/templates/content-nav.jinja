@@ -5,7 +5,7 @@
             draggable="false">
     </button>
 </div>
-<button aria-label="Home" hx-get="{{url_for('projects_page')}}" hx-trigger="click"
+<button aria-label="Home" hx-get="{{url_path_for('projects_page')}}" hx-trigger="click"
     hx-swap="outerHTML swap:{{config.swap_delay}}ms" hx-target="#main" hx-select="#main" hx-push-url="true"
     hx-indicator="#main" hx-request='{"timeout": {{config.timeout}}}'>
     <img src="{{url_path_for('home_page')}}static/img/home-outline.svg" alt="Home Icon" draggable="false">
@@ -15,7 +15,7 @@
     <img src="{{url_path_for('home_page')}}static/img/settings-outline.svg" alt="Settings Icon" draggable="false">
     <span>Settings</span>
 </button>
-<button aria-label="Logout" hx-post="{{url_for('logout')}}" hx-trigger="click"
+<button aria-label="Logout" hx-post="{{url_path_for('logout')}}" hx-trigger="click"
     hx-swap="innerHTML swap:{{config.swap_delay}}ms" hx-target="body" hx-push-url="true" hx-indicator="body"
     hx-request='{"timeout": {{config.timeout}}}'>
     <img src="{{url_path_for('home_page')}}static/img/log-out-outline.svg" alt="Logout Icon" draggable="false">

@@ -1,19 +1,11 @@
 {% extends "base.jinja" %}
 
-{% block header %}
-<header id="header">
-    <a href="{{projects_url}}" class="logo">MRKR</a>
-    <span></span>
-    <span></span>
-</header>
-{% endblock %}
-
 {% block main %}
 <div class="error">
     <div class="error-card">
         <h1>We are terrible sorry, but something went wrong!</h1>
         <p>{{status_code}} &mdash; {{error_message}}</p>
-        <a class="primary" href="{{url_for('projects_page')}}">Return home</a>
+        <a class="primary" href="{{url_path_for('projects_page')}}">Return home</a>
     </div>
 </div>
 {% endblock %}
